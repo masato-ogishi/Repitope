@@ -11,7 +11,7 @@ Installation and loading
 ``` r
 # Install
 if(!require(devtools)) install.packages("devtools")
-devtools::install_github("kassambara/ggpubr")
+devtools::install_github("masato-ogishi/Repitope")
 ```
 
 Distribution
