@@ -2,7 +2,7 @@
 % Please edit documentation in R/mrTPCP.R
 \name{mrTPCP}
 \alias{mrTPCP}
-\title{Calculate repertoire-wide TCR-peptide contact profile (rTPCP) variables}
+\title{Calculate modified repertoire-wide TCR-peptide contact profile (mrTPCP) variables}
 \usage{
 mrTPCP(peptList, repertoire, winds = 4:5, aa.index.id = c("MIYS990106"))
 }
@@ -16,5 +16,5 @@ mrTPCP(peptList, repertoire, winds = 4:5, aa.index.id = c("MIYS990106"))
 \item{aa.index.id}{A character vector of AAIndex names to be used}
 }
 \description{
-Calculate repertoire-wide TCR-peptide contact profile (rTPCP) variables
+Calculate modified repertoire-wide TCR-peptide contact profile (mrTPCP) variables
 }

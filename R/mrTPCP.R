@@ -106,7 +106,7 @@ mrTPCP.fixedWindow <- function(peptList, rept, wind, aa.index.id=c("MIYS990106")
   return(mrtpcp_df)
 }
 
-#' Calculate repertoire-wide TCR-peptide contact profile (rTPCP) variables
+#' Calculate modified repertoire-wide TCR-peptide contact profile (mrTPCP) variables
 #' @param peptList A character vector containing input peptide sequences
 #' @param repertoire A character vector containing input TCR CDR3 sequences
 #' @param winds A vector of the sizes of window
