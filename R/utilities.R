@@ -59,9 +59,10 @@ multiPlot <- function(..., plotlist=NULL, cols=1, layout=NULL) {
 #' @export
 savePDF <- function(graphicObject=ggplot2::last_plot(), outputFileName, width, height,
                     pointsize=12, family="Helvetica", useDingbats=F){
+  windowsFonts(UserDefinedFont=windowsFont(family))
   out <- ifelse(stringr::str_detect(outputFileName, ".pdf$"), outputFileName, paste0(outputFileName, ".pdf"))
   print(graphicObject)
-  grDevices::dev.copy2pdf(file=out, width=width, height=height, pointsize=pointsize, family=family, useDingbats=useDingbats)
+  grDevices::dev.copy2pdf(file=out, width=width, height=height, pointsize=pointsize, family="UserDefinedFont", useDingbats=useDingbats)
 }
 
 #' @title Plot saving utilities
@@ -79,8 +80,9 @@ savePDF <- function(graphicObject=ggplot2::last_plot(), outputFileName, width, h
 #' @export
 saveCurrentGraphicPDF <- function(outputFileName, width, height,
                                   pointsize=12, family="Helvetica", useDingbats=F){
+  windowsFonts(UserDefinedFont=windowsFont(family))
   out <- ifelse(stringr::str_detect(outputFileName, ".pdf$"), outputFileName, paste0(outputFileName, ".pdf"))
-  grDevices::dev.copy2pdf(file=out, width=width, height=height, pointsize=pointsize, family=family, useDingbats=useDingbats)
+  grDevices::dev.copy2pdf(file=out, width=width, height=height, pointsize=pointsize, family="UserDefinedFont", useDingbats=useDingbats)
 }
 
 #' @title Publication-ready ggplot scales
@@ -118,6 +120,8 @@ scale_fill_Publication <- function(...) {
 #' @param base_size The base font size.
 #' @param base_family The base font family.
 #' @import ggplot2
+#' @importFrom grDevices windowsFonts
+#' @importFrom grDevices windowsFont
 #' @importFrom grid gpar
 #' @importFrom grid polylineGrob
 #' @importFrom utils modifyList
@@ -125,6 +129,8 @@ scale_fill_Publication <- function(...) {
 #' @export
 theme_Publication <-
   function(base_size=18, base_family="Helvetica") {
+    # Translation of a device-independent R graphics font family name to a windows font description
+    windowsFonts(UserDefinedFont = windowsFont(base_family))
 
     # The preset ggplot parameters
     .pt <- 1 / 0.352777778
@@ -155,7 +161,7 @@ theme_Publication <-
 
     # A combined set of ggplot theme options
     (
-      theme_foundation(base_size = base_size, base_family = base_family)
+      theme_foundation(base_size = base_size, base_family = UserDefinedFont)
       + theme(
         plot.title = element_text(
           face = "bold",
