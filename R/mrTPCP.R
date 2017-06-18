@@ -1,9 +1,9 @@
 # Perform modified repertoire-wide TCR-peptide contact profile (mrTPCP) analysis
 #' Calculate modified repertoire-wide TCR-peptide contact profile (mrTPCP) variables with a fixed window size
-#' @param peptList A character vector containing input peptide sequences
-#' @param rept A character vector containing input TCR CDR3 sequences
-#' @param wind A size of window
-#' @param aa.index.id A character vector of AAIndex names to be used
+#' @param peptList A character vector containing input peptide sequences.
+#' @param rept A character vector containing input TCR CDR3 sequences. A default is NULL; in this case, a reference CD8 TCR repertoire used in the original paper will be used. Alternatively, users can provide a character vector containing a CDR3 sequence repertoire of interest.
+#' @param wind A size of the window.
+#' @param aa.index.id A character vector of AAIndex names to be used. Can also be NULL or "all"; in those cases, all AAIndex scales will be used.
 #' @importFrom readr read_csv
 #' @importFrom dplyr %>%
 #' @importFrom dplyr filter
@@ -22,27 +22,8 @@
 #' @importFrom tidyr spread
 #' @importFrom tidyr gather
 #' @importFrom magrittr set_colnames
-mrTPCP.fixedWindow <- function(peptList, rept, wind, aa.index.id=c("MIYS990106")){
-  # Import AACP AAIndex matrix
-  AACP.AAIndex.DF <- readr::read_csv(system.file("AACP_AAIndex_Matrix.csv", package="Repitope"), na="") %>%
-    dplyr::filter(AAIndexID %in% aa.index.id) %>%
-    AACP.AAIndex.Matrix.Format()
-  AAPairsList <- colnames(AACP.AAIndex.DF)
-  AACPValues <- setNames(as.vector(as.matrix(AACP.AAIndex.DF)), AAPairsList)
-
-  # Length check
-  if(length(unique(nchar(peptList)))>=2){
-    print("The lengths of the input peptides are not the same!")
-    return(NULL)
-  }
-  pept.length <- nchar(peptList[[1]])
-  n.windows <- pept.length - wind + 1
-  if(n.windows<=1){
-    print("The window size is larger than peptide length!")
-    return(NULL)
-  }
-
-  # Compile TCR CDR3 repertoire into a set of fragments
+mrTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id=c("MIYS990106")){
+  # Functions for string fragmentation
   slidingFragment <- function(seq, wind){
     aa.list <- stringr::str_split(seq, "") %>% unlist()
     len <- nchar(seq)
@@ -52,7 +33,39 @@ mrTPCP.fixedWindow <- function(peptList, rept, wind, aa.index.id=c("MIYS990106")
   slidingFragment.Batch <- function(seqList, wind){
     lapply(seqList, function(s){slidingFragment(s, wind)})
   }
-  rept.frag <- unique(unlist(slidingFragment.Batch(rept[nchar(rept)>wind], wind)))
+
+  # Import AACP AAIndex matrix
+  AACP.AAIndex.DF <- readr::read_csv(system.file("AACP_AAIndex_Matrix.csv", package="Repitope"), na="")
+  if(is.null(aa.index.id)||aa.index.id=="all"){
+    AACP.AAIndex.DF <- AACP.AAIndex.Matrix.Format(AACP.AAIndex.DF)
+  } else {
+    AACP.AAIndex.DF <- AACP.AAIndex.DF %>%
+      dplyr::filter(AAIndexID %in% aa.index.id) %>%
+      AACP.AAIndex.Matrix.Format()
+  }
+  AAPairsList <- colnames(AACP.AAIndex.DF)
+  AACPValues <- setNames(as.vector(as.matrix(AACP.AAIndex.DF)), AAPairsList)
+
+  # Compile TCR repertoire into a set of fragments
+  if(is.null(rept)){
+    rept.seq <- read.delim(system.file("TCRRepertoire_CD8.txt", package="Repitope"), header=T, sep="\t")[["cdr3aa"]] %>%
+      as.character() %>% toupper()
+  } else {
+    rept.seq <- rept %>% as.character() %>% toupper()
+  }
+  rept.frag <- unique(unlist(slidingFragment.Batch(rept.seq[nchar(rept.seq)>wind], wind)))
+
+  # Length check
+  if(length(unique(nchar(peptList)))>=2){
+    print("The lengths of the input peptides are not the same!")
+    return(NULL)
+  }
+  pept.length <- nchar(peptList[[1]])
+  n.windows <- pept.length - wind + 1
+  if(n.windows<=0){
+    print("The window size is larger than the peptide length!")
+    return(NULL)
+  }
 
   # Calculate AACP values at the level of peptide fragments
   AACPByWindow.Fragment <- function(pept.frag, window.id){
@@ -107,18 +120,22 @@ mrTPCP.fixedWindow <- function(peptList, rept, wind, aa.index.id=c("MIYS990106")
 }
 
 #' Calculate modified repertoire-wide TCR-peptide contact profile (mrTPCP) variables
-#' @param peptList A character vector containing input peptide sequences
-#' @param repertoire A character vector containing input TCR CDR3 sequences
-#' @param winds A vector of the sizes of window
-#' @param aa.index.id A character vector of AAIndex names to be used
+#' @param peptList A character vector containing input peptide sequences.
+#' @param repertoire A character vector containing input TCR CDR3 sequences. A default is NULL; in this case, a reference CD8 TCR repertoire used in the original paper will be used. Alternatively, users can provide a character vector containing a CDR3 sequence repertoire of interest.
+#' @param winds A vector of the sizes of window.
+#' @param aa.index.id A character vector of AAIndex names to be used. Can also be NULL or "all"; in those cases, all AAIndex scales will be used.
 #' @importFrom dplyr bind_cols
 #' @importFrom dplyr as_data_frame
 #' @export
-mrTPCP <- function(peptList, repertoire, winds=4:5, aa.index.id=c("MIYS990106")){
+mrTPCP <- function(peptList, repertoire=NULL, winds=4:5, aa.index.id=c("MIYS990106")){
+  # Length check
+  peptList_th <- peptList[nchar(peptList)>=max(winds)]
+
+  # A batch mode
   mrtpcp_df <- data.frame(
-    "Peptide"=peptList,
+    "Peptide"=peptList_th,
     dplyr::bind_cols(
-      lapply(winds, function(windowSize){mrTPCP.fixedWindow(peptList, repertoire, windowSize, aa.index.id)})
+      lapply(winds, function(windowSize){mrTPCP.fixedWindow(peptList_th, repertoire, windowSize, aa.index.id)})
     )
   ) %>% dplyr::as_data_frame()
   return(mrtpcp_df)

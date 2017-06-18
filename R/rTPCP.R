@@ -1,9 +1,9 @@
 # Perform repertoire-wide TCR-peptide contact profile (rTPCP) analysis
 #' Calculate repertoire-wide TCR-peptide contact profile (rTPCP) variables with a fixed window size
-#' @param peptList A character vector containing input peptide sequences
-#' @param rept A character vector containing input TCR CDR3 sequences
-#' @param wind A size of window
-#' @param aa.index.id A character vector of AAIndex names to be used
+#' @param peptList A character vector containing input peptide sequences.
+#' @param rept A character vector containing input TCR CDR3 sequences. A default is NULL; in this case, a reference CD8 TCR repertoire used in the original paper will be used. Alternatively, users can provide a character vector containing a CDR3 sequence repertoire of interest.
+#' @param wind A size of the window.
+#' @param aa.index.id A character vector of AAIndex names to be used. Can also be NULL or "all"; in those cases, all AAIndex scales will be used.
 #' @importFrom readr read_csv
 #' @importFrom dplyr %>%
 #' @importFrom dplyr filter
@@ -21,29 +21,42 @@
 #' @importFrom dplyr select
 #' @importFrom tidyr spread
 #' @importFrom tidyr gather
-rTPCP.fixedWindow <- function(peptList, rept, wind, aa.index.id=c("MIYS990106")){
+rTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id=c("MIYS990106")){
   # Import AACP AAIndex matrix
-  AACP.AAIndex.DF <- readr::read_csv(system.file("AACP_AAIndex_Matrix.csv", package="Repitope"), na="") %>%
-    dplyr::filter(AAIndexID %in% aa.index.id) %>%
-    AACP.AAIndex.Matrix.Format()
+  AACP.AAIndex.DF <- readr::read_csv(system.file("AACP_AAIndex_Matrix.csv", package="Repitope"), na="")
+  if(is.null(aa.index.id)||aa.index.id=="all"){
+    AACP.AAIndex.DF <- AACP.AAIndex.Matrix.Format(AACP.AAIndex.DF)
+  } else {
+    AACP.AAIndex.DF <- AACP.AAIndex.DF %>%
+      dplyr::filter(AAIndexID %in% aa.index.id) %>%
+      AACP.AAIndex.Matrix.Format()
+  }
   AAPairsList <- colnames(AACP.AAIndex.DF)
+
+  # Import TCR repertoire
+  if(is.null(rept)){
+    rept.seq <- read.delim(system.file("TCRRepertoire_CD8.txt", package="Repitope"), header=T, sep="\t")[["cdr3aa"]] %>%
+      as.character() %>% toupper()
+  } else {
+    rept.seq <- rept %>% as.character() %>% toupper()
+  }
 
   # Length check
   peptList_th <- peptList[nchar(peptList)>=wind]
-  rept_th <- rept[nchar(rept)>=wind]
+  rept_th <- rept.seq[nchar(rept.seq)>=wind]
 
   # Generate fragment pairs
-  peptList.id <- paste0("Pept", formatC(1:length(peptList), flag="0", width=(floor(log10(length(peptList)))+1)))
-  rept.id <- paste0("Rept", formatC(1:length(rept), flag="0", width=(floor(log10(length(rept)))+1)))
-  l_max <- max(nchar(peptList), nchar(rept))
-  peptList.2 <- substr(paste0(peptList, paste0(rep("X", l_max), collapse="")), 1, l_max)
-  rept.2 <- substr(paste0(rept, paste0(rep("X", l_max), collapse="")), 1, l_max)
+  peptList.id <- paste0("Pept", formatC(1:length(peptList_th), flag="0", width=(floor(log10(length(peptList_th)))+1)))
+  rept.id <- paste0("Rept", formatC(1:length(rept_th), flag="0", width=(floor(log10(length(rept_th)))+1)))
+  l_max <- max(nchar(peptList_th), nchar(rept_th))
+  peptList.2 <- substr(paste0(peptList_th, paste0(rep("X", l_max), collapse="")), 1, l_max)
+  rept.2 <- substr(paste0(rept_th, paste0(rep("X", l_max), collapse="")), 1, l_max)
   peptList.3 <- t(sapply(seq(1, l_max-wind+1), function(i){str_sub(peptList.2, i, i+wind-1)}))
   rept.3 <- t(sapply(seq(1, l_max-wind+1), function(i){str_sub(rept.2, i, i+wind-1)}))
 
   fragpairs_df <- expand.grid(peptList.3, rept.3) %>%
-    dplyr::mutate(PeptideID=rep(unlist(lapply(peptList.id, function(x){rep(x, l_max-wind+1)})), length(rept)*(l_max-wind+1))) %>%
-    dplyr::mutate(RepertoireID=unlist(lapply(rept.id, function(x){rep(x, length(peptList)*(l_max-wind+1)*(l_max-wind+1))})))
+    dplyr::mutate(PeptideID=rep(unlist(lapply(peptList.id, function(x){rep(x, l_max-wind+1)})), length(rept_th)*(l_max-wind+1))) %>%
+    dplyr::mutate(RepertoireID=unlist(lapply(rept.id, function(x){rep(x, length(peptList_th)*(l_max-wind+1)*(l_max-wind+1))})))
 
   pairs_mat <- t(mapply(paste0, str_split(fragpairs_df$"Var1",""), str_split(fragpairs_df$"Var2","")))
   pairs_mat[str_detect(pairs_mat, "X")] <- NA
@@ -95,15 +108,19 @@ rTPCP.fixedWindow <- function(peptList, rept, wind, aa.index.id=c("MIYS990106"))
 #' @param peptList A character vector containing input peptide sequences
 #' @param repertoire A character vector containing input TCR CDR3 sequences
 #' @param winds A vector of the sizes of window
-#' @param aa.index.id A character vector of AAIndex names to be used
+#' @param aa.index.id A character vector of AAIndex names to be used. Can also be NULL or "all", and all AAIndex scales will be used.
 #' @importFrom dplyr bind_cols
 #' @importFrom dplyr as_data_frame
 #' @export
-rTPCP <- function(peptList, repertoire, winds=4:5, aa.index.id=c("MIYS990106")){
+rTPCP <- function(peptList, repertoire=NULL, winds=4:5, aa.index.id=c("MIYS990106")){
+  # Length check
+  peptList_th <- peptList[nchar(peptList)>=max(winds)]
+
+  # A batch mode
   rtpcp_df <- data.frame(
-    "Peptide"=peptList,
+    "Peptide"=peptList_th,
     dplyr::bind_cols(
-      lapply(winds, function(windowSize){rTPCP.fixedWindow(peptList, repertoire, windowSize, aa.index.id)})
+      lapply(winds, function(windowSize){rTPCP.fixedWindow(peptList_th, repertoire, windowSize, aa.index.id)})
     )
   ) %>% dplyr::as_data_frame()
   return(rtpcp_df)

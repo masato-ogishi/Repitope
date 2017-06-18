@@ -4,16 +4,17 @@
 \alias{rTPCP.fixedWindow}
 \title{Calculate repertoire-wide TCR-peptide contact profile (rTPCP) variables with a fixed window size}
 \usage{
-rTPCP.fixedWindow(peptList, rept, wind, aa.index.id = c("MIYS990106"))
+rTPCP.fixedWindow(peptList, rept = NULL, wind = 4,
+  aa.index.id = c("MIYS990106"))
 }
 \arguments{
-\item{peptList}{A character vector containing input peptide sequences}
+\item{peptList}{A character vector containing input peptide sequences.}
 
-\item{rept}{A character vector containing input TCR CDR3 sequences}
+\item{rept}{A character vector containing input TCR CDR3 sequences. A default is NULL; in this case, a reference CD8 TCR repertoire used in the original paper will be used. Alternatively, users can provide a character vector containing a CDR3 sequence repertoire of interest.}
 
-\item{wind}{A size of window}
+\item{wind}{A size of the window.}
 
-\item{aa.index.id}{A character vector of AAIndex names to be used}
+\item{aa.index.id}{A character vector of AAIndex names to be used. Can also be NULL or "all"; in those cases, all AAIndex scales will be used.}
 }
 \description{
 Calculate repertoire-wide TCR-peptide contact profile (rTPCP) variables with a fixed window size

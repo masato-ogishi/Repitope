@@ -4,16 +4,17 @@
 \alias{mrTPCP}
 \title{Calculate modified repertoire-wide TCR-peptide contact profile (mrTPCP) variables}
 \usage{
-mrTPCP(peptList, repertoire, winds = 4:5, aa.index.id = c("MIYS990106"))
+mrTPCP(peptList, repertoire = NULL, winds = 4:5,
+  aa.index.id = c("MIYS990106"))
 }
 \arguments{
-\item{peptList}{A character vector containing input peptide sequences}
+\item{peptList}{A character vector containing input peptide sequences.}
 
-\item{repertoire}{A character vector containing input TCR CDR3 sequences}
+\item{repertoire}{A character vector containing input TCR CDR3 sequences. A default is NULL; in this case, a reference CD8 TCR repertoire used in the original paper will be used. Alternatively, users can provide a character vector containing a CDR3 sequence repertoire of interest.}
 
-\item{winds}{A vector of the sizes of window}
+\item{winds}{A vector of the sizes of window.}
 
-\item{aa.index.id}{A character vector of AAIndex names to be used}
+\item{aa.index.id}{A character vector of AAIndex names to be used. Can also be NULL or "all"; in those cases, all AAIndex scales will be used.}
 }
 \description{
 Calculate modified repertoire-wide TCR-peptide contact profile (mrTPCP) variables

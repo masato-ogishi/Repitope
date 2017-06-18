@@ -4,7 +4,8 @@
 \alias{rTPCP}
 \title{Calculate repertoire-wide TCR-peptide contact profile (rTPCP) variables}
 \usage{
-rTPCP(peptList, repertoire, winds = 4:5, aa.index.id = c("MIYS990106"))
+rTPCP(peptList, repertoire = NULL, winds = 4:5,
+  aa.index.id = c("MIYS990106"))
 }
 \arguments{
 \item{peptList}{A character vector containing input peptide sequences}
@@ -13,7 +14,7 @@ rTPCP(peptList, repertoire, winds = 4:5, aa.index.id = c("MIYS990106"))
 
 \item{winds}{A vector of the sizes of window}
 
-\item{aa.index.id}{A character vector of AAIndex names to be used}
+\item{aa.index.id}{A character vector of AAIndex names to be used. Can also be NULL or "all", and all AAIndex scales will be used.}
 }
 \description{
 Calculate repertoire-wide TCR-peptide contact profile (rTPCP) variables
