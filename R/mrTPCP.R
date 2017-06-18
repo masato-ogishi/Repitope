@@ -16,7 +16,7 @@
 #' @importFrom tidyr drop_na
 #' @importFrom dplyr as_data_frame
 #' @importFrom dplyr group_by
-#' @importFrom dplyr summarise_each
+#' @importFrom dplyr summarise_at
 #' @importFrom dplyr ungroup
 #' @importFrom dplyr select
 #' @importFrom tidyr spread
@@ -89,23 +89,24 @@ mrTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id=c("MIYS9
     Q70 <- function(v){quantile(v, probs=0.7, names=F)}
     Q80 <- function(v){quantile(v, probs=0.8, names=F)}
     Q90 <- function(v){quantile(v, probs=0.9, names=F)}
-    mrtpcp_df <- mapply(AACPByWindow.Fragment, slidingFragment(pept, wind), paste0("Wind", 1:n.windows), SIMPLIFY=F) %>%
-      dplyr::bind_rows()
+    mrtpcp_df <- suppressWarnings(dplyr::bind_rows(
+      mapply(AACPByWindow.Fragment, slidingFragment(pept, wind), paste0("Wind", 1:n.windows), SIMPLIFY=F)
+    ))
     mrtpcp_df.ByTCRFragment <- mrtpcp_df %>%
       dplyr::group_by(TCRFragmentID) %>%
-      dplyr::summarise_each(funs(min, max, median), AACPValue) %>%
+      dplyr::summarise_at(vars(AACPValue), funs(min, max, median)) %>%
       magrittr::set_colnames(c("TCRFragmentID", paste0("AACPByTCRFragment_", c("min", "max", "median")))) %>%
       dplyr::ungroup() %>%
       tidyr::gather(Variable, AACPValue, -TCRFragmentID) %>%
       dplyr::group_by(Variable) %>%
-      dplyr::summarise_each(funs(min, max, median, Q10, Q20, Q30, Q40, Q60, Q70, Q80, Q90), AACPValue) %>%
+      dplyr::summarise_at(vars(AACPValue), funs(min, max, median, Q10, Q20, Q30, Q40, Q60, Q70, Q80, Q90)) %>%
       tidyr::gather(Stat, AACPValue, -Variable) %>%
       dplyr::mutate(Variable=paste0(Variable, "_", Stat)) %>%
       dplyr::select(Variable, AACPValue) %>%
       tidyr::spread(Variable, AACPValue)
     mrtpcp_df.ByWindow <- mrtpcp_df %>%
       dplyr::group_by(WindowID) %>%
-      dplyr::summarise_each(funs(min, max, median, Q10, Q20, Q30, Q40, Q60, Q70, Q80, Q90), AACPValue) %>%
+      dplyr::summarise_at(vars(AACPValue), funs(min, max, median, Q10, Q20, Q30, Q40, Q60, Q70, Q80, Q90)) %>%
       tidyr::gather(Variable, AACPValue, -WindowID) %>%
       dplyr::mutate(Variable=paste0(WindowID, "_", Variable)) %>%
       dplyr::select(Variable, AACPValue) %>%

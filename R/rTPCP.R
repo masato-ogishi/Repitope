@@ -16,7 +16,7 @@
 #' @importFrom tidyr drop_na
 #' @importFrom dplyr as_data_frame
 #' @importFrom dplyr group_by
-#' @importFrom dplyr summarise_each
+#' @importFrom dplyr summarise_at
 #' @importFrom dplyr ungroup
 #' @importFrom dplyr select
 #' @importFrom tidyr spread
@@ -51,15 +51,15 @@ rTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id=c("MIYS99
   l_max <- max(nchar(peptList_th), nchar(rept_th))
   peptList.2 <- substr(paste0(peptList_th, paste0(rep("X", l_max), collapse="")), 1, l_max)
   rept.2 <- substr(paste0(rept_th, paste0(rep("X", l_max), collapse="")), 1, l_max)
-  peptList.3 <- t(sapply(seq(1, l_max-wind+1), function(i){str_sub(peptList.2, i, i+wind-1)}))
-  rept.3 <- t(sapply(seq(1, l_max-wind+1), function(i){str_sub(rept.2, i, i+wind-1)}))
+  peptList.3 <- t(sapply(seq(1, l_max-wind+1), function(i){stringr::str_sub(peptList.2, i, i+wind-1)}))
+  rept.3 <- t(sapply(seq(1, l_max-wind+1), function(i){stringr::str_sub(rept.2, i, i+wind-1)}))
 
   fragpairs_df <- expand.grid(peptList.3, rept.3) %>%
     dplyr::mutate(PeptideID=rep(unlist(lapply(peptList.id, function(x){rep(x, l_max-wind+1)})), length(rept_th)*(l_max-wind+1))) %>%
     dplyr::mutate(RepertoireID=unlist(lapply(rept.id, function(x){rep(x, length(peptList_th)*(l_max-wind+1)*(l_max-wind+1))})))
 
-  pairs_mat <- t(mapply(paste0, str_split(fragpairs_df$"Var1",""), str_split(fragpairs_df$"Var2","")))
-  pairs_mat[str_detect(pairs_mat, "X")] <- NA
+  pairs_mat <- t(mapply(paste0, stringr::str_split(fragpairs_df$"Var1",""), stringr::str_split(fragpairs_df$"Var2","")))
+  pairs_mat[stringr::str_detect(pairs_mat, "X")] <- NA
 
   # Calculate summed contact potentials for each of the fragment pairs
   fragpairs_df <- lapply(
@@ -89,10 +89,10 @@ rTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id=c("MIYS99
 
   rtpcp_df <- fragpairs_df %>%
     dplyr::group_by(PeptideID, RepertoireID, AAIndexID) %>%
-    dplyr::summarise_each(funs(mean, median, max, secondMax, deltaMax, min, secondMin, deltaMin, rangeDiff), Fragment.AACP.Sum) %>%
+    dplyr::summarise_at(vars(Fragment.AACP.Sum), funs(mean, median, max, secondMax, deltaMax, min, secondMin, deltaMin, rangeDiff)) %>%
     dplyr::ungroup() %>%
     dplyr::group_by(PeptideID, AAIndexID) %>%
-    dplyr::summarise_each(funs(mean, median, max, min), mean, median, max, secondMax, deltaMax, min, secondMin, deltaMin, rangeDiff) %>%
+    dplyr::summarise_at(vars(mean, median, max, secondMax, deltaMax, min, secondMin, deltaMin, rangeDiff), funs(mean, median, max, min)) %>%
     dplyr::ungroup() %>%
     tidyr::gather(Variable, Value, -PeptideID, -AAIndexID) %>%
     dplyr::mutate(Variable=paste0(AAIndexID,"_",Variable)) %>%
