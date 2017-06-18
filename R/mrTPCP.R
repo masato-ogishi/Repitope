@@ -1,9 +1,9 @@
-# Perform modified repertoire-wide TCR-peptide contact profile (mrTPCP) analysis
-#' Calculate modified repertoire-wide TCR-peptide contact profile (mrTPCP) variables with a fixed window size
+#' @title Modified repertoire-wide TCR-peptide contact profile (mrTPCP) analysis with a fixed window size
+#' @description Modified repertoire-wide TCR-peptide contact profile (mrTPCP) analysis with a fixed window size
 #' @param peptList A character vector containing input peptide sequences.
 #' @param rept A character vector containing input TCR CDR3 sequences. A default is NULL; in this case, a reference CD8 TCR repertoire used in the original paper will be used. Alternatively, users can provide a character vector containing a CDR3 sequence repertoire of interest.
 #' @param wind A size of the window.
-#' @param aa.index.id A character vector of AAIndex names to be used. Can also be NULL or "all"; in those cases, all AAIndex scales will be used.
+#' @param aa.index.id The AAIndex name of the AACP scale to be used. Currently, only one AAIndex name is supported.
 #' @importFrom readr read_csv
 #' @importFrom dplyr %>%
 #' @importFrom dplyr filter
@@ -22,7 +22,9 @@
 #' @importFrom tidyr spread
 #' @importFrom tidyr gather
 #' @importFrom magrittr set_colnames
-mrTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id=c("MIYS990106")){
+#' @keywords internal
+#' @export
+mrTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id="MIYS990106"){
   # Functions for string fragmentation
   slidingFragment <- function(seq, wind){
     aa.list <- stringr::str_split(seq, "") %>% unlist()
@@ -35,14 +37,9 @@ mrTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id=c("MIYS9
   }
 
   # Import AACP AAIndex matrix
-  AACP.AAIndex.DF <- readr::read_csv(system.file("AACP_AAIndex_Matrix.csv", package="Repitope"), na="")
-  if(is.null(aa.index.id)||aa.index.id=="all"){
-    AACP.AAIndex.DF <- AACP.AAIndex.Matrix.Format(AACP.AAIndex.DF)
-  } else {
-    AACP.AAIndex.DF <- AACP.AAIndex.DF %>%
-      dplyr::filter(AAIndexID %in% aa.index.id) %>%
-      AACP.AAIndex.Matrix.Format()
-  }
+  AACP.AAIndex.DF <- readr::read_csv(system.file("AACP_AAIndex_Matrix.csv", package="Repitope"), na="") %>%
+    dplyr::filter(AAIndexID %in% aa.index.id) %>%
+    AACP.AAIndex.Matrix.Format()
   AAPairsList <- colnames(AACP.AAIndex.DF)
   AACPValues <- setNames(as.vector(as.matrix(AACP.AAIndex.DF)), AAPairsList)
 
@@ -120,15 +117,16 @@ mrTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id=c("MIYS9
   return(mrtpcp_df)
 }
 
-#' Calculate modified repertoire-wide TCR-peptide contact profile (mrTPCP) variables
-#' @param peptList A character vector containing input peptide sequences.
+#' @title Modified repertoire-wide TCR-peptide contact profile (mrTPCP) analysis
+#' @description
+#' \code{mrTPCP} returns the modified repertoire-wide TCR-peptide contact profile (mrTPCP) variables.
+#' @param peptList A character vector containing input peptide sequences. Peptides must be of the same length.
 #' @param repertoire A character vector containing input TCR CDR3 sequences. A default is NULL; in this case, a reference CD8 TCR repertoire used in the original paper will be used. Alternatively, users can provide a character vector containing a CDR3 sequence repertoire of interest.
-#' @param winds A vector of the sizes of window.
-#' @param aa.index.id A character vector of AAIndex names to be used. Can also be NULL or "all"; in those cases, all AAIndex scales will be used.
+#' @param winds A vector of the sizes of the window.
+#' @param aa.index.id The AAIndex name of the AACP scale to be used. Currently, only one AAIndex name is supported.
 #' @importFrom dplyr bind_cols
 #' @importFrom dplyr as_data_frame
-#' @export
-mrTPCP <- function(peptList, repertoire=NULL, winds=4:5, aa.index.id=c("MIYS990106")){
+mrTPCP <- function(peptList, repertoire=NULL, winds=4:5, aa.index.id="MIYS990106"){
   # Length check
   peptList_th <- peptList[nchar(peptList)>=max(winds)]
 

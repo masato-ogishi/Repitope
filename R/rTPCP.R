@@ -1,5 +1,5 @@
-# Perform repertoire-wide TCR-peptide contact profile (rTPCP) analysis
-#' Calculate repertoire-wide TCR-peptide contact profile (rTPCP) variables with a fixed window size
+#' @title Repertoire-wide TCR-peptide contact profile (rTPCP) analysis with a fixed window size
+#' @description Repertoire-wide TCR-peptide contact profile (rTPCP) analysis with a fixed window size
 #' @param peptList A character vector containing input peptide sequences.
 #' @param rept A character vector containing input TCR CDR3 sequences. A default is NULL; in this case, a reference CD8 TCR repertoire used in the original paper will be used. Alternatively, users can provide a character vector containing a CDR3 sequence repertoire of interest.
 #' @param wind A size of the window.
@@ -21,7 +21,9 @@
 #' @importFrom dplyr select
 #' @importFrom tidyr spread
 #' @importFrom tidyr gather
-rTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id=c("MIYS990106")){
+#' @keywords internal
+#' @export
+rTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id="MIYS990106"){
   # Import AACP AAIndex matrix
   AACP.AAIndex.DF <- readr::read_csv(system.file("AACP_AAIndex_Matrix.csv", package="Repitope"), na="")
   if(is.null(aa.index.id)||aa.index.id=="all"){
@@ -104,15 +106,17 @@ rTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id=c("MIYS99
   return(rtpcp_df)
 }
 
-#' Calculate repertoire-wide TCR-peptide contact profile (rTPCP) variables
-#' @param peptList A character vector containing input peptide sequences
-#' @param repertoire A character vector containing input TCR CDR3 sequences
-#' @param winds A vector of the sizes of window
+#' @title Repertoire-wide TCR-peptide contact profile (rTPCP) analysis
+#' @description
+#' \code{rTPCP} returns the repertoire-wide TCR-peptide contact profile (rTPCP) variables.
+#' Be aware that this process is memory-consuming and time-consuming. Consider trying \code{mrTPCP} for speed.
+#' @param peptList A character vector containing input peptide sequences.
+#' @param repertoire A character vector containing input TCR CDR3 sequences.
+#' @param winds A vector of the sizes of the window.
 #' @param aa.index.id A character vector of AAIndex names to be used. Can also be NULL or "all", and all AAIndex scales will be used.
 #' @importFrom dplyr bind_cols
 #' @importFrom dplyr as_data_frame
-#' @export
-rTPCP <- function(peptList, repertoire=NULL, winds=4:5, aa.index.id=c("MIYS990106")){
+rTPCP <- function(peptList, repertoire=NULL, winds=4:5, aa.index.id="MIYS990106"){
   # Length check
   peptList_th <- peptList[nchar(peptList)>=max(winds)]
 

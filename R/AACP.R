@@ -1,8 +1,10 @@
-# Amino Acid Pairwise Contact Potential (AACP)
-#' Format AAIndex Amino Acid Pairwise Contact Potential (AACP) matrix
+#' @title Amino Acid Pairwise Contact Potential (AACP)
+#' @description Format AAIndex Amino Acid Pairwise Contact Potential (AACP) matrix
 #' @param aacp.aaindex.matrix AAIndex AACP matrix
 #' @importFrom dplyr select
 #' @importFrom IRanges reverse
+#' @keywords internal
+#' @export
 AACP.AAIndex.Matrix.Format <- function(aacp.aaindex.matrix){
   df <- aacp.aaindex.matrix
   aaindex.names <- df[["AAIndexID"]]

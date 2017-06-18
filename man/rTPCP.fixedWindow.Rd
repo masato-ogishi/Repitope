@@ -2,10 +2,10 @@
 % Please edit documentation in R/rTPCP.R
 \name{rTPCP.fixedWindow}
 \alias{rTPCP.fixedWindow}
-\title{Calculate repertoire-wide TCR-peptide contact profile (rTPCP) variables with a fixed window size}
+\title{Repertoire-wide TCR-peptide contact profile (rTPCP) analysis with a fixed window size}
 \usage{
 rTPCP.fixedWindow(peptList, rept = NULL, wind = 4,
-  aa.index.id = c("MIYS990106"))
+  aa.index.id = "MIYS990106")
 }
 \arguments{
 \item{peptList}{A character vector containing input peptide sequences.}
@@ -17,5 +17,6 @@ rTPCP.fixedWindow(peptList, rept = NULL, wind = 4,
 \item{aa.index.id}{A character vector of AAIndex names to be used. Can also be NULL or "all"; in those cases, all AAIndex scales will be used.}
 }
 \description{
-Calculate repertoire-wide TCR-peptide contact profile (rTPCP) variables with a fixed window size
+Repertoire-wide TCR-peptide contact profile (rTPCP) analysis with a fixed window size
 }
+\keyword{internal}

@@ -20,3 +20,5 @@ Imports: tidyverse (>= 1.1.1),
     rlang (>= 0.1.1),
     magrittr (>= 1.5),
     IRanges (>= 2.8.2)
+Suggests: classifierplots (>= 1.3.3),
+    caret (>= 6.0-76)

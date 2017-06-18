@@ -2,20 +2,21 @@
 % Please edit documentation in R/rTPCP.R
 \name{rTPCP}
 \alias{rTPCP}
-\title{Calculate repertoire-wide TCR-peptide contact profile (rTPCP) variables}
+\title{Repertoire-wide TCR-peptide contact profile (rTPCP) analysis}
 \usage{
 rTPCP(peptList, repertoire = NULL, winds = 4:5,
-  aa.index.id = c("MIYS990106"))
+  aa.index.id = "MIYS990106")
 }
 \arguments{
-\item{peptList}{A character vector containing input peptide sequences}
+\item{peptList}{A character vector containing input peptide sequences.}
 
-\item{repertoire}{A character vector containing input TCR CDR3 sequences}
+\item{repertoire}{A character vector containing input TCR CDR3 sequences.}
 
-\item{winds}{A vector of the sizes of window}
+\item{winds}{A vector of the sizes of the window.}
 
 \item{aa.index.id}{A character vector of AAIndex names to be used. Can also be NULL or "all", and all AAIndex scales will be used.}
 }
 \description{
-Calculate repertoire-wide TCR-peptide contact profile (rTPCP) variables
+\code{rTPCP} returns the repertoire-wide TCR-peptide contact profile (rTPCP) variables.
+Be aware that this process is memory-consuming and time-consuming. Consider trying \code{mrTPCP} for speed.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/AACP.R
 \name{AACP.AAIndex.Matrix.Format}
 \alias{AACP.AAIndex.Matrix.Format}
-\title{Format AAIndex Amino Acid Pairwise Contact Potential (AACP) matrix}
+\title{Amino Acid Pairwise Contact Potential (AACP)}
 \usage{
 AACP.AAIndex.Matrix.Format(aacp.aaindex.matrix)
 }
@@ -12,3 +12,4 @@ AACP.AAIndex.Matrix.Format(aacp.aaindex.matrix)
 \description{
 Format AAIndex Amino Acid Pairwise Contact Potential (AACP) matrix
 }
+\keyword{internal}
