@@ -22,8 +22,6 @@
 #' @importFrom tidyr spread
 #' @importFrom tidyr gather
 #' @importFrom magrittr set_colnames
-#' @keywords internal
-#' @export
 mrTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id="MIYS990106"){
   # Functions for string fragmentation
   slidingFragment <- function(seq, wind){
@@ -126,6 +124,7 @@ mrTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id="MIYS990
 #' @param aa.index.id The AAIndex name of the AACP scale to be used. Currently, only one AAIndex name is supported.
 #' @importFrom dplyr bind_cols
 #' @importFrom dplyr as_data_frame
+#' @export
 mrTPCP <- function(peptList, repertoire=NULL, winds=4:5, aa.index.id="MIYS990106"){
   # Length check
   peptList_th <- peptList[nchar(peptList)>=max(winds)]

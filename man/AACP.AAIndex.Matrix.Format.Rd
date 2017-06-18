@@ -12,4 +12,3 @@ AACP.AAIndex.Matrix.Format(aacp.aaindex.matrix)
 \description{
 Format AAIndex Amino Acid Pairwise Contact Potential (AACP) matrix
 }
-\keyword{internal}

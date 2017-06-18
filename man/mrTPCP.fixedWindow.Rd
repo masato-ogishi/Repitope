@@ -19,4 +19,3 @@ mrTPCP.fixedWindow(peptList, rept = NULL, wind = 4,
 \description{
 Modified repertoire-wide TCR-peptide contact profile (mrTPCP) analysis with a fixed window size
 }
-\keyword{internal}

@@ -21,8 +21,6 @@
 #' @importFrom dplyr select
 #' @importFrom tidyr spread
 #' @importFrom tidyr gather
-#' @keywords internal
-#' @export
 rTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id="MIYS990106"){
   # Import AACP AAIndex matrix
   AACP.AAIndex.DF <- readr::read_csv(system.file("AACP_AAIndex_Matrix.csv", package="Repitope"), na="")
@@ -116,6 +114,7 @@ rTPCP.fixedWindow <- function(peptList, rept=NULL, wind=4, aa.index.id="MIYS9901
 #' @param aa.index.id A character vector of AAIndex names to be used. Can also be NULL or "all", and all AAIndex scales will be used.
 #' @importFrom dplyr bind_cols
 #' @importFrom dplyr as_data_frame
+#' @export
 rTPCP <- function(peptList, repertoire=NULL, winds=4:5, aa.index.id="MIYS990106"){
   # Length check
   peptList_th <- peptList[nchar(peptList)>=max(winds)]

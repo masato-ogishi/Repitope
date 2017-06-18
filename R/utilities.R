@@ -5,6 +5,7 @@
 #' @importFrom stringr str_replace_all
 #' @importFrom magrittr set_colnames
 #' @importFrom readr read_csv
+#' @export
 read_csv_checkColumnNames <- function(fileName){
   readr::read_csv(fileName) %>%
     (function(d){magrittr::set_colnames(d, stringr::str_replace_all(colnames(d), " ", "."))})
@@ -19,6 +20,7 @@ read_csv_checkColumnNames <- function(fileName){
 #' @importFrom grid grid.newpage
 #' @importFrom grid pushViewport
 #' @importFrom grid viewport
+#' @export
 multiPlot <- function(..., plotlist=NULL, cols=1, layout=NULL) {
   plots <- c(list(...), plotlist)
   numPlots = length(plots)
@@ -54,6 +56,7 @@ multiPlot <- function(..., plotlist=NULL, cols=1, layout=NULL) {
 #' @importFrom ggplot2 last_plot
 #' @importFrom stringr str_detect
 #' @importFrom grDevices dev.copy2pdf
+#' @export
 savePDF <- function(graphicObject=ggplot2::last_plot(), outputFileName, width, height,
                     pointsize=12, family="Helvetica", useDingbats=F){
   out <- ifelse(stringr::str_detect(outputFileName, ".pdf$"), outputFileName, paste0(outputFileName, ".pdf"))
@@ -73,6 +76,7 @@ savePDF <- function(graphicObject=ggplot2::last_plot(), outputFileName, width, h
 #' @importFrom ggplot2 last_plot
 #' @importFrom stringr str_detect
 #' @importFrom grDevices dev.copy2pdf
+#' @export
 saveCurrentGraphicPDF <- function(outputFileName, width, height,
                                   pointsize=12, family="Helvetica", useDingbats=F){
   out <- ifelse(stringr::str_detect(outputFileName, ".pdf$"), outputFileName, paste0(outputFileName, ".pdf"))
@@ -84,6 +88,7 @@ saveCurrentGraphicPDF <- function(outputFileName, width, height,
 #' @param ... No extra arguments are supported.
 #' @importFrom ggplot2 discrete_scale
 #' @importFrom scales manual_pal
+#' @export
 scale_color_Publication <- function(...) {
   discrete_scale("color", "Publication", manual_pal(values=c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
 }
@@ -93,6 +98,7 @@ scale_color_Publication <- function(...) {
 #' @param ... No extra arguments are supported.
 #' @importFrom ggplot2 discrete_scale
 #' @importFrom scales manual_pal
+#' @export
 scale_colour_Publication <- function(...) {
   discrete_scale("colour", "Publication", manual_pal(values=c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
 }
@@ -102,6 +108,7 @@ scale_colour_Publication <- function(...) {
 #' @param ... No extra arguments are supported.
 #' @importFrom ggplot2 discrete_scale
 #' @importFrom scales manual_pal
+#' @export
 scale_fill_Publication <- function(...) {
   discrete_scale("fill", "Publication", manual_pal(values=c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
 }
@@ -115,6 +122,7 @@ scale_fill_Publication <- function(...) {
 #' @importFrom grid polylineGrob
 #' @importFrom utils modifyList
 #' @importFrom ggthemes theme_foundation
+#' @export
 theme_Publication <-
   function(base_size=18, base_family="Helvetica") {
 

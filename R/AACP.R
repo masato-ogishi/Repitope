@@ -3,7 +3,6 @@
 #' @param aacp.aaindex.matrix AAIndex AACP matrix
 #' @importFrom dplyr select
 #' @importFrom IRanges reverse
-#' @keywords internal
 #' @export
 AACP.AAIndex.Matrix.Format <- function(aacp.aaindex.matrix){
   df <- aacp.aaindex.matrix

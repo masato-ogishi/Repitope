@@ -19,4 +19,3 @@ rTPCP.fixedWindow(peptList, rept = NULL, wind = 4,
 \description{
 Repertoire-wide TCR-peptide contact profile (rTPCP) analysis with a fixed window size
 }
-\keyword{internal}
