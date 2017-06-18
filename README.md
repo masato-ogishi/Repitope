@@ -41,7 +41,6 @@ Usage
 # Setting up the working environment
 set.seed(12345)
 library(tidyverse)
-library(ggsci)
 library(caret)
 
 # Enable parallel computing
