@@ -16,7 +16,7 @@ saveCurrentGraphicPDF(outputFileName, width, height, pointsize = 12,
 
 \item{pointsize}{A pointsize}
 
-\item{family}{A font family}
+\item{family}{A font family, which is one of the followings: "AvantGarde", "Bookman", "Courier", "Helvetica", "Helvetica-Narrow", "NewCenturySchoolbook", "Palatino" or "Times".}
 
 \item{useDingbats}{Logical indicating whether points shuold be replaced with the Dingbat font.}
 }

@@ -51,7 +51,7 @@ multiPlot <- function(..., plotlist=NULL, cols=1, layout=NULL) {
 #' @param width A plot width
 #' @param height A plot height
 #' @param pointsize A pointsize
-#' @param family A font family
+#' @param family A font family, which is one of the followings: "AvantGarde", "Bookman", "Courier", "Helvetica", "Helvetica-Narrow", "NewCenturySchoolbook", "Palatino" or "Times".
 #' @param useDingbats Logical indicating whether points shuold be replaced with the Dingbat font.
 #' @importFrom ggplot2 last_plot
 #' @importFrom stringr str_detect
@@ -59,10 +59,9 @@ multiPlot <- function(..., plotlist=NULL, cols=1, layout=NULL) {
 #' @export
 savePDF <- function(graphicObject=ggplot2::last_plot(), outputFileName, width, height,
                     pointsize=12, family="Helvetica", useDingbats=F){
-  windowsFonts("UserDefinedFont"=windowsFont(family))
   out <- ifelse(stringr::str_detect(outputFileName, ".pdf$"), outputFileName, paste0(outputFileName, ".pdf"))
   print(graphicObject)
-  grDevices::dev.copy2pdf(file=out, width=width, height=height, pointsize=pointsize, family="UserDefinedFont", useDingbats=useDingbats)
+  grDevices::dev.copy2pdf(file=out, width=width, height=height, pointsize=pointsize, family=family, useDingbats=useDingbats)
 }
 
 #' @title Plot saving utilities
@@ -72,7 +71,7 @@ savePDF <- function(graphicObject=ggplot2::last_plot(), outputFileName, width, h
 #' @param width A plot width
 #' @param height A plot height
 #' @param pointsize A pointsize
-#' @param family A font family
+#' @param family A font family, which is one of the followings: "AvantGarde", "Bookman", "Courier", "Helvetica", "Helvetica-Narrow", "NewCenturySchoolbook", "Palatino" or "Times".
 #' @param useDingbats Logical indicating whether points shuold be replaced with the Dingbat font.
 #' @importFrom ggplot2 last_plot
 #' @importFrom stringr str_detect
@@ -80,9 +79,8 @@ savePDF <- function(graphicObject=ggplot2::last_plot(), outputFileName, width, h
 #' @export
 saveCurrentGraphicPDF <- function(outputFileName, width, height,
                                   pointsize=12, family="Helvetica", useDingbats=F){
-  windowsFonts("UserDefinedFont"=windowsFont(family))
   out <- ifelse(stringr::str_detect(outputFileName, ".pdf$"), outputFileName, paste0(outputFileName, ".pdf"))
-  grDevices::dev.copy2pdf(file=out, width=width, height=height, pointsize=pointsize, family="UserDefinedFont", useDingbats=useDingbats)
+  grDevices::dev.copy2pdf(file=out, width=width, height=height, pointsize=pointsize, family=family, useDingbats=useDingbats)
 }
 
 #' @title Publication-ready ggplot scales
