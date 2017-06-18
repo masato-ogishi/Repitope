@@ -4,12 +4,10 @@
 \alias{theme_Publication}
 \title{The publication-ready ggplot theme}
 \usage{
-theme_Publication(base_size = 18, base_family = "Helvetica")
+theme_Publication(base_size = 18)
 }
 \arguments{
 \item{base_size}{The base font size.}
-
-\item{base_family}{The base font family.}
 }
 \description{
 The publication-ready ggplot theme.

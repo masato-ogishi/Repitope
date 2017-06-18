@@ -5,7 +5,7 @@
 \title{Plot saving utilities}
 \usage{
 saveCurrentGraphicPDF(outputFileName, width, height, pointsize = 12,
-  family = "Helvetica", useDingbats = F)
+  useDingbats = F)
 }
 \arguments{
 \item{outputFileName}{The name of the exported PDF file}
@@ -15,8 +15,6 @@ saveCurrentGraphicPDF(outputFileName, width, height, pointsize = 12,
 \item{height}{A plot height}
 
 \item{pointsize}{A pointsize}
-
-\item{family}{A font family, which is one of the followings: "AvantGarde", "Bookman", "Courier", "Helvetica", "Helvetica-Narrow", "NewCenturySchoolbook", "Palatino" or "Times".}
 
 \item{useDingbats}{Logical indicating whether points shuold be replaced with the Dingbat font.}
 }

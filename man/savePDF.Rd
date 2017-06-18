@@ -5,7 +5,7 @@
 \title{Plot saving utilities}
 \usage{
 savePDF(graphicObject = ggplot2::last_plot(), outputFileName, width, height,
-  pointsize = 12, family = "Helvetica", useDingbats = F)
+  pointsize = 12, useDingbats = F)
 }
 \arguments{
 \item{graphicObject}{The plot object to be saved.}
@@ -17,8 +17,6 @@ savePDF(graphicObject = ggplot2::last_plot(), outputFileName, width, height,
 \item{height}{A plot height}
 
 \item{pointsize}{A pointsize}
-
-\item{family}{A font family, which is one of the followings: "AvantGarde", "Bookman", "Courier", "Helvetica", "Helvetica-Narrow", "NewCenturySchoolbook", "Palatino" or "Times".}
 
 \item{useDingbats}{Logical indicating whether points shuold be replaced with the Dingbat font.}
 }
