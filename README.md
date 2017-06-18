@@ -13,18 +13,29 @@ if(!require(devtools)) install.packages("devtools")
 devtools::install_github("masato-ogishi/Repitope")
 ```
 
+-   When you encounter errors, error might be resolved after installing and updating dependent packages.
+
 Loading
 ------------------
 
 ``` r
-# Loading the package
+# Loading the Repitope package
 library(Repitope)
 
-# Datasets
-data(XXX)
+# Datasets included
+data(Chowell)
+data(HCV)
+data(HIV)
+data(WellEstablishedNeoepitopes)
+data(Stronen_Best)
+data(Stronen_All)
+data(Calis)
+data(Rizvi)
+data(vanAllen)
+data(TCGA)
 ```
 
-Predicting immunogenicity
+Usage
 -----------------------------------
 ``` r
 # Calculating rTPCPs for a given set of input peptides
