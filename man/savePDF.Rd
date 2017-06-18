@@ -5,7 +5,8 @@
 \title{Plot saving utilities}
 \usage{
 savePDF(graphicObject = ggplot2::last_plot(), outputFileName, width, height,
-  pointsize = 12, useDingbats = F)
+  pointsize = 12, useDingbats = F,
+  ghostScriptPath = "C:/gs/gs9.16/bin/gswin32c.exe")
 }
 \arguments{
 \item{graphicObject}{The plot object to be saved.}
@@ -19,6 +20,8 @@ savePDF(graphicObject = ggplot2::last_plot(), outputFileName, width, height,
 \item{pointsize}{A pointsize}
 
 \item{useDingbats}{Logical indicating whether points shuold be replaced with the Dingbat font.}
+
+\item{ghostScriptPath}{The file path to the GhostScript.exe file.}
 }
 \description{
 \code{savePDF} saves a plot to a PDF file.

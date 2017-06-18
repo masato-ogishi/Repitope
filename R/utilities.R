@@ -52,16 +52,21 @@ multiPlot <- function(..., plotlist=NULL, cols=1, layout=NULL) {
 #' @param height A plot height
 #' @param pointsize A pointsize
 #' @param useDingbats Logical indicating whether points shuold be replaced with the Dingbat font.
+#' @param ghostScriptPath The file path to the GhostScript.exe file.
 #' @importFrom ggplot2 last_plot
 #' @importFrom stringr str_detect
 #' @importFrom grDevices dev.copy2pdf
+#' @importFrom grDevices embedFonts
 #' @export
 savePDF <- function(graphicObject=ggplot2::last_plot(), outputFileName, width, height,
-                    pointsize=12, useDingbats=F){
+                    pointsize=12, useDingbats=F, ghostScriptPath="C:/gs/gs9.16/bin/gswin32c.exe"){
+  Sys.setenv(R_GSCMD=ghostScriptPath)
+  .gsOption <- "-sFONTPATH=C:/Windows/Fonts -dSubsetFonts=true -dEmbedAllFonts=true"
   windowsFonts(Helvetica=windowsFont("Helvetica"))
   out <- ifelse(stringr::str_detect(outputFileName, ".pdf$"), outputFileName, paste0(outputFileName, ".pdf"))
   print(graphicObject)
   grDevices::dev.copy2pdf(file=out, width=width, height=height, pointsize=pointsize, family="Helvetica", useDingbats=useDingbats)
+  grDevices::embedFonts(out, outfile=out, options=.gsOption)
 }
 
 #' @title Plot saving utilities
@@ -72,15 +77,20 @@ savePDF <- function(graphicObject=ggplot2::last_plot(), outputFileName, width, h
 #' @param height A plot height
 #' @param pointsize A pointsize
 #' @param useDingbats Logical indicating whether points shuold be replaced with the Dingbat font.
+#' @param ghostScriptPath The file path to the GhostScript.exe file.
 #' @importFrom ggplot2 last_plot
 #' @importFrom stringr str_detect
 #' @importFrom grDevices dev.copy2pdf
+#' @importFrom grDevices embedFonts
 #' @export
 saveCurrentGraphicPDF <- function(outputFileName, width, height,
-                                  pointsize=12, useDingbats=F){
+                                  pointsize=12, useDingbats=F, ghostScriptPath="C:/gs/gs9.16/bin/gswin32c.exe"){
+  Sys.setenv(R_GSCMD=ghostScriptPath)
+  .gsOption <- "-sFONTPATH=C:/Windows/Fonts -dSubsetFonts=true -dEmbedAllFonts=true"
   windowsFonts(Helvetica=windowsFont("Helvetica"))
   out <- ifelse(stringr::str_detect(outputFileName, ".pdf$"), outputFileName, paste0(outputFileName, ".pdf"))
   grDevices::dev.copy2pdf(file=out, width=width, height=height, pointsize=pointsize, family="Helvetica", useDingbats=useDingbats)
+  grDevices::embedFonts(out, outfile=out, options=.gsOption)
 }
 
 #' @title Publication-ready ggplot scales

@@ -5,7 +5,7 @@
 \title{Plot saving utilities}
 \usage{
 saveCurrentGraphicPDF(outputFileName, width, height, pointsize = 12,
-  useDingbats = F)
+  useDingbats = F, ghostScriptPath = "C:/gs/gs9.16/bin/gswin32c.exe")
 }
 \arguments{
 \item{outputFileName}{The name of the exported PDF file}
@@ -17,6 +17,8 @@ saveCurrentGraphicPDF(outputFileName, width, height, pointsize = 12,
 \item{pointsize}{A pointsize}
 
 \item{useDingbats}{Logical indicating whether points shuold be replaced with the Dingbat font.}
+
+\item{ghostScriptPath}{The file path to the GhostScript.exe file.}
 }
 \description{
 \code{saveCurrentGraphicPDF} saves the plot currently on the graphics device to a PDF file.
