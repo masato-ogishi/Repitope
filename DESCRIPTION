@@ -17,4 +17,5 @@ Imports: readr (>= 1.1.1),
     stringr (>= 1.2.0),
     tidyr (>= 0.6.3),
     IRanges (>= 2.8.2),
-    magrittr
+    magrittr,
+    rlang (>= 0.1.1)
