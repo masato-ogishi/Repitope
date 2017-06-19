@@ -11,9 +11,12 @@ Installation
 ``` r
 if(!require(devtools)) install.packages("devtools")
 devtools::install_github("masato-ogishi/Repitope")
+
+# Alternatively, please download this repository as a Zip file, unzip it to the directory you want, and run the following command.
+devtools::install_local("path/to/the/unzipped/folder")
 ```
 
--   When you encounter errors, error might be resolved after installing and updating dependent packages.
+-   You might be prompted to install some packages before installling Repitope. Follow the message(s).
 
 Loading
 ------------------
