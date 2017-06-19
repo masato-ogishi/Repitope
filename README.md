@@ -90,9 +90,7 @@ ml.pred <- predict(ml.model, predict(ml.model.preProc, newdata=df.test))
 caret::confusionMatrix(ml.pred, df.test$Immunogenicity)
 
 # Predicting immunogenicity using the pre-trained support vector machine classifier
-# :::::::::::::::::::::::::::::::::::::::::::::::::::
 ml.pred <- predict_PreTrained(df.mrTPCP, variableType="mrTPCP")
 caret::confusionMatrix(ml.pred, df.mrTPCP$Immunogenicity)
-# :::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ```
