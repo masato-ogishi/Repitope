@@ -94,3 +94,8 @@ ml.pred <- predict_PreTrained(df.mrTPCP, variableType="mrTPCP")
 caret::confusionMatrix(ml.pred, df.mrTPCP$Immunogenicity)
 
 ```
+
+Reference
+------------------------
+
+Ogishi, M and Yotsuyanagi, H. (2017) "TCR-peptide contact profile determines immunogenicity in pathogen/tumor-derived MHC-I epitopes." bioRxiv. doi: https://doi.org/10.1101/155317
