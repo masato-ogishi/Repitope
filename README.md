@@ -98,4 +98,4 @@ caret::confusionMatrix(ml.pred, df.mrTPCP$Immunogenicity)
 Reference
 ------------------------
 
-Ogishi, M and Yotsuyanagi, H. (2017) "TCR-peptide contact profile determines immunogenicity in pathogen/tumor-derived MHC-I epitopes." bioRxiv. https://doi.org/10.1101/155317
+Ogishi, M and Yotsuyanagi, H. (2017) "Epitope immunogenicity prediction through repertoire-wide TCR-peptide contact profiles." bioRxiv. https://doi.org/10.1101/155317
