@@ -18,6 +18,7 @@ read_csv_checkColumnNames <- function(fileName){
 #' @param cols The number of columns
 #' @param layout A matrix for layouting the plots
 #' @importFrom grid grid.newpage
+#' @importFrom grid grid.layout
 #' @importFrom grid pushViewport
 #' @importFrom grid viewport
 #' @export
