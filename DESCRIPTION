@@ -15,6 +15,7 @@ RoxygenNote: 6.0.1
 Imports: tidyverse (>= 1.1.1),
     ggplot2 (>= 2.2.1),
     ggthemes (>= 3.4.0),
+    grid (>= 3.4.0),
     readr (>= 1.1.1),
     dplyr (>= 0.7.0),
     tidyr (>= 0.6.3),
