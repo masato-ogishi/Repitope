@@ -1,52 +1,8 @@
-#' @title Reading a CSV file and remove spaces from the column names
-#' @description Reading a CSV file and remove spaces from the column names
-#' @param fileName a CSV file name
-#' @importFrom dplyr %>%
-#' @importFrom stringr str_replace_all
-#' @importFrom magrittr set_colnames
-#' @importFrom readr read_csv
-#' @export
-read_csv_checkColumnNames <- function(fileName){
-  readr::read_csv(fileName) %>%
-    (function(d){magrittr::set_colnames(d, stringr::str_replace_all(colnames(d), " ", "."))})
-}
-
-#' @title Combine multiple ggplots
-#' @description \code{multiplot} combines multiple ggplots.
-#' @param ... ggplots
-#' @param plotlist A list of ggplots
-#' @param cols The number of columns
-#' @param layout A matrix for layouting the plots
-#' @importFrom grid grid.newpage
-#' @importFrom grid grid.layout
-#' @importFrom grid pushViewport
-#' @importFrom grid viewport
-#' @export
-multiPlot <- function(..., plotlist=NULL, cols=1, layout=NULL) {
-  plots <- c(list(...), plotlist)
-  numPlots = length(plots)
-  if (is.null(layout)) {
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                     ncol = cols, nrow = ceiling(numPlots/cols))
-  }
-  if (numPlots == 1) {
-    print(plots[[1]])
-  } else {
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
-
-    for (i in 1:numPlots) {
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
-                                      layout.pos.col = matchidx$col))
-    }
-  }
-}
-
-#' @title Plot saving utilities
-#' @description
-#' \code{savePDF} saves a plot to a PDF file.
+#' Plot saving utilities
+#' 
+#' \code{savePDF} saves a plot to a PDF file.\cr
+#' \code{saveCurrentGraphicPDF} saves the plot currently on the graphics device to a PDF file.
+#' 
 #' @param graphicObject The plot object to be saved.
 #' @param outputFileName The name of the exported PDF file
 #' @param width A plot width
@@ -59,6 +15,8 @@ multiPlot <- function(..., plotlist=NULL, cols=1, layout=NULL) {
 #' @importFrom grDevices dev.copy2pdf
 #' @importFrom grDevices embedFonts
 #' @export
+#' @rdname plot-utilities
+#' @name plot-utilities
 savePDF <- function(graphicObject=ggplot2::last_plot(), outputFileName, width, height,
                     pointsize=12, useDingbats=F, ghostScriptPath="C:/gs/gs9.16/bin/gswin32c.exe"){
   Sys.setenv(R_GSCMD=ghostScriptPath)
@@ -69,21 +27,9 @@ savePDF <- function(graphicObject=ggplot2::last_plot(), outputFileName, width, h
   grDevices::dev.copy2pdf(file=out, width=width, height=height, pointsize=pointsize, family="Helvetica", useDingbats=useDingbats)
   grDevices::embedFonts(out, outfile=out, options=.gsOption)
 }
-
-#' @title Plot saving utilities
-#' @description
-#' \code{saveCurrentGraphicPDF} saves the plot currently on the graphics device to a PDF file.
-#' @param outputFileName The name of the exported PDF file
-#' @param width A plot width
-#' @param height A plot height
-#' @param pointsize A pointsize
-#' @param useDingbats Logical indicating whether points shuold be replaced with the Dingbat font.
-#' @param ghostScriptPath The file path to the GhostScript.exe file.
-#' @importFrom ggplot2 last_plot
-#' @importFrom stringr str_detect
-#' @importFrom grDevices dev.copy2pdf
-#' @importFrom grDevices embedFonts
 #' @export
+#' @rdname plot-utilities
+#' @name plot-utilities
 saveCurrentGraphicPDF <- function(outputFileName, width, height,
                                   pointsize=12, useDingbats=F, ghostScriptPath="C:/gs/gs9.16/bin/gswin32c.exe"){
   Sys.setenv(R_GSCMD=ghostScriptPath)
@@ -94,38 +40,29 @@ saveCurrentGraphicPDF <- function(outputFileName, width, height,
   grDevices::embedFonts(out, outfile=out, options=.gsOption)
 }
 
-#' @title Publication-ready ggplot scales
-#' @description Publication-ready ggplot scales.
-#' @param ... No extra arguments are supported.
+#' Publication-ready ggplot scales
 #' @importFrom ggplot2 discrete_scale
 #' @importFrom scales manual_pal
 #' @export
-scale_color_Publication <- function(...) {
+#' @rdname ggplot-scales
+#' @name ggplot-scales
+scale_color_Publication <- function() {
   discrete_scale("color", "Publication", manual_pal(values=c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
 }
-
-#' @title Publication-ready ggplot scales
-#' @description Publication-ready ggplot scales.
-#' @param ... No extra arguments are supported.
-#' @importFrom ggplot2 discrete_scale
-#' @importFrom scales manual_pal
 #' @export
-scale_colour_Publication <- function(...) {
+#' @rdname ggplot-scales
+#' @name ggplot-scales
+scale_colour_Publication <- function() {
   discrete_scale("colour", "Publication", manual_pal(values=c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
 }
-
-#' @title Publication-ready ggplot scales
-#' @description Publication-ready ggplot scales.
-#' @param ... No extra arguments are supported.
-#' @importFrom ggplot2 discrete_scale
-#' @importFrom scales manual_pal
 #' @export
-scale_fill_Publication <- function(...) {
+#' @rdname ggplot-scales
+#' @name ggplot-scales
+scale_fill_Publication <- function() {
   discrete_scale("fill", "Publication", manual_pal(values=c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
 }
 
-#' @title The publication-ready ggplot theme
-#' @description The publication-ready ggplot theme.
+#' The publication-ready ggplot theme
 #' @param base_size The base font size.
 #' @import ggplot2
 #' @importFrom grDevices windowsFonts
@@ -135,18 +72,19 @@ scale_fill_Publication <- function(...) {
 #' @importFrom utils modifyList
 #' @importFrom ggthemes theme_foundation
 #' @export
+#' @rdname ggplot-theme
 theme_Publication <-
   function(base_size=18) {
     # Translation of a device-independent R graphics font family name to a windows font description
     windowsFonts(Helvetica=windowsFont("Helvetica"))
-
+    
     # The preset ggplot parameters
     .pt <- 1 / 0.352777778
     .len0_null <- function(x) {
       if (length(x) == 0)  NULL
       else                 x
     }
-
+    
     # A ggplot theme for the "L" (left + bottom) border
     theme_L_border <- function(colour = "black", size = 1, linetype = 1) {
       # use with e.g.: ggplot(...) + theme( panel.border=theme_L_border() ) + ...
@@ -166,7 +104,7 @@ theme_Publication <-
         gp = modifyList(element_gp, gp)
       )
     }
-
+    
     # A combined set of ggplot theme options
     (
       theme_foundation(base_size = base_size, base_family = "Helvetica")
@@ -199,4 +137,5 @@ theme_Publication <-
         strip.text = element_text(face = "bold")
       )
     )
-}
+  }
+
