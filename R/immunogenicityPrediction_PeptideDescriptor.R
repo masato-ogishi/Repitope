@@ -82,7 +82,7 @@ peptideDescriptorAnalysis <- function(peptideSet, fragLenSet=5){
   gc();gc();
   df_feature <- suppressWarnings(dplyr::bind_rows(df_feature)) %>%
     tidyr::gather(Stat, Value, -Peptide, -FragLen, -AADescriptor) %>%
-    tidyr::unite(Feature, AADescriptor, Stat, FragLen, sep="_") %>%
+    tidyr::unite(Feature, AADescriptor, Stat, sep="_") %>%
     tidyr::spread(Feature, Value)
   
   # Output

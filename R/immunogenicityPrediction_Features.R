@@ -23,5 +23,5 @@ immunogenicityPrediction_Features <- function(
   message("rTPCP analysis.")
   df_feature_rTPCP <- rTPCPAnalysis(peptideSet, TCRSet, aaIndexIDSet, alignTypeSet, fragLenSet, TCRFragDepthSet, seedSet)
   gc();gc()
-  dplyr::left_join(df_feature_pepDesc, df_feature_rTPCP, by="Peptide")
+  list(df_feature_pepDesc, df_feature_rTPCP)
 }
