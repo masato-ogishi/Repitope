@@ -2,40 +2,28 @@
 % Please edit documentation in R/immunogenicityPrediction_rTPCP.R
 \name{rTPCP}
 \alias{rTPCP}
-\alias{fragmentation}
-\alias{rTPCP}
-\alias{tcrFragmentDictionary}
-\alias{rTPCP}
 \alias{rTPCPAnalysis}
 \title{Repertoire-wide TCR-peptide contact profile (rTPCP) analysis.}
 \usage{
-fragmentation(sequenceSet, fragLen)
-
-tcrFragmentDictionary(TCRSet, fragLen = 5, TCRFragDepth = 10000,
-  seed = 12345)
-
-rTPCPAnalysis(peptideSet, TCRSet, aaIndexIDSet = "all", fragLen = 5,
-  alignTypeSet = "global-local", seed = 12345, TCRFragDepth = 10000)
+rTPCPAnalysis(peptideSet, TCRSet, aaIndexIDSet = "all",
+  alignTypeSet = "global-local", fragLenSet = 5, TCRFragDepthSet = 10000,
+  seedSet = 1:5)
 }
 \arguments{
-\item{sequenceSet}{A set of amino acid sequences.}
-
-\item{fragLen}{The length of TCR sequence fragments to be matched against the peptide set.}
+\item{peptideSet}{A set of peptide sequences.}
 
 \item{TCRSet}{A set of TCR sequences.}
-
-\item{TCRFragDepth}{The number of TCR fragments to be matched. This should be kept constant throughout an analysis to keep repertoire-dependent fluctuation of descriptive statistics minimized.}
-
-\item{seed}{A random seed.}
-
-\item{peptideSet}{A set of peptide sequences.}
 
 \item{aaIndexIDSet}{A set of AAIndexIDs indicating the pairwise matching score matrix to be used. A set of AAIndex-derived matrices can be retrieved by \code{AACPMatrix}. Set "all" to select all AAIndexIDs.}
 
 \item{alignTypeSet}{A set of alignment-type strings directly passed to the \code{type} argument of the \code{pairwiseAlignment} function in the \code{Biostrings} package.}
+
+\item{fragLenSet}{A set of the lengths of TCR sequence fragments to be matched against the peptide set.}
+
+\item{TCRFragDepthSet}{A set of the numbers of TCR fragments to be matched. This should be kept constant for comparison.}
+
+\item{seedSet}{A set of random seeds.}
 }
 \description{
-\code{fragmentation} is a utility function which generates fragments (substrings of fixed length) from input sequences.\cr
-\code{tcrFragmentDictionary} creates the TCR fragment dictionary to be matched.\cr
-\code{rTPCPAnalysis} calculates descriptive statistics of repertoire-wide TCR-peptide pairwise contact potentials.
+Calculates descriptive statistics of repertoire-wide TCR-peptide pairwise contact potentials.
 }

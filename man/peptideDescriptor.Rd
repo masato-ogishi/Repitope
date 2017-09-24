@@ -5,12 +5,12 @@
 \alias{peptideDescriptorAnalysis}
 \title{Descriptive statistics of peptide fragment descriptors.}
 \usage{
-peptideDescriptorAnalysis(peptideSet, fragLen = 5)
+peptideDescriptorAnalysis(peptideSet, fragLenSet = 5)
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}
 
-\item{fragLen}{The length of TCR sequence fragments to be matched against the peptide set.}
+\item{fragLenSet}{A set of the lengths of TCR sequence fragments to be matched against the peptide set.}
 }
 \description{
 Descriptive statistics of peptide fragment descriptors.

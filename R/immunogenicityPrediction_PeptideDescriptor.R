@@ -1,6 +1,6 @@
 #' Descriptive statistics of peptide fragment descriptors.
 #' @param peptideSet A set of peptide sequences.
-#' @param fragLen The length of TCR sequence fragments to be matched against the peptide set.
+#' @param fragLenSet A set of the lengths of TCR sequence fragments to be matched against the peptide set.
 #' @importFrom stringr str_sub
 #' @importFrom matrixStats rowMins
 #' @importFrom matrixStats rowMaxs
@@ -16,16 +16,18 @@
 #' @importFrom tidyr unite
 #' @importFrom parallel splitIndices
 #' @importFrom parallel detectCores
-#' @importFrom snowfall sfInit
-#' @importFrom snowfall sfLibrary
-#' @importFrom snowfall sfExport
-#' @importFrom snowfall sfLapply
-#' @importFrom snowfall sfStop
+#' @importFrom parallel splitIndices
+#' @importFrom parallel detectCores
+#' @importFrom parallel makeCluster
+#' @importFrom parallel clusterEvalQ
+#' @importFrom pbapply pbapply
+#' @importFrom parallel clusterExport
+#' @importFrom parallel stopCluster
 #' @import Peptides
 #' @export
 #' @rdname peptideDescriptor
 #' @name peptideDescriptor
-peptideDescriptorAnalysis <- function(peptideSet, fragLen=5){
+peptideDescriptorAnalysis <- function(peptideSet, fragLenSet=5){
   time.start <- proc.time()
   
   # Working functions
@@ -53,6 +55,7 @@ peptideDescriptorAnalysis <- function(peptideSet, fragLen=5){
     f <- sapply(1:(max(nchar(peptide))-fragLen+1), function(i){stringr::str_sub(peptide, i, i+fragLen-1)})
     d <- sapply(f[nchar(f)==fragLen], function(s){peptideDescriptor.Batch(s)})
     data.frame("Peptide"=peptide,
+               "FragLen"=fragLen,
                "AADescriptor"=peptideDescriptor.NameSet, 
                "Min"=matrixStats::rowMins(d), 
                "Max"=matrixStats::rowMaxs(d), 
@@ -61,27 +64,30 @@ peptideDescriptorAnalysis <- function(peptideSet, fragLen=5){
   }
   
   # Parallelization
-  snowfall::sfInit(parallel=T, cpus=parallel::detectCores(), type="SOCK")
-  sink(tempfile())
-  suppressMessages(snowfall::sfLibrary(ff))
-  suppressMessages(snowfall::sfLibrary(Peptides))
-  suppressMessages(snowfall::sfLibrary(matrixStats))
-  sink()
-  snowfall::sfExport("peptideDescriptor.FragStat.Single","peptideDescriptor.NameSet","peptideDescriptor.Batch")
+  cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
+  invisible(parallel::clusterEvalQ(cl, {
+    library(ff)
+    library(Peptides)
+    library(matrixStats)
+  }))
   
   # Descriptive statistics of peptide fragment descriptors
+  parameterGrid <- expand.grid(peptideSet, fragLenSet, stringsAsFactors=F)
   message(paste0("Parallelized fragment descriptor calculation was started. (Memory occupied = ", memory.size(), "[Mb])"))
-  df_feature <- dplyr::bind_rows(snowfall::sfLapply(peptideSet, function(p){peptideDescriptor.FragStat.Single(p, fragLen)}))
+  df_feature <- pbapply::pbapply(
+    parameterGrid, 1, 
+    function(v){peptideDescriptor.FragStat.Single(v[1], as.numeric(v[2]))},
+    cl=cl
+  ) %>% dplyr::bind_rows()
   message(paste0("Parallelized fragment descriptor calculation was finished. (Memory occupied = ", memory.size(), "[Mb])"))
   gc();gc();
   df_feature <- df_feature %>%
-    tidyr::gather(Stat, Value, -Peptide, -AADescriptor) %>%
-    tidyr::unite(Feature, AADescriptor, Stat, sep="_") %>%
-    dplyr::mutate(Feature=paste0(Feature, "_", fragLen)) %>%
+    tidyr::gather(Stat, Value, -Peptide, -FragLen, -AADescriptor) %>%
+    tidyr::unite(Feature, AADescriptor, Stat, FragLen, sep="_") %>%
     tidyr::spread(Feature, Value)
-  snowfall::sfStop()
   
   # Output
+  parallel::stopCluster(cl)
   time.end <- proc.time()
   message(paste0("Overall time required = ", (time.end-time.start)[3], "[sec]"))
   return(df_feature)

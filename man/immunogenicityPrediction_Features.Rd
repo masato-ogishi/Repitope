@@ -5,8 +5,8 @@
 \title{Generate peptide features for immunogenicity prediction.}
 \usage{
 immunogenicityPrediction_Features(peptideSet, TCRSet, aaIndexIDSet = "all",
-  fragLen = 5, alignTypeSet = "global-local", seed = 12345,
-  TCRFragDepth = 10000)
+  alignTypeSet = "global-local", fragLenSet = 5, TCRFragDepthSet = 10000,
+  seedSet = 1:5)
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}
@@ -15,13 +15,13 @@ immunogenicityPrediction_Features(peptideSet, TCRSet, aaIndexIDSet = "all",
 
 \item{aaIndexIDSet}{A set of AAIndexIDs indicating the pairwise matching score matrix to be used. A set of AAIndex-derived matrices can be retrieved by \code{AACPMatrix}. Set "all" to select all AAIndexIDs.}
 
-\item{fragLen}{The length of TCR sequence fragments to be matched against the peptide set.}
-
 \item{alignTypeSet}{A set of alignment-type strings directly passed to the \code{type} argument of the \code{pairwiseAlignment} function in the \code{Biostrings} package.}
 
-\item{seed}{A random seed.}
+\item{fragLenSet}{A set of the lengths of TCR sequence fragments to be matched against the peptide set.}
 
-\item{TCRFragDepth}{The number of TCR fragments to be matched. This should be kept constant throughout an analysis to keep repertoire-dependent fluctuation of descriptive statistics minimized.}
+\item{TCRFragDepthSet}{A set of the numbers of TCR fragments to be matched. This should be kept constant for comparison.}
+
+\item{seedSet}{A set of random seeds.}
 }
 \description{
 A wrapper function of \code{peptideDescriptorAnalysis} and \code{rTPCPAnalysis}.

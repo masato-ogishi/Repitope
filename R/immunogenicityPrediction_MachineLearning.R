@@ -36,10 +36,13 @@
 #' @export
 #' @rdname immunogenicityPrediction_MachineLearning
 #' @name immunogenicityPrediction_MachineLearning
-immunogenicityPrediction_MachineLearning.DataFormat <- function(featureDF, seed=12345){
+immunogenicityPrediction_MachineLearning.DataFormat <- function(featureDF, metadataDF, seed=12345){
+  # Combine metadata
+  df <- dplyr::left_join(metadataDF, featureDF, by="Peptide")
+  
   # Randomly choose one epitope per each cluster
   set.seed(seed)
-  ML_Data <- featureDF %>%
+  ML_Data <- df %>%
     (function(d){d[sample.int(nrow(d)),]}) %>%
     dplyr::distinct(Cluster, .keep_all=T) %>%
     dplyr::distinct(Peptide, .keep_all=T) %>%
@@ -55,14 +58,14 @@ immunogenicityPrediction_MachineLearning.DataFormat <- function(featureDF, seed=
   ML_Test <- ML_Test[testID,]   ## Proportion == 0.2
   ML_Valid <- ML_Test[-testID,] ## Proportion == 0.1
 
-  # Pre-process the training data to eliminate useless features
+  # Pre-processing
   ML_Train_Features <- dplyr::select(ML_Train, -Peptide, -Immunogenicity, -MHC, -Cluster)
   ML_Train_Features <- predict(caret::preProcess(ML_Train_Features, method=c("nzv", "corr")), ML_Train_Features)
-  features_Train <- colnames(ML_Train_Features)
+  featureSet <- colnames(ML_Train_Features)
   pp_Train <- caret::preProcess(ML_Train_Features, method=c("center", "scale"))
-  ML_Train <- predict(pp_Train, dplyr::select(ML_Train, Peptide, Immunogenicity, MHC, Cluster, dplyr::one_of(features_Train)))
-  ML_Test <- predict(pp_Train, dplyr::select(ML_Test, Peptide, Immunogenicity, MHC, Cluster, dplyr::one_of(features_Train)))
-  ML_Valid <- predict(pp_Train, dplyr::select(ML_Valid, Peptide, Immunogenicity, MHC, Cluster, dplyr::one_of(features_Train)))
+  ML_Train <- predict(pp_Train, dplyr::select(ML_Train, Peptide, Immunogenicity, MHC, Cluster, dplyr::one_of(featureSet)))
+  ML_Test <- predict(pp_Train, dplyr::select(ML_Test, Peptide, Immunogenicity, MHC, Cluster, dplyr::one_of(featureSet)))
+  ML_Valid <- predict(pp_Train, dplyr::select(ML_Valid, Peptide, Immunogenicity, MHC, Cluster, dplyr::one_of(featureSet)))
 
   # Output
   list("ML_Data"=ML_Data, "ML_Train"=ML_Train, "ML_Test"=ML_Test, "ML_Valid"=ML_Valid)
@@ -77,11 +80,13 @@ immunogenicityPrediction_MachineLearning.Single <- function(
 ){
   # Train
   set.seed(seed)
+  sink(tempfile())
   model <- try(caret::train(Immunogenicity~.,
                             dplyr::select(formattedDataList$"ML_Train", -Peptide, -MHC, -Cluster),
                             method=mlAlgorithm,
                             trControl=trainControlOptions),
-               silent=F)
+               silent=T)
+  sink()
   if(class(model)=="try-error"){
     print("Model training process encountered an unexpected error!")
     return("Error")
@@ -104,13 +109,10 @@ immunogenicityPrediction_MachineLearning.Single <- function(
   sink(paste0(out, "/ConfusionMatrix.txt"))
   print(cm)
   sink()
-
-  # Finish
-  rm(list=c("model"))
   gc();gc()
 
-  # Result
-  return(cm)
+  # Output
+  list("ML_Model"=model, "ML_ConfMat"=cm)
 }
 #' @export
 #' @rdname immunogenicityPrediction_MachineLearning
@@ -123,27 +125,31 @@ immunogenicityPrediction_MachineLearning <- function(
   cmSummaryList <- as.list(numeric(length(seedSet)))
   for(i in 1:length(seedSet)){
     set.seed(seedSet[[i]])
-    data <- immunogenicityPrediction_MachineLearning.DataFormat(
-      dplyr::left_join(metadataDF, featureDFSet[[i]], by="Peptide"),
-      seedSet[[i]]
-    )
+    data <- immunogenicityPrediction_MachineLearning.DataFormat(featureDFSet[[i]], metadataDF, seedSet[[i]])
     dir.create(paste0(outDir, "/"), showWarnings=F, recursive=T)
     saveRDS(data, paste0(outDir, "/Data_Seed", seedSet[[i]], ".rds"))
-    cmList <- mapply(
+    mlList <- mapply(
       function(x, y){
         immunogenicityPrediction_MachineLearning.Single(
           data, trainControlOptions,
           mlAlgorithm=x, mlAlgorithmLabel=y, seed=seedSet[[i]], outDir
         )
       }, mlAlgorithmSet, mlAlgorithmLabelSet, SIMPLIFY=F)
-    errors <- cmList=="Error"
-    cmList <- cmList[!errors]
+    errors <- mlList=="Error"
+    mlList <- mlList[!errors]
+    cmList <- lapply(mlList, function(ml){ml$"ML_ConfMat"})
+    modelList <- lapply(mlList, function(ml){ml$"ML_Model"})
     cmSummary <- as.data.frame(sapply(cmList, function(cm){c(cm$"overall", cm$"byClass")}))
     colnames(cmSummary) <- mlAlgorithmLabelSet[!errors]
+    cmSummary[["Metric"]] <- rownames(cmSummary)
     cmSummary[["RandomSeed.ML"]] <- seedSet[[i]]
+    cmSummary <- cmSummary %>% 
+      tidyr::gather(Algorithm, Value, -Metric, -RandomSeed.ML) %>% 
+      dplyr::select(RandomSeed.ML, Algorithm, Metric, Value) %>%
+      tidyr::spread(Algorithm, Value)
     cmSummaryList[[i]] <- cmSummary
   }
   cmSummary <- dplyr::bind_rows(cmSummaryList)
-  write.csv(cmSummary, paste0(outDir, "/SummaryTable.csv"), row.names=T)
-  return(cmSummary)
+  write.csv(cmSummary, paste0(outDir, "/SummaryTable.csv"), row.names=F)
+  list("ML_ModelList"=modelList, "ML_ConfMat_SummaryTable"=cmSummary)
 }

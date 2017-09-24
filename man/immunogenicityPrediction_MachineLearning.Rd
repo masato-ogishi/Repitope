@@ -8,7 +8,8 @@
 \alias{immunogenicityPrediction_MachineLearning}
 \title{Machine learning for immunogenicity prediction}
 \usage{
-immunogenicityPrediction_MachineLearning.DataFormat(featureDF, seed = 12345)
+immunogenicityPrediction_MachineLearning.DataFormat(featureDF, metadataDF,
+  seed = 12345)
 
 immunogenicityPrediction_MachineLearning.Single(formattedDataList,
   trainControlOptions, mlAlgorithm, mlAlgorithmLabel, seed = 12345,
@@ -20,6 +21,8 @@ immunogenicityPrediction_MachineLearning(featureDFSet, metadataDF,
 }
 \arguments{
 \item{featureDF}{A feature dataframe. A "Peptide" column is required.}
+
+\item{metadataDF}{A metadata dataframe labeled as "Peptide", "Immunogenicity", "MHC", and "Cluster". No extra metadata is allowed (mistaken as features).}
 
 \item{seed}{A random seed.}
 
@@ -34,8 +37,6 @@ immunogenicityPrediction_MachineLearning(featureDFSet, metadataDF,
 \item{outDir}{A directory for exporting the results.}
 
 \item{featureDFSet}{A set of feature dataframes.}
-
-\item{metadataDF}{A metadata dataframe labeled as "Peptide", "Immunogenicity", "MHC", and "Cluster". No extra metadata is allowed (mistaken as features).}
 
 \item{mlAlgorithmSet}{A set of strings indicating the caret machine learning algorithms.}
 
