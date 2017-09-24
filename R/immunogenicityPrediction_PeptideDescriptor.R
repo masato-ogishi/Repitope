@@ -66,7 +66,6 @@ peptideDescriptorAnalysis <- function(peptideSet, fragLenSet=5){
   # Parallelization
   cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
   invisible(parallel::clusterEvalQ(cl, {
-    library(ff)
     library(Peptides)
     library(matrixStats)
   }))
@@ -78,10 +77,10 @@ peptideDescriptorAnalysis <- function(peptideSet, fragLenSet=5){
     parameterGrid, 1, 
     function(v){peptideDescriptor.FragStat.Single(v[1], as.numeric(v[2]))},
     cl=cl
-  ) %>% dplyr::bind_rows()
+  )
   message(paste0("Parallelized fragment descriptor calculation was finished. (Memory occupied = ", memory.size(), "[Mb])"))
   gc();gc();
-  df_feature <- df_feature %>%
+  df_feature <- suppressWarnings(dplyr::bind_rows(df_feature)) %>%
     tidyr::gather(Stat, Value, -Peptide, -FragLen, -AADescriptor) %>%
     tidyr::unite(Feature, AADescriptor, Stat, FragLen, sep="_") %>%
     tidyr::spread(Feature, Value)

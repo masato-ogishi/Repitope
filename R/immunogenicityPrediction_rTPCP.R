@@ -30,10 +30,10 @@
 #' @importFrom parallel detectCores
 #' @importFrom parallel makeCluster
 #' @importFrom parallel clusterEvalQ
-#' @importFrom pbapply pbapply
 #' @importFrom parallel clusterExport
 #' @importFrom parallel stopCluster
-#' @importFrom ff ff 
+#' @importFrom pbapply pbapply
+#' @importFrom pbapply pblapply
 #' @export
 #' @rdname rTPCP
 #' @name rTPCP
@@ -62,9 +62,9 @@ rTPCPAnalysis <- function(peptideSet, TCRSet,
     list("FR"=TCRSet.FR, "Mock"=TCRSet.mock)
   }
   TCRFragDictSet.List <- apply(expand.grid(fragLenSet, TCRFragDepthSet, seedSet, stringsAsFactors=F), 1,
-                               function(v){TCRFragDictSet(TCRSet, as.numeric(v[[1]]), as.numeric(v[[2]]), as.numeric(v[[3]]))})
+                               function(v){TCRFragDictSet(TCRSet, as.numeric(v[1]), as.numeric(v[2]), as.numeric(v[3]))})
   TCRParameterSet <- apply(expand.grid(fragLenSet, TCRFragDepthSet, seedSet, stringsAsFactors=F), 1,
-                           function(v){paste0(v[[1]], "_", v[[2]], "_", v[[3]])})
+                           function(v){paste0(v[1], "_", v[2], "_", v[3])})
   TCRFragDictSet.List <- purrr::set_names(TCRFragDictSet.List, nm=TCRParameterSet)
     
   # AAIndex-derived pairwise matching matrices
@@ -83,7 +83,6 @@ rTPCPAnalysis <- function(peptideSet, TCRSet,
   # Parallelization
   cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
   invisible(parallel::clusterEvalQ(cl, {
-    library(ff)
     library(Biostrings)
     library(psych)
   }))
@@ -101,23 +100,26 @@ rTPCPAnalysis <- function(peptideSet, TCRSet,
       trim=.1, interp=F, skew=T, type=3, ranges=T, IQR=T, quant=c(.10, .25, .75, .90)
     ))[c(6, 7, 14, 15, 16, 5, 17, 18, 11, 12)]
     ## trimmed, mad, IQR, Q0.1, Q0.25, median, Q0.75, Q0.9, skew, kurtosis
-    ff::ff(c(s1, s1-s2), vmode="double") ## A vector of length 20
+    c(s1, s1-s2) ## A vector of length 20
   }
   statNameSet <- c("TrimmedMean10","MedAbsDev","IQR","Q10","Q25","Q50","Q75","Q90","Skew","Kurtosis")
   statNameSet <- expand.grid(statNameSet, c("FR", "Diff"))
   statNameSet <- apply(statNameSet, 1, function(v){paste0(v[1], "_", v[2])})
   parameterGrid <- expand.grid(peptideSet, aaIndexIDSet, alignTypeSet, TCRParameterSet, stringsAsFactors=F)
-  message(paste0("Number of parameter combinations = ", nrow(parameterGrid)))
+  paramCombN <- nrow(parameterGrid)
+  message(paste0("Number of parameter combinations = ", paramCombN))
   message(paste0("Parallelized fragment matching was started. (Memory occupied = ", memory.size(), "[Mb])"))
+  #parallel::clusterExport(cl, c("parameterGrid","fragmentMatchingStats","TCRFragDictSet.List","pairMatSet"))
   df_feature <- pbapply::pbapply(parameterGrid, 1, 
-                                 function(v){fragmentMatchingStats(v[1], v[2], v[3], v[4])},
-                                 cl=cl)
+    function(v){
+      s <- fragmentMatchingStats(v[[1]], v[[2]], v[[3]], v[[4]])
+      gc();gc()
+      return(s)
+    },
+    cl=cl
+  )
+  df_feature <- dplyr::bind_cols(parameterGrid, as.data.frame(t(df_feature)))
   message(paste0("Parallelized fragment matching was finished. (Memory occupied = ", memory.size(), "[Mb])"))
-  gc();gc();
-  message(paste0("Integration of fragment matching results was started. (Memory occupied = ", memory.size(), "[Mb])"))
-  df_feature <- as.numeric(unlist(lapply(df_feature, function(ffVector){ffVector[]}))) ## Convert a list of ff vectors into a combined normal numeric vector
-  df_feature <- dplyr::bind_cols(parameterGrid, as.data.frame(t(matrix(df_feature, nrow=length(statNameSet))))) ## The row number 10 corresponds to the number of descriptive statistics retained.
-  message(paste0("Integration of fragment matching results was finished. (Memory occupied = ", memory.size(), "[Mb])"))
   gc();gc();
   message(paste0("Data formatting..."))
   df_feature <- df_feature %>%
@@ -128,7 +130,7 @@ rTPCPAnalysis <- function(peptideSet, TCRSet,
     tidyr::spread(Feature, Value)
   
   # Output
-  parallell::stopCluster(cl)
+  parallel::stopCluster(cl)
   time.end <- proc.time()
   message(paste0("Overall time required = ", (time.end-time.start)[3], "[sec]"))
   return(df_feature)
