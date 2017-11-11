@@ -131,16 +131,16 @@ Features_rTPCP <- function(peptideSet, TCRSet,
   message("Fragment matching was started. (Memory occupied = ", memory.size(), "[Mb])")
   mat <- matrix(nrow=paramCombN, ncol=length(statNameSet))
   id.lst <- parallel::splitIndices(paramCombN, 100)
-  time.elapsed <- 0
+  tm.elapsed <- 0
   for(j in 1:100){
-    time.start <- proc.time()
+    tm.start <- proc.time()
     for(i in id.lst[[j]]){
       mat[i,] <- fragmentMatchingStats(parameterGrid[i,1], parameterGrid[i,2], parameterGrid[i,3], parameterGrid[i,4])
     }
-    time.end <- proc.time()
-    time.elapsed <- round(time.elapsed + (time.end-time.start)[3])
-    time.remain <- round(time.elapsed*100/j - time.elapsed)
-    cat("\r ", j, "% elapsed = ", as.character(lubridate::seconds_to_period(time.elapsed)), ", remaining ~ ", as.character(lubridate::seconds_to_period(time.remain)), sep="")
+    tm.end <- proc.time()
+    tm.elapsed <- round(tm.elapsed + (tm.end-tm.start)[3])
+    tm.remain <- round(tm.elapsed*100/j - tm.elapsed)
+    cat("\r ", j, "% elapsed = ", as.character(lubridate::seconds_to_period(tm.elapsed)), ", remaining ~ ", as.character(lubridate::seconds_to_period(tm.remain)), sep="")
   }
   message("Fragment matching was finished. (Memory occupied = ", memory.size(), "[Mb])")
   gc();gc()
