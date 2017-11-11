@@ -139,7 +139,7 @@ Features_rTPCP <- function(peptideSet, TCRSet,
     }
     time.end <- proc.time()
     time.elapsed <- round(time.elapsed + (time.end-time.start)[3])
-    time.remain <- round(time.elapsed*100/j)
+    time.remain <- round(time.elapsed*100/j - time.elapsed)
     cat("\r ", j, "% elapsed = ", as.character(lubridate::seconds_to_period(time.elapsed)), ", remaining ~ ", as.character(lubridate::seconds_to_period(time.remain)), sep="")
   }
   message("Fragment matching was finished. (Memory occupied = ", memory.size(), "[Mb])")
