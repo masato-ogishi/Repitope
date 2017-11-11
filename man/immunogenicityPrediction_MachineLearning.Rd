@@ -4,6 +4,8 @@
 \alias{immunogenicityPrediction_MachineLearning}
 \alias{immunogenicityPrediction_MachineLearning.DataFormat}
 \alias{immunogenicityPrediction_MachineLearning}
+\alias{immunogenicityPrediction_MachineLearning.TrainAndEvaluate}
+\alias{immunogenicityPrediction_MachineLearning}
 \alias{immunogenicityPrediction_MachineLearning.Single}
 \alias{immunogenicityPrediction_MachineLearning}
 \title{Machine learning for immunogenicity prediction}
@@ -11,18 +13,22 @@
 immunogenicityPrediction_MachineLearning.DataFormat(featureDF, metadataDF,
   seed = 12345)
 
-immunogenicityPrediction_MachineLearning.Single(formattedDataList,
-  trainControlOptions, mlAlgorithm, mlAlgorithmLabel, seed = 12345,
-  outDir = "./classifiers/")
+immunogenicityPrediction_MachineLearning.TrainAndEvaluate(formattedDataList,
+  trainControlOptions, weighted = F, mlAlgorithm, mlAlgorithmLabel,
+  seed = 12345, outDir = "./classifiers/")
+
+immunogenicityPrediction_MachineLearning.Single(featureDF, metadataDF,
+  trainControlOptions, weighted = F, mlAlgorithmSet, mlAlgorithmLabelSet,
+  seed = 12345, outDir = "./classifiers/")
 
 immunogenicityPrediction_MachineLearning(featureDFSet, metadataDF,
-  trainControlOptions, mlAlgorithmSet, mlAlgorithmLabelSet, seedSet = 1:5,
-  outDir = "./classifiers/")
+  trainControlOptions, weighted = F, mlAlgorithmSet, mlAlgorithmLabelSet,
+  parameterSet = names(featureDFSet), outDir = "./classifiers/")
 }
 \arguments{
 \item{featureDF}{A feature dataframe. A "Peptide" column is required.}
 
-\item{metadataDF}{A metadata dataframe labeled as "Peptide", "Immunogenicity", "MHC", and "Cluster". No extra metadata is allowed (mistaken as features).}
+\item{metadataDF}{A metadata dataframe labeled as "Peptide", "Immunogenicity", and "Cluster". No extra metadata is allowed. Feature dataframes are downsized based on the "Peptide" column in this metadata. In other words, peptides not contained in the metadata dataframe are omitted.}
 
 \item{seed}{A random seed.}
 
@@ -30,19 +36,21 @@ immunogenicityPrediction_MachineLearning(featureDFSet, metadataDF,
 
 \item{trainControlOptions}{A trainControl object.}
 
+\item{weighted}{Logical. Whether class imbalance should be adjusted by class-specific weighting.}
+
 \item{mlAlgorithm}{A string indicating the caret machine learning algorithm.}
 
 \item{mlAlgorithmLabel}{A label for the caret machine learning algorithm.}
 
 \item{outDir}{A directory for exporting the results.}
 
-\item{featureDFSet}{A set of feature dataframes.}
-
 \item{mlAlgorithmSet}{A set of strings indicating the caret machine learning algorithms.}
 
 \item{mlAlgorithmLabelSet}{A set of labels for the caret machine learning algorithms.}
 
-\item{seedSet}{A set of random seeds.}
+\item{featureDFSet}{A list of feature dataframes. The names will be used as parameter sets by default.}
+
+\item{parameterSet}{A set of parameters to generate features. Ex. "global-local.3.10.1" (AlignmentMethod.FragLen.Depth.Seed). A random seed value is reused for machine learning.}
 }
 \description{
 \code{immunogenicityPrediction_MachineLearning.DataFormat} generates machine-learning-ready datasets.\cr

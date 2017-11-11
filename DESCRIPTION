@@ -7,37 +7,42 @@ Maintainer: Masato Ogishi <oogishi-tky@umin.ac.jp>
 Description: In sillico prediction of peptide immunogenicity is a critical component of precision immunotherapy.
     Sequence-based features have been extensively explored to construct immunogenicity prediction model.
     Here, we developped a novel framework, which we termed 'repertoire-wide TCR-peptide contact profile', that yields far better classification between epitopes (immunogenic MHC-loaded peptides) and MHC ligands (non-immunogenic MHC-loaded peptides).
-Depends: R (>= 3.4.1) 
+Depends: R (>= 3.4.2) 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
 Imports: tidyverse (>= 1.1.1),
-    ggplot2 (>= 2.2.1),
-    ggthemes (>= 3.4.0),
-    grid (>= 3.4.1),
+    rlang (>= 0.1.2),
     readr (>= 1.1.1),
     dplyr (>= 0.7.3),
     tidyr (>= 0.7.1),
-    stringr (>= 1.2.0),
-    scales (>= 0.4.1),
-    caret (>= 6.0-77),
-    DescTools (>= 0.99.21),
-    grDevices (>= 3.4.1),
-    utils (>= 3.4.1),
-    classifierplots (>= 1.3.3),
-    Biostrings (>= 2.44.2),
-    gtools (>= 3.5.0),
-    magrittr (>= 1.5),
     purrr (>= 0.2.3),
-    tibble (>= 1.3.3),
+    magrittr (>= 1.5),
+    stringr (>= 1.2.0),
+    ggplot2 (>= 2.2.1),
+    ggthemes (>= 3.4.0),
+    ggsci (>= 2.8),
+    grDevices (>= 3.4.1),
+    grid (>= 3.4.1),
+    utils (>= 3.4.1),
+    gtools (>= 3.5.0),
+    scales (>= 0.4.1),
+    parallel (>= 3.4.1),
+    pbapply (>= 1.3-3),
+    caret (>= 6.0-77),
+    data.table (>= 1.10.4),
+    tibble (>= 1.3.4),
+    Matrix (>= 1.2-11),
+    matrixStats (>= 0.52.2),
+    psych (>= 1.7.8),
+    DescTools (>= 0.99.21),
     igraph (>= 1.1.2),
     Kmisc (>= 0.5.0),
     seqinr (>= 3.4-5),
     stringdist (>= 0.9.4.6),
-    parallel (>= 3.4.1),
-    pbapply (>= 1.3-3),
-    psych (>= 1.7.8),
-    ff (>= 2.2-13),
+    Biostrings (>= 2.44.2),
+    S4Vectors (>= 0.14.7),
     Peptides (>= 2.2),
-    matrixStats (>= 0.52.2)
+    EpitopePrediction (>= 0.1-2),
+    classifierplots (>= 1.3.3)
