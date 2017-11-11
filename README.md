@@ -2,7 +2,7 @@ Repitope: Epitope prediction via repertoire-wide TCR-peptide contact profiles
 ===============================================
 
 The 'Repitope' package provides some easy-to-use functions for conducting epitope prediction analysis via repertoire-wide TCR-peptide contact profiles.
-Note: Repitope is under construction.
+Note: Repitope is currently under construction.
 
 Installation
 ------------------------
@@ -33,10 +33,9 @@ Usage
 # Setting up the working environment
 set.seed(12345)
 library(tidyverse)
-library(caret)
 ```
 
 Reference
 ------------------------
 
-Ogishi, M and Yotsuyanagi, H. (2017) "Immunogenicity prediction from reciprocal adaptation of epitopes and human TCR repertoire." (Manuscript in preparation)
+Ogishi, M and Yotsuyanagi, H. (2017) "Quantitative modeling of repertoire-wide epitope-TCR interactions in human." (Manuscript in preparation)
