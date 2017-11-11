@@ -109,7 +109,7 @@ Features_rTPCP <- function(peptideSet, TCRSet,
     )[c("mean","sd","median","trimmed","mad","skew","kurtosis","se","IQR","Q0.1","Q0.25","Q0.75","Q0.9")], silent=T)
     ## psych::describe returns the following values: vars,n,mean,sd,median,trimmed,mad,min,max,range,skew,kurtosis,se,IQR,Q0.1,Q0.25,Q0.75,Q0.9
     ## Of which the followings are kept: mean,sd,median,trimmed,mad,skew,kurtosis,se,IQR,Q0.1,Q0.25,Q0.75,Q0.9
-    if(class(s1)=="try-error"|class(s2)=="try-error"){
+    if(any(c(class(s1),class(s2))=="try-error")){
       message(paste0("Fragment matching on the peptide '", peptide, "' returned an unexpected error!"))
       return(rep(NA, 26))
     }
@@ -140,7 +140,7 @@ Features_rTPCP <- function(peptideSet, TCRSet,
     time.end <- proc.time()
     time.elapsed <- round(time.elapsed + (time.end-time.start)[3])
     time.remain <- round(time.elapsed*100/j)
-    cat("\r ", j, "% elapsed = ", lubridate::seconds_to_period(time.elapsed), ", remaining ~ ", lubridate::seconds_to_period(time.remain), sep="")
+    cat("\r ", j, "% elapsed = ", as.character(lubridate::seconds_to_period(time.elapsed)), ", remaining ~ ", as.character(lubridate::seconds_to_period(time.remain)), sep="")
   }
   message("Fragment matching was finished. (Memory occupied = ", memory.size(), "[Mb])")
   gc();gc()
