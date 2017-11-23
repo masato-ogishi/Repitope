@@ -38,4 +38,4 @@ library(tidyverse)
 Reference
 ------------------------
 
-Ogishi, M and Yotsuyanagi, H. (2017) "Quantitative modeling of repertoire-wide epitope-TCR interactions in human." (Manuscript in preparation)
+Ogishi, M and Yotsuyanagi, H. (2017) "Epitope prediction through quantitative modeling of repertoire-wide epitope-TCR interactions in human." (Manuscript in preparation)
