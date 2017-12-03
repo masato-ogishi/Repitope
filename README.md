@@ -23,16 +23,14 @@ Loading
 ------------------
 
 ``` r
-# Loading the Repitope package
+library(tidyverse)
 library(Repitope)
 ```
 
 Usage
 -----------------------------------
 ``` r
-# Setting up the working environment
-set.seed(12345)
-library(tidyverse)
+## Under construction...
 ```
 
 Reference
