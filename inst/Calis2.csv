@@ -1,520 +1,520 @@
-Peptide,Immunogenicity,MHC
-MMLPATLAF,Positive,HLA-B3501
-QEGAMHTAL,Positive,HLA-B4001
-VATTFVTPM,Positive,HLA-B3501
-YAQMWSLMY,Positive,HLA-B1501
-TFKVPHAKR,Positive,HLA-A3301
-MEGVFHTMW,Positive,HLA-B4403
-ATGPILTLW,Positive,HLA-B5801
-GPLVAGGLL,Positive,HLA-B0702
-SQIGAGVYK,Positive,HLA-A1101
-LEFEALGFM,Positive,HLA-B4001
-KAKGSRAIW,Positive,HLA-B5701
-TPEGIIPSM,Positive,HLA-B3501
-KPWDVIPMV,Positive,HLA-B5101
-WSIHAHHQW,Positive,HLA-B5801
-QYSDRRWCF,Positive,HLA-A2402
-DTTPFGQQR,Positive,HLA-A6801
-NPEIEDDIF,Positive,HLA-B3501
-GEGLHKLGY,Positive,HLA-B4403
-IILEFFLMV,Positive,HLA-A0201
-EENMDVEIW,Positive,HLA-B4403
-ETACLGKAY,Positive,HLA-A2601
-MLLALIAVL,Positive,HLA-A0201
-VYTQLCDHR,Positive,HLA-A3301
-CPTQGEAVL,Positive,HLA-B3501
-LGFLNEDHW,Positive,HLA-B5701
-TYLALIATF,Positive,HLA-A2402
-KVRKDIQQW,Positive,HLA-B5701
-KQIANELNY,Positive,HLA-B1501
-MEITAEWLW,Positive,HLA-B5801
-MLIPTAMAF,Positive,HLA-B3501
-ETTHHAVSR,Positive,HLA-A6801
-STYGWNLVR,Positive,HLA-A1101
-LTAAVLLLI,Positive,HLA-B5801
-TSGSPIIDK,Positive,HLA-A1101
-IGIGILLTW,Positive,HLA-B5801
-IGLTSRATW,Positive,HLA-B5801
-RQLANAIFK,Positive,HLA-A1101
-RQMEGEGVL,Positive,HLA-B1501
-HPASAWTLY,Positive,HLA-B3501
-QYIFTGQPL,Positive,HLA-A2402
-ALRGLPIRY,Positive,HLA-A0301
-IANQAAILM,Positive,HLA-B3501
-TEMGRLPTF,Negative,HLA-B4402
-LLKNDVPLA,Negative,HLA-A0203
-KLITQFETY,Negative,HLA-B1501
-KEENLVNSL,Negative,HLA-B4001
-KILAKAIFK,Negative,HLA-A0301
-LLIMGQLTW,Negative,HLA-B5801
-VMVMVGATM,Negative,HLA-B1501
-LQRKYGGAL,Negative,HLA-B1501
-ALITVSGLY,Negative,HLA-A2601
-ETAWDFGSV,Negative,HLA-A2601
-GSCVTTMAK,Negative,HLA-A1101
-KSRLNALGK,Negative,HLA-A3001
-VFKEKVDTR,Negative,HLA-A3301
-SYAMCTNTF,Negative,HLA-A2402
-LAILFEEVM,Negative,HLA-B3501
-EEHSSTWHY,Negative,HLA-B4403
-ALWDVPSPA,Negative,HLA-A0201
-NSTSTWVTY,Negative,HLA-A0101
-VLFTFVLLL,Negative,HLA-A0201
-FWKLVDRER,Negative,HLA-A3301
-LTDALALGM,Negative,HLA-A0101
-TTEAILPEY,Negative,HLA-A0101
-YLDVDLHPA,Negative,HLA-A0201
-INKRKKTSL,Negative,HLA-B0801
-AENHHHATM,Negative,HLA-B4403
-ISYGGGWRF,Negative,HLA-B5701
-VEGLSGATW,Negative,HLA-B4402
-KVRSNAALG,Negative,HLA-A3001
-RVYADPMAL,Negative,HLA-A3201
-IPEGRVIDL,Negative,HLA-B0702
-RTLAKEGIK,Negative,HLA-A3001
-ALFLEEMLR,Negative,HLA-A0301
-GSSPIIEVK,Negative,HLA-A1101
-GLLCLTLFV,Negative,HLA-A0201
-SPAATQKAA,Negative,HLA-B0702
-GTGNIGETL,Negative,HLA-A3201
-GVVTRSGAY,Negative,HLA-A2601
-LTWLGLNSR,Negative,HLA-A3301
-KFREGSSEV,Negative,HLA-A3001
-ATLAFHLTS,Negative,HLA-A3201
-KVDNFTMGV,Negative,HLA-A0206
-IEETNMITL,Negative,HLA-B4001
-AVFQEEQGW,Negative,HLA-B5701
-IQKETLVTF,Negative,HLA-B1501
-LPEIEDEVF,Negative,HLA-B3501
-SVICHETGR,Negative,HLA-A6801
-VTLFFLSGK,Negative,HLA-A1101
-ATLLVAVSF,Negative,HLA-A3201
-EEESEGAIW,Negative,HLA-B4403
-LPDTIETLM,Negative,HLA-B3501
-AEHTGREIV,Negative,HLA-B4001
-RMVLAFITF,Negative,HLA-B1501
-KPSGSASSM,Negative,HLA-B0702
-TSEIQLTDY,Negative,HLA-A0101
-YYMATLKNV,Negative,HLA-A2301
-DENKWKSAR,Negative,HLA-A3301
-RVLSIPPTA,Negative,HLA-A3001
-ITNITTDSR,Negative,HLA-A6801
-ETTMRGAKR,Negative,HLA-A6801
-VMRGKFGKK,Negative,HLA-A0301
-LGAQALPVY,Negative,HLA-B1501
-RTRVGTKHA,Negative,HLA-A3001
-TENILTVLL,Negative,HLA-B4001
-KLRDSYTQV,Negative,HLA-A0203
-TPRSPSVEV,Negative,HLA-B0702
-ILLENDMKF,Negative,HLA-A2301
-WYMWLGARF,Negative,HLA-A2402
-LEYTVVVTV,Negative,HLA-B4001
-LIKNAQTPR,Negative,HLA-A3101
-FCSHHFHEL,Negative,HLA-B0801
-TPQAPTSEI,Negative,HLA-B0702
-AQNALDNLV,Negative,HLA-A0206
-KLGEFGRAK,Negative,HLA-A0301
-FLIDGPETA,Negative,HLA-A0203
-GLNSRSTSL,Negative,HLA-B0801
-FVTLITGNM,Negative,HLA-A2601
-AMEELPDTI,Negative,HLA-A3201
-ISSTPFAEY,Negative,HLA-A0101
-LETRAETWM,Negative,HLA-B4001
-RSTPFNMLK,Negative,HLA-A1101
-ATFKIQPFL,Negative,HLA-A3001
-AYQHALNEL,Negative,HLA-A2301
-VLNSLGKMV,Negative,HLA-A0203
-QEHETSWHY,Negative,HLA-B4403
-IESQKNGSW,Negative,HLA-B4402
-TTIFAGHLK,Negative,HLA-A6801
-KAKIFTPEA,Negative,HLA-A3001
-CTTTGEHRR,Negative,HLA-A6801
-TPTWNRKEL,Negative,HLA-B0702
-MTLWYMWQV,Negative,HLA-A0206
-MVGANASDR,Negative,HLA-A6801
-AEISGSSPI,Negative,HLA-B4001
-IAVGGITLF,Negative,HLA-B5801
-RSQVGVGVF,Negative,HLA-B1501
-EVEDYGFGM,Negative,HLA-A2601
-AYVVIGLLF,Negative,HLA-A2301
-TTNIWMKFR,Negative,HLA-A3101
-RSVSGDLIL,Negative,HLA-B5801
-IMKNTTNTR,Negative,HLA-A3101
-MTAGIFLFF,Negative,HLA-A2601
-IFKLTYQNK,Negative,HLA-A3001
-ETKGVERLK,Negative,HLA-A6801
-SPARLASAI,Negative,HLA-B0702
-SLSVSLVLV,Negative,HLA-A0203
-IFLFLMSGR,Negative,HLA-A3301
-NEAKITDIM,Negative,HLA-B4001
-LLKTALLIV,Negative,HLA-A0203
-RELKCGSGI,Negative,HLA-B4001
-VIDLEPISY,Negative,HLA-A0101
-GMLIACYVI,Negative,HLA-A2301
-ITWIGMNSR,Negative,HLA-A3301
-LLMRTTWAL,Negative,HLA-B0801
-ISLGLILLK,Negative,HLA-A1101
-RLKMDKLTL,Negative,HLA-B0801
-KQLGQIMLL,Negative,HLA-A0206
-KQIQRVETW,Negative,HLA-A3201
-KVSCTILAV,Negative,HLA-A0206
-KVKYEGAGA,Negative,HLA-A3001
-LPEYGTLGL,Negative,HLA-B0702
-TVCYVLTGR,Negative,HLA-A6801
-EVKSCHWPK,Negative,HLA-A3301
-MENLLWKQI,Negative,HLA-B4402
-TYLALLAAF,Negative,HLA-A2301
-RSLIGNEEF,Negative,HLA-B5801
-MLMTGTLAV,Negative,HLA-A0203
-IMKSVGTGK,Negative,HLA-A0301
-TPRRGTGTT,Negative,HLA-B0702
-AETQHGTVL,Negative,HLA-B4001
-KVRPTFAAG,Negative,HLA-A3001
-QVFGSVYTT,Negative,HLA-A3201
-TVNPIVTEK,Negative,HLA-A1101
-RHRKPTYEK,Negative,HLA-A3001
-GEEVQVLAL,Negative,HLA-B4001
-KLLTKPWDV,Negative,HLA-A0201
-ILIGVVITW,Negative,HLA-B5701
-GLLCISIMI,Negative,HLA-A0201
-LIIMDEAHF,Negative,HLA-B1501
-GLFGKGSLV,Negative,HLA-A0203
-IESSKNQTW,Negative,HLA-B4402
-WQIERASLI,Negative,HLA-A0206
-SENEVKLTI,Negative,HLA-B4403
-EEEEAGVLW,Negative,HLA-B4403
-IPNHGVTAT,Negative,HLA-B3501
-KTDWLPMTV,Negative,HLA-A0101
-KSWLVHKQW,Negative,HLA-B5701
-TWKLARASF,Negative,HLA-A2301
-TWILRHPGF,Negative,HLA-A2402
-MAMTTVLSI,Negative,HLA-B5101
-ITEAELTGY,Negative,HLA-A0101
-NWLNNNIQF,Negative,HLA-A2301
-LEKAANVQW,Negative,HLA-B4402
-IMQRGLFGK,Negative,HLA-A1101
-NFQTMPGTF,Negative,HLA-A2301
-ITASILLWY,Negative,HLA-A0101
-VEGVSGGAW,Negative,HLA-B4403
-NERGKSLLF,Negative,HLA-B4403
-AVFKMSPGY,Negative,HLA-A2601
-SASRAWNVW,Negative,HLA-B5701
-SSADLSLEK,Negative,HLA-A1101
-TESHNQTFL,Negative,HLA-B4001
-WAKNIHTAI,Negative,HLA-B0801
-NESDPEGAL,Negative,HLA-B4001
-RTYCIEASI,Negative,HLA-A3201
-MLQGRGPLK,Negative,HLA-A0301
-IGKALHQVF,Negative,HLA-B1501
-RMLNILNGR,Negative,HLA-A3101
-NENDQYIYM,Negative,HLA-B4403
-KWKRQLNSL,Negative,HLA-A3001
-KSIEDNPEI,Negative,HLA-B5801
-HERGRPLLF,Negative,HLA-B4403
-FPYSIPATL,Negative,HLA-B5101
-SETFSMGLL,Negative,HLA-B4001
-TVAWRTATL,Negative,HLA-B0702
-YMPTVIEEL,Negative,HLA-A0201
-RIKQQGIFG,Negative,HLA-A3001
-TEIASLPTY,Negative,HLA-B4402
-DVIGERIKR,Negative,HLA-A3301
-SPAAAQKAT,Negative,HLA-B0702
-MECSPRTGL,Negative,HLA-B4001
-FLSGRGLGK,Negative,HLA-A0301
-VVVDEHCGY,Negative,HLA-A2601
-VIYDSKFEK,Negative,HLA-A1101
-TLYAVATTV,Negative,HLA-A0203
-GGWRFQGSW,Negative,HLA-B5701
-LSAAIGKAW,Negative,HLA-B5701
-LAMATTLQL,Negative,HLA-B0702
-ETALMVIGM,Negative,HLA-A2601
-KHVQRIETW,Negative,HLA-B5801
-KLREVYTQL,Negative,HLA-A0203
-MDLEKRHVL,Negative,HLA-B0801
-SVVETLEQM,Negative,HLA-A2601
-WQQVPFCSH,Negative,HLA-B1501
-TPPGSVEAF,Negative,HLA-B3501
-ISNITTATR,Negative,HLA-A3101
-RREKRSVAL,Negative,HLA-B0801
-VVVGDIIGV,Negative,HLA-A0206
-FPLCLSTTS,Negative,HLA-B3501
-GPLRLFMAL,Negative,HLA-B0801
-MLAVWNRVW,Negative,HLA-B5701
-LMMLVAPSY,Negative,HLA-B1501
-RLGYILEEI,Negative,HLA-A3201
-TMFLITENK,Negative,HLA-A1101
-EPWLKNNQF,Negative,HLA-B3501
-ALNELPESL,Negative,HLA-A0203
-QPKPGTRMV,Negative,HLA-B0702
-WEGGHDLTV,Negative,HLA-B4001
-ITFLRVLSI,Negative,HLA-A3201
-ASDRMGMGV,Negative,HLA-A0101
-VLDDGIYRI,Negative,HLA-A0201
-SILASSLLK,Negative,HLA-A1101
-PEVANLDII,Negative,HLA-B4001
-STRDGEPLM,Negative,HLA-A3001
-YPLAIPVTM,Negative,HLA-B3501
-GEKALKLSW,Negative,HLA-B4402
-QMAPHHKIL,Negative,HLA-B0801
-IWGRKSWPI,Negative,HLA-A2402
-HEWMTTEDM,Negative,HLA-B4402
-SMAMRCVGI,Negative,HLA-B0801
-HTIENTSAN,Negative,HLA-A2601
-HMIVSKQER,Negative,HLA-A3101
-VSTPQGLVK,Negative,HLA-A1101
-PFGDSYVII,Negative,HLA-A2301
-LLNGQGPMK,Negative,HLA-A0301
-VTTWENVPY,Negative,HLA-A0101
-TIIGRRLQR,Negative,HLA-A3301
-LNGRKRSTM,Negative,HLA-B0801
-ALFEPEREK,Negative,HLA-A0301
-PLAENTNSV,Negative,HLA-A0203
-SLAAIANQA,Negative,HLA-A0203
-ILIGFLVLW,Negative,HLA-B5701
-TILIKVEYK,Negative,HLA-A1101
-LGKCGSCVY,Negative,HLA-B1501
-HWVEITALI,Negative,HLA-A2402
-LLATVTGGI,Negative,HLA-A0203
-ILLKMVTHF,Negative,HLA-B1501
-HVLGRLITV,Negative,HLA-A0206
-LEKKITQWL,Negative,HLA-B4001
-ILKDGPERV,Negative,HLA-A0203
-PWLSSKPEF,Negative,HLA-A2301
-QVIAVEPGK,Negative,HLA-A1101
-RQWFFDLPL,Negative,HLA-A3201
-IVIGIITLY,Negative,HLA-A2601
-VLMHRGKRI,Negative,HLA-B0801
-MTDDIGMGV,Negative,HLA-A0101
-NEEKITQQM,Negative,HLA-B4402
-QMSSGNLLF,Negative,HLA-B1501
-TTLSRTSKK,Negative,HLA-A1101
-AERTGEPDY,Negative,HLA-B4403
-MGANFRAGR,Negative,HLA-A6801
-GWGNGCGLF,Negative,HLA-A2301
-ITLDILTEI,Negative,HLA-A0206
-IASAIVLEF,Negative,HLA-B5801
-HAHWTEAKM,Negative,HLA-B3501
-RSCTMPPLR,Negative,HLA-A3101
-GASTSQETW,Negative,HLA-B5801
-QVAINQVRR,Negative,HLA-A6801
-GMSKEPGVV,Negative,HLA-A0203
-IVMLHTTER,Negative,HLA-A6801
-RQDLLVTFK,Negative,HLA-A1101
-TEFQPHQLW,Negative,HLA-B4402
-LLLTLLATV,Negative,HLA-A0201
-CLRRRVTRK,Negative,HLA-A0301
-VSSVNTTSK,Negative,HLA-A1101
-KVVQHENLK,Negative,HLA-A0301
-TFIKTTFSL,Negative,HLA-A2301
-HTWQKQTQR,Negative,HLA-A3301
-WSYYCGGLK,Negative,HLA-A0301
-ALKRRLRTL,Negative,HLA-B0801
-QETWNRQDL,Negative,HLA-B4001
-TWRDMAHTL,Negative,HLA-A2301
-MTLGMCCII,Negative,HLA-A3201
-ELCEDTMTY,Negative,HLA-A2601
-EELGDGLAM,Negative,HLA-B4403
-KFQPESPSK,Negative,HLA-A3001
-SLLGSALLK,Negative,HLA-A0301
-WTMKILIGV,Negative,HLA-A0206
-LIVSGIFPY,Negative,HLA-B1501
-RWLWGFLSR,Negative,HLA-A3101
-NYKERMVTF,Negative,HLA-A2402
-YQGKTVWFV,Negative,HLA-A0206
-TPQPMELKY,Negative,HLA-B3501
-IPKIYGGPI,Negative,HLA-B0702
-SEMIIPKNF,Negative,HLA-B4402
-LGRNKRPRL,Negative,HLA-B0801
-VTCAMFTCK,Negative,HLA-A1101
-GTLALSLTF,Negative,HLA-A3201
-KITGNLVQI,Negative,HLA-A3201
-LLTIGLSLV,Negative,HLA-A0203
-DTSECPNER,Negative,HLA-A3301
-ALLAGFMAY,Negative,HLA-B1501
-LEKHGAERL,Negative,HLA-B4001
-SEFQIYKKS,Negative,HLA-B4403
-KEVALLRTY,Negative,HLA-B4403
-LMKSLGGGR,Negative,HLA-A3101
-FMTATPPGA,Negative,HLA-A0203
-EIWTKEGER,Negative,HLA-A3301
-MVSAGSGEV,Negative,HLA-A0203
-AEPDDVDCW,Negative,HLA-B4402
-VTRKHMILA,Negative,HLA-A3001
-KVRMEKLRI,Negative,HLA-A3001
-TLLSLTFIK,Negative,HLA-A0301
-KVDAIDGEY,Negative,HLA-A0101
-RVIDLGCGR,Negative,HLA-A3101
-AVFVDENQW,Negative,HLA-B5701
-LLKATLLAV,Negative,HLA-A0203
-DVISRRDQR,Negative,HLA-A3301
-RPAKSGTVM,Negative,HLA-B0702
-IWPKSHTLW,Negative,HLA-A2402
-YLMTLMKGA,Negative,HLA-A0203
-KALKINWYK,Negative,HLA-A1101
-IAVGMVTLY,Negative,HLA-B3501
-RTLILAPTR,Negative,HLA-A3101
-SQSTIPETI,Negative,HLA-A3201
-RSGAYVSAI,Negative,HLA-A3201
-LNRRRRTAG,Negative,HLA-B0801
-MELKYSWKT,Negative,HLA-B4403
-TLKRRSWPL,Negative,HLA-B0801
-GESNIVIGI,Negative,HLA-B4001
-NMLSIINKR,Negative,HLA-A3301
-KTWGKAKIF,Negative,HLA-A3201
-AVVLMGLDK,Negative,HLA-A1101
-VAATMANEM,Negative,HLA-B3501
-EEYVDYMPV,Negative,HLA-B4001
-LLFLNDMGK,Negative,HLA-A0301
-AVILQNAWK,Negative,HLA-A1101
-LAMGIMMLK,Negative,HLA-A1101
-LLLRKLTSK,Negative,HLA-A0301
-IPLCRTSCL,Negative,HLA-B0801
-LVQIENLEY,Negative,HLA-A0101
-LMKMKKKTW,Negative,HLA-B0801
-WMASVEPHW,Negative,HLA-B5801
-EVMRSRWSR,Negative,HLA-A3301
-SALTLHWFR,Negative,HLA-A3101
-MMGKREKKL,Negative,HLA-B0801
-RSWNSGHEW,Negative,HLA-B5801
-FQRALIFIL,Negative,HLA-A0206
-LLILCTSQI,Negative,HLA-A0203
-DWIPLALTI,Negative,HLA-A2402
-LTGGVTLFF,Negative,HLA-B5801
-ATVLMGLGK,Negative,HLA-A1101
-LMSGRGIGK,Negative,HLA-A0301
-KLAEAIFKL,Negative,HLA-A0201
-GYISTRVEM,Negative,HLA-A2301
-LAHRTRNAL,Negative,HLA-B0702
-CTGKFKIVK,Negative,HLA-A1101
-AGLAFSLMK,Negative,HLA-A1101
-SPKRLSAAI,Negative,HLA-B0801
-KTQRSGALW,Negative,HLA-B5701
-TEEIAVQNW,Negative,HLA-B4402
-IESALNDTW,Negative,HLA-B4402
-SLGCKPLTM,Negative,HLA-B0801
-MFKKRNLTI,Negative,HLA-B0801
-EVHTWTEQY,Negative,HLA-A2601
-EVKKQRAGV,Negative,HLA-A2601
-RMIVGKNER,Negative,HLA-A3101
-KTQAIDGEF,Negative,HLA-B5801
-YVFSGDPLK,Negative,HLA-A6801
-SLVMLLVHY,Negative,HLA-B1501
-ATYEPDVDL,Negative,HLA-A3201
-ILARWSSFK,Negative,HLA-A0301
-EEEQTLTIL,Negative,HLA-B4001
-MYFHRRDLR,Negative,HLA-A3301
-VVIAILTVV,Negative,HLA-A0206
-TEHGTIATI,Negative,HLA-B4001
-RARNRVSTV,Negative,HLA-B0801
-ILIRTGLLV,Negative,HLA-A0203
-AIKILIGFR,Negative,HLA-A3101
-IPKNFAGPV,Negative,HLA-B0702
-ALSELPETL,Negative,HLA-A3201
-DTRTPRAKR,Negative,HLA-A3301
-SLLTCAKFK,Negative,HLA-A0301
-FTMRLLSPV,Negative,HLA-A0206
-RVPSHLAHR,Negative,HLA-A3101
-TIMAVLFVV,Negative,HLA-A0206
-MQAGKRSLR,Negative,HLA-A3101
-GTFKKSGAI,Negative,HLA-A3201
-MSAAIKDNR,Negative,HLA-A6801
-KMRPMFAVG,Negative,HLA-B1501
-KTNTGTIGA,Negative,HLA-A3001
-KMDIGVPLL,Negative,HLA-A0201
-EVTNPAVLR,Negative,HLA-A6801
-ETMETLLLL,Negative,HLA-A2601
-ELGKKKTPR,Negative,HLA-A3301
-VSGKLIHEW,Negative,HLA-B5701
-VSWSGRELK,Negative,HLA-A1101
-NYILWENNI,Negative,HLA-A2301
-VLLGSFGCK,Negative,HLA-A0301
-TLAVFLLLI,Negative,HLA-A0201
-TTRNGEPHM,Negative,HLA-A3001
-LLFKTSAGV,Negative,HLA-A0203
-PLNEGVMAV,Negative,HLA-A0203
-MLLNRFTMA,Negative,HLA-B0801
-IQRTVFFVL,Negative,HLA-B1501
-AISCVPNAV,Negative,HLA-A0203
-IQNSGGTSI,Negative,HLA-B1501
-AETQNSSFI,Negative,HLA-B4402
-VVRPPFNML,Negative,HLA-B0702
-NSKNTSMSF,Negative,HLA-B1501
-IIFILLMLV,Negative,HLA-A0201
-GYVLGIFLR,Negative,HLA-A3301
-KFQADSPKR,Negative,HLA-A3101
-LSKSEFNTY,Negative,HLA-B1501
-EWLWRTLGR,Negative,HLA-A3301
-DTSEVHWNY,Negative,HLA-A0101
-FVIDNVHTW,Negative,HLA-B5801
-TPNLAKRVL,Negative,HLA-B0702
-TSSQQKADW,Negative,HLA-B5701
-LLFRRLTSR,Negative,HLA-A3101
-LAVSGVYPM,Negative,HLA-B3501
-GLLFMILTV,Negative,HLA-A0201
-TSADLTVEK,Negative,HLA-A1101
-ELKGMSYAM,Negative,HLA-A2601
-HLAIMAVFK,Negative,HLA-A0301
-RTEAKSALK,Negative,HLA-A3001
-RTAGMIIML,Negative,HLA-A3201
-CTGSFKLEK,Negative,HLA-A1101
-RERLSRMAI,Negative,HLA-B4001
-FLAHYIGTS,Negative,HLA-A0203
-TLFVEECLR,Negative,HLA-A6801
-SQHNYRPGY,Negative,HLA-B1501
-LPVCQSSSM,Negative,HLA-B3501
-MVLLQMENK,Negative,HLA-A1101
-HSGVDVFYK,Negative,HLA-A1101
-KSKAINVLR,Negative,HLA-A3101
-VEVQDDGTM,Negative,HLA-B4001
-RARVSQGAG,Negative,HLA-A3001
-EATQLATLR,Negative,HLA-A6801
-LLLGLMILL,Negative,HLA-A0201
-RVWIQENPW,Negative,HLA-B5701
-LTDYGALTL,Negative,HLA-A0101
-FAVGLLFRR,Negative,HLA-A3301
-DVRNDMISY,Negative,HLA-A2601
-ALSEGVYRI,Negative,HLA-A0203
-MILAVVITL,Negative,HLA-A0201
-EQMANGIAL,Negative,HLA-B4001
-RGRIGRNPK,Negative,HLA-A3001
-YFWQKKKQR,Negative,HLA-A3301
-FIRSTMSLV,Negative,HLA-A0203
-KKMIRPQPM,Negative,HLA-B0801
-VSTVQQLTK,Negative,HLA-A1101
-ESRTIRVLK,Negative,HLA-A6801
-GMMVLKIVR,Negative,HLA-A3101
-KAKRGTAQI,Negative,HLA-A3001
-AIFLTTLSR,Negative,HLA-A1101
-TYSDPLALR,Negative,HLA-A3301
-KGKRIEPSW,Negative,HLA-B5701
-ILNAHEDGV,Negative,HLA-A0203
-MEFIDGISL,Negative,HLA-B4001
-NRRKRSVTM,Negative,HLA-B0801
-NERRAWNFL,Negative,HLA-B4403
-FMAYMIGQT,Negative,HLA-A0203
-IPHDLMELI,Negative,HLA-B5101
-SEIPNLDII,Negative,HLA-B4001
-GLFTSLGKA,Negative,HLA-A0203
-SQLAKRFSR,Negative,HLA-A3101
-IALGLMALK,Negative,HLA-A1101
-YQVKTETTI,Negative,HLA-A0206
-ATLLVWHTW,Negative,HLA-B5701
-KTFDTEYPK,Negative,HLA-A1101
-STTSQKTTW,Negative,HLA-B5701
-KEKVVGRII,Negative,HLA-B4001
-TIFTLTVAW,Negative,HLA-A3201
-VILAGPIPV,Negative,HLA-A0201
-EEYKRSGIL,Negative,HLA-B4001
-LAAVSVSPL,Negative,HLA-B0702
-NTYKRSGIM,Negative,HLA-A2601
-AIGTSITQK,Negative,HLA-A0301
-LVISGLFPV,Negative,HLA-A0206
-KPIDDRFAT,Negative,HLA-B0702
-KTRRYLPAI,Negative,HLA-A3001
-PTAGVLARW,Negative,HLA-B5701
-MFGGVSWMI,Negative,HLA-A2301
-GATTETPTW,Negative,HLA-B5701
-ETLGEKWKR,Negative,HLA-A3301
-TQTAGPWHL,Negative,HLA-A0206
-LLLGVGLAM,Negative,HLA-B1501
-LMIVARHER,Negative,HLA-A3101
+Peptide,Immunogenicity,ImmunogenicityEvidence,MHC,MHCEvidence,Host,Dataset
+MMLPATLAF,Positive,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+QEGAMHTAL,Positive,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+VATTFVTPM,Positive,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+YAQMWSLMY,Positive,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+TFKVPHAKR,Positive,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+MEGVFHTMW,Positive,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+ATGPILTLW,Positive,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+GPLVAGGLL,Positive,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+SQIGAGVYK,Positive,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+LEFEALGFM,Positive,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+KAKGSRAIW,Positive,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+TPEGIIPSM,Positive,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+KPWDVIPMV,Positive,IFNg release,HLA-B5101,Cited reference,Homo sapiens,Calis2
+WSIHAHHQW,Positive,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+QYSDRRWCF,Positive,IFNg release,HLA-A2402,Cited reference,Homo sapiens,Calis2
+DTTPFGQQR,Positive,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+NPEIEDDIF,Positive,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+GEGLHKLGY,Positive,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+IILEFFLMV,Positive,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+EENMDVEIW,Positive,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+ETACLGKAY,Positive,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+MLLALIAVL,Positive,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+VYTQLCDHR,Positive,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+CPTQGEAVL,Positive,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+LGFLNEDHW,Positive,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+TYLALIATF,Positive,IFNg release,HLA-A2402,Cited reference,Homo sapiens,Calis2
+KVRKDIQQW,Positive,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+KQIANELNY,Positive,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+MEITAEWLW,Positive,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+MLIPTAMAF,Positive,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+ETTHHAVSR,Positive,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+STYGWNLVR,Positive,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+LTAAVLLLI,Positive,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+TSGSPIIDK,Positive,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+IGIGILLTW,Positive,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+IGLTSRATW,Positive,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+RQLANAIFK,Positive,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+RQMEGEGVL,Positive,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+HPASAWTLY,Positive,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+QYIFTGQPL,Positive,IFNg release,HLA-A2402,Cited reference,Homo sapiens,Calis2
+ALRGLPIRY,Positive,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+IANQAAILM,Positive,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+TEMGRLPTF,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+LLKNDVPLA,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+KLITQFETY,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+KEENLVNSL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+KILAKAIFK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+LLIMGQLTW,Negative,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+VMVMVGATM,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+LQRKYGGAL,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+ALITVSGLY,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+ETAWDFGSV,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+GSCVTTMAK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+KSRLNALGK,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+VFKEKVDTR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+SYAMCTNTF,Negative,IFNg release,HLA-A2402,Cited reference,Homo sapiens,Calis2
+LAILFEEVM,Negative,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+EEHSSTWHY,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+ALWDVPSPA,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+NSTSTWVTY,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+VLFTFVLLL,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+FWKLVDRER,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+LTDALALGM,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+TTEAILPEY,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+YLDVDLHPA,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+INKRKKTSL,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+AENHHHATM,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+ISYGGGWRF,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+VEGLSGATW,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+KVRSNAALG,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+RVYADPMAL,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+IPEGRVIDL,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+RTLAKEGIK,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+ALFLEEMLR,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+GSSPIIEVK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+GLLCLTLFV,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+SPAATQKAA,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+GTGNIGETL,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+GVVTRSGAY,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+LTWLGLNSR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+KFREGSSEV,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+ATLAFHLTS,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+KVDNFTMGV,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+IEETNMITL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+AVFQEEQGW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+IQKETLVTF,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+LPEIEDEVF,Negative,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+SVICHETGR,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+VTLFFLSGK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+ATLLVAVSF,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+EEESEGAIW,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+LPDTIETLM,Negative,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+AEHTGREIV,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+RMVLAFITF,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+KPSGSASSM,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+TSEIQLTDY,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+YYMATLKNV,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+DENKWKSAR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+RVLSIPPTA,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+ITNITTDSR,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+ETTMRGAKR,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+VMRGKFGKK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+LGAQALPVY,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+RTRVGTKHA,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+TENILTVLL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+KLRDSYTQV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+TPRSPSVEV,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+ILLENDMKF,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+WYMWLGARF,Negative,IFNg release,HLA-A2402,Cited reference,Homo sapiens,Calis2
+LEYTVVVTV,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+LIKNAQTPR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+FCSHHFHEL,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+TPQAPTSEI,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+AQNALDNLV,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+KLGEFGRAK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+FLIDGPETA,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+GLNSRSTSL,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+FVTLITGNM,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+AMEELPDTI,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+ISSTPFAEY,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+LETRAETWM,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+RSTPFNMLK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+ATFKIQPFL,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+AYQHALNEL,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+VLNSLGKMV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+QEHETSWHY,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+IESQKNGSW,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+TTIFAGHLK,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+KAKIFTPEA,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+CTTTGEHRR,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+TPTWNRKEL,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+MTLWYMWQV,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+MVGANASDR,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+AEISGSSPI,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+IAVGGITLF,Negative,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+RSQVGVGVF,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+EVEDYGFGM,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+AYVVIGLLF,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+TTNIWMKFR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+RSVSGDLIL,Negative,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+IMKNTTNTR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+MTAGIFLFF,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+IFKLTYQNK,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+ETKGVERLK,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+SPARLASAI,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+SLSVSLVLV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+IFLFLMSGR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+NEAKITDIM,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+LLKTALLIV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+RELKCGSGI,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+VIDLEPISY,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+GMLIACYVI,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+ITWIGMNSR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+LLMRTTWAL,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+ISLGLILLK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+RLKMDKLTL,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+KQLGQIMLL,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+KQIQRVETW,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+KVSCTILAV,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+KVKYEGAGA,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+LPEYGTLGL,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+TVCYVLTGR,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+EVKSCHWPK,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+MENLLWKQI,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+TYLALLAAF,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+RSLIGNEEF,Negative,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+MLMTGTLAV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+IMKSVGTGK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+TPRRGTGTT,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+AETQHGTVL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+KVRPTFAAG,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+QVFGSVYTT,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+TVNPIVTEK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+RHRKPTYEK,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+GEEVQVLAL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+KLLTKPWDV,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+ILIGVVITW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+GLLCISIMI,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+LIIMDEAHF,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+GLFGKGSLV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+IESSKNQTW,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+WQIERASLI,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+SENEVKLTI,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+EEEEAGVLW,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+IPNHGVTAT,Negative,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+KTDWLPMTV,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+KSWLVHKQW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+TWKLARASF,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+TWILRHPGF,Negative,IFNg release,HLA-A2402,Cited reference,Homo sapiens,Calis2
+MAMTTVLSI,Negative,IFNg release,HLA-B5101,Cited reference,Homo sapiens,Calis2
+ITEAELTGY,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+NWLNNNIQF,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+LEKAANVQW,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+IMQRGLFGK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+NFQTMPGTF,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+ITASILLWY,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+VEGVSGGAW,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+NERGKSLLF,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+AVFKMSPGY,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+SASRAWNVW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+SSADLSLEK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+TESHNQTFL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+WAKNIHTAI,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+NESDPEGAL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+RTYCIEASI,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+MLQGRGPLK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+IGKALHQVF,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+RMLNILNGR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+NENDQYIYM,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+KWKRQLNSL,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+KSIEDNPEI,Negative,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+HERGRPLLF,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+FPYSIPATL,Negative,IFNg release,HLA-B5101,Cited reference,Homo sapiens,Calis2
+SETFSMGLL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+TVAWRTATL,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+YMPTVIEEL,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+RIKQQGIFG,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+TEIASLPTY,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+DVIGERIKR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+SPAAAQKAT,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+MECSPRTGL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+FLSGRGLGK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+VVVDEHCGY,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+VIYDSKFEK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+TLYAVATTV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+GGWRFQGSW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+LSAAIGKAW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+LAMATTLQL,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+ETALMVIGM,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+KHVQRIETW,Negative,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+KLREVYTQL,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+MDLEKRHVL,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+SVVETLEQM,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+WQQVPFCSH,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+TPPGSVEAF,Negative,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+ISNITTATR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+RREKRSVAL,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+VVVGDIIGV,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+FPLCLSTTS,Negative,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+GPLRLFMAL,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+MLAVWNRVW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+LMMLVAPSY,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+RLGYILEEI,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+TMFLITENK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+EPWLKNNQF,Negative,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+ALNELPESL,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+QPKPGTRMV,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+WEGGHDLTV,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+ITFLRVLSI,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+ASDRMGMGV,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+VLDDGIYRI,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+SILASSLLK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+PEVANLDII,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+STRDGEPLM,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+YPLAIPVTM,Negative,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+GEKALKLSW,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+QMAPHHKIL,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+IWGRKSWPI,Negative,IFNg release,HLA-A2402,Cited reference,Homo sapiens,Calis2
+HEWMTTEDM,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+SMAMRCVGI,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+HTIENTSAN,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+HMIVSKQER,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+VSTPQGLVK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+PFGDSYVII,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+LLNGQGPMK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+VTTWENVPY,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+TIIGRRLQR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+LNGRKRSTM,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+ALFEPEREK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+PLAENTNSV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+SLAAIANQA,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+ILIGFLVLW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+TILIKVEYK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+LGKCGSCVY,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+HWVEITALI,Negative,IFNg release,HLA-A2402,Cited reference,Homo sapiens,Calis2
+LLATVTGGI,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+ILLKMVTHF,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+HVLGRLITV,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+LEKKITQWL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+ILKDGPERV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+PWLSSKPEF,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+QVIAVEPGK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+RQWFFDLPL,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+IVIGIITLY,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+VLMHRGKRI,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+MTDDIGMGV,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+NEEKITQQM,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+QMSSGNLLF,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+TTLSRTSKK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+AERTGEPDY,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+MGANFRAGR,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+GWGNGCGLF,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+ITLDILTEI,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+IASAIVLEF,Negative,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+HAHWTEAKM,Negative,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+RSCTMPPLR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+GASTSQETW,Negative,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+QVAINQVRR,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+GMSKEPGVV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+IVMLHTTER,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+RQDLLVTFK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+TEFQPHQLW,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+LLLTLLATV,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+CLRRRVTRK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+VSSVNTTSK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+KVVQHENLK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+TFIKTTFSL,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+HTWQKQTQR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+WSYYCGGLK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+ALKRRLRTL,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+QETWNRQDL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+TWRDMAHTL,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+MTLGMCCII,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+ELCEDTMTY,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+EELGDGLAM,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+KFQPESPSK,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+SLLGSALLK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+WTMKILIGV,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+LIVSGIFPY,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+RWLWGFLSR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+NYKERMVTF,Negative,IFNg release,HLA-A2402,Cited reference,Homo sapiens,Calis2
+YQGKTVWFV,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+TPQPMELKY,Negative,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+IPKIYGGPI,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+SEMIIPKNF,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+LGRNKRPRL,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+VTCAMFTCK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+GTLALSLTF,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+KITGNLVQI,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+LLTIGLSLV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+DTSECPNER,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+ALLAGFMAY,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+LEKHGAERL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+SEFQIYKKS,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+KEVALLRTY,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+LMKSLGGGR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+FMTATPPGA,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+EIWTKEGER,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+MVSAGSGEV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+AEPDDVDCW,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+VTRKHMILA,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+KVRMEKLRI,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+TLLSLTFIK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+KVDAIDGEY,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+RVIDLGCGR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+AVFVDENQW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+LLKATLLAV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+DVISRRDQR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+RPAKSGTVM,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+IWPKSHTLW,Negative,IFNg release,HLA-A2402,Cited reference,Homo sapiens,Calis2
+YLMTLMKGA,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+KALKINWYK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+IAVGMVTLY,Negative,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+RTLILAPTR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+SQSTIPETI,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+RSGAYVSAI,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+LNRRRRTAG,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+MELKYSWKT,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+TLKRRSWPL,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+GESNIVIGI,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+NMLSIINKR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+KTWGKAKIF,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+AVVLMGLDK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+VAATMANEM,Negative,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+EEYVDYMPV,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+LLFLNDMGK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+AVILQNAWK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+LAMGIMMLK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+LLLRKLTSK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+IPLCRTSCL,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+LVQIENLEY,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+LMKMKKKTW,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+WMASVEPHW,Negative,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+EVMRSRWSR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+SALTLHWFR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+MMGKREKKL,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+RSWNSGHEW,Negative,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+FQRALIFIL,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+LLILCTSQI,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+DWIPLALTI,Negative,IFNg release,HLA-A2402,Cited reference,Homo sapiens,Calis2
+LTGGVTLFF,Negative,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+ATVLMGLGK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+LMSGRGIGK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+KLAEAIFKL,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+GYISTRVEM,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+LAHRTRNAL,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+CTGKFKIVK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+AGLAFSLMK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+SPKRLSAAI,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+KTQRSGALW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+TEEIAVQNW,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+IESALNDTW,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+SLGCKPLTM,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+MFKKRNLTI,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+EVHTWTEQY,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+EVKKQRAGV,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+RMIVGKNER,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+KTQAIDGEF,Negative,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+YVFSGDPLK,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+SLVMLLVHY,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+ATYEPDVDL,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+ILARWSSFK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+EEEQTLTIL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+MYFHRRDLR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+VVIAILTVV,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+TEHGTIATI,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+RARNRVSTV,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+ILIRTGLLV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+AIKILIGFR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+IPKNFAGPV,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+ALSELPETL,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+DTRTPRAKR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+SLLTCAKFK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+FTMRLLSPV,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+RVPSHLAHR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+TIMAVLFVV,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+MQAGKRSLR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+GTFKKSGAI,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+MSAAIKDNR,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+KMRPMFAVG,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+KTNTGTIGA,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+KMDIGVPLL,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+EVTNPAVLR,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+ETMETLLLL,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+ELGKKKTPR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+VSGKLIHEW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+VSWSGRELK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+NYILWENNI,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+VLLGSFGCK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+TLAVFLLLI,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+TTRNGEPHM,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+LLFKTSAGV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+PLNEGVMAV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+MLLNRFTMA,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+IQRTVFFVL,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+AISCVPNAV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+IQNSGGTSI,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+AETQNSSFI,Negative,IFNg release,HLA-B4402,Cited reference,Homo sapiens,Calis2
+VVRPPFNML,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+NSKNTSMSF,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+IIFILLMLV,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+GYVLGIFLR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+KFQADSPKR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+LSKSEFNTY,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+EWLWRTLGR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+DTSEVHWNY,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+FVIDNVHTW,Negative,IFNg release,HLA-B5801,Cited reference,Homo sapiens,Calis2
+TPNLAKRVL,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+TSSQQKADW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+LLFRRLTSR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+LAVSGVYPM,Negative,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+GLLFMILTV,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+TSADLTVEK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+ELKGMSYAM,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+HLAIMAVFK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+RTEAKSALK,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+RTAGMIIML,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+CTGSFKLEK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+RERLSRMAI,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+FLAHYIGTS,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+TLFVEECLR,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+SQHNYRPGY,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+LPVCQSSSM,Negative,IFNg release,HLA-B3501,Cited reference,Homo sapiens,Calis2
+MVLLQMENK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+HSGVDVFYK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+KSKAINVLR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+VEVQDDGTM,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+RARVSQGAG,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+EATQLATLR,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+LLLGLMILL,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+RVWIQENPW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+LTDYGALTL,Negative,IFNg release,HLA-A0101,Cited reference,Homo sapiens,Calis2
+FAVGLLFRR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+DVRNDMISY,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+ALSEGVYRI,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+MILAVVITL,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+EQMANGIAL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+RGRIGRNPK,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+YFWQKKKQR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+FIRSTMSLV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+KKMIRPQPM,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+VSTVQQLTK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+ESRTIRVLK,Negative,IFNg release,HLA-A6801,Cited reference,Homo sapiens,Calis2
+GMMVLKIVR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+KAKRGTAQI,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+AIFLTTLSR,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+TYSDPLALR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+KGKRIEPSW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+ILNAHEDGV,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+MEFIDGISL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+NRRKRSVTM,Negative,IFNg release,HLA-B0801,Cited reference,Homo sapiens,Calis2
+NERRAWNFL,Negative,IFNg release,HLA-B4403,Cited reference,Homo sapiens,Calis2
+FMAYMIGQT,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+IPHDLMELI,Negative,IFNg release,HLA-B5101,Cited reference,Homo sapiens,Calis2
+SEIPNLDII,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+GLFTSLGKA,Negative,IFNg release,HLA-A0203,Cited reference,Homo sapiens,Calis2
+SQLAKRFSR,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
+IALGLMALK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+YQVKTETTI,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+ATLLVWHTW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+KTFDTEYPK,Negative,IFNg release,HLA-A1101,Cited reference,Homo sapiens,Calis2
+STTSQKTTW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+KEKVVGRII,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+TIFTLTVAW,Negative,IFNg release,HLA-A3201,Cited reference,Homo sapiens,Calis2
+VILAGPIPV,Negative,IFNg release,HLA-A0201,Cited reference,Homo sapiens,Calis2
+EEYKRSGIL,Negative,IFNg release,HLA-B4001,Cited reference,Homo sapiens,Calis2
+LAAVSVSPL,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+NTYKRSGIM,Negative,IFNg release,HLA-A2601,Cited reference,Homo sapiens,Calis2
+AIGTSITQK,Negative,IFNg release,HLA-A0301,Cited reference,Homo sapiens,Calis2
+LVISGLFPV,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+KPIDDRFAT,Negative,IFNg release,HLA-B0702,Cited reference,Homo sapiens,Calis2
+KTRRYLPAI,Negative,IFNg release,HLA-A3001,Cited reference,Homo sapiens,Calis2
+PTAGVLARW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+MFGGVSWMI,Negative,IFNg release,HLA-A2301,Cited reference,Homo sapiens,Calis2
+GATTETPTW,Negative,IFNg release,HLA-B5701,Cited reference,Homo sapiens,Calis2
+ETLGEKWKR,Negative,IFNg release,HLA-A3301,Cited reference,Homo sapiens,Calis2
+TQTAGPWHL,Negative,IFNg release,HLA-A0206,Cited reference,Homo sapiens,Calis2
+LLLGVGLAM,Negative,IFNg release,HLA-B1501,Cited reference,Homo sapiens,Calis2
+LMIVARHER,Negative,IFNg release,HLA-A3101,Cited reference,Homo sapiens,Calis2
