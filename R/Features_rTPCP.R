@@ -50,24 +50,24 @@ Features_rTPCP <- function(peptideSet, TCRSet,
     pr <- table(f)/l
     sample(names(pr), size=depth, replace=T, prob=pr)
   }
-  TCRFragDictSet <- function(TCRSet, fragLen, TCRFragDepth, seed){
+  TCRFragDictSet <- function(TCRSet, fragLen, depth, seed){
     set.seed(seed)
-    TCRSet.FR <- fragmentDictionary(TCRSet, fragLen, TCRFragDepth, seed)
+    TCRSet.FR <- fragmentDictionary(TCRSet, fragLen, depth, seed)
     TCRSet.mock <- fragmentDictionary(
       sapply(TCRSet, function(tcr){paste0(sample(Biostrings::AA_STANDARD, size=nchar(tcr), replace=T), collapse="")}),
-      fragLen, TCRFragDepth, seed
+      fragLen, depth, seed
     )
     list("FR"=TCRSet.FR, "Mock"=TCRSet.mock)
   }
-  message("Creation of TCR fragment dictionary was started.")
+  message("Preparation of TCR fragment dictionary was started.")
   if(is.character(TCRSet)){
-    TCRSet <- lapply(seedSet, function(s){set.seed(s); sample(TCRSet, min(10000, length(TCRSet)))})
+    TCRSet <- lapply(seedSet, function(s){set.seed(s); sample(TCRSet, length(TCRSet))})
   }else if(is.list(TCRSet)){
     if(length(TCRSet)!=length(seedSet)){
       print("The length of TCRSet (list) and that of seedSet are not matched!")
       return(NULL)
     }else{
-      TCRSet <- mapply(function(tcr, s){set.seed(s); sample(tcr, min(10000, length(tcr)))}, TCRSet, seedSet, SIMPLIFY=F)
+      TCRSet <- mapply(function(tcr, s){set.seed(s); sample(tcr, length(tcr))}, TCRSet, seedSet, SIMPLIFY=F)
     }
   }
   names(TCRSet) <- seedSet
@@ -78,7 +78,7 @@ Features_rTPCP <- function(peptideSet, TCRSet,
   TCRParameterSet <- apply(expand.grid(fragLenSet, TCRFragDepthSet, seedSet, stringsAsFactors=F), 1,
                            function(v){paste0(v[1], "_", v[2], "_", v[3])})
   names(TCRFragDictSet.List) <- TCRParameterSet
-  message("Creation of TCR fragment dictionary was finished.")
+  message("Preparation of TCR fragment dictionary was finished.")
     
   # AAIndex-derived pairwise matching matrices
   aaIndexMatrixFormat <- function(aaIndexID, pairMatInverse=T){
@@ -96,28 +96,29 @@ Features_rTPCP <- function(peptideSet, TCRSet,
   # Fragment matching
   
   ## Working function
+  statSet <- c("mean","sd","median","trimmed","mad","skew","kurtosis","se","IQR","Q0.1","Q0.9")
+  statNameSet <- c("Mean","SD","Median","TrimmedMean10","MedAbsDev","Skew","Kurtosis","SE","IQR","Q10","Q90")
+  statNameSet <- expand.grid(statNameSet, c("FR", "Diff"))
+  statNameSet <- apply(statNameSet, 1, function(v){paste0(v[1], "_", v[2])}) ## A character vector of length 22
   fragmentMatchingStats <- function(peptide, AAIndexID, alignType, TCRParameterString){
     s1 <- try(psych::describe(
       Biostrings::pairwiseAlignment(pattern=TCRFragDictSet.List[[TCRParameterString]][["FR"]], subject=peptide, 
                                     substitutionMatrix=pairMatSet[[AAIndexID]], type=alignType, scoreOnly=T), 
-      trim=.1, interp=F, skew=T, type=3, ranges=T, IQR=T, quant=c(.10, .25, .75, .90)
-    )[c("mean","sd","median","trimmed","mad","skew","kurtosis","se","IQR","Q0.1","Q0.25","Q0.75","Q0.9")], silent=T)
+      trim=.1, interp=F, skew=T, type=3, ranges=T, IQR=T, quant=c(.10, .90)
+    )[statSet], silent=T)
     s2 <- try(psych::describe(
       Biostrings::pairwiseAlignment(pattern=TCRFragDictSet.List[[TCRParameterString]][["Mock"]], subject=peptide, 
                                     substitutionMatrix=pairMatSet[[AAIndexID]], type=alignType, scoreOnly=T), 
-      trim=.1, interp=F, skew=T, type=3, ranges=T, IQR=T, quant=c(.10, .25, .75, .90)
-    )[c("mean","sd","median","trimmed","mad","skew","kurtosis","se","IQR","Q0.1","Q0.25","Q0.75","Q0.9")], silent=T)
-    ## psych::describe returns the following values: vars,n,mean,sd,median,trimmed,mad,min,max,range,skew,kurtosis,se,IQR,Q0.1,Q0.25,Q0.75,Q0.9
-    ## Of which the followings are kept: mean,sd,median,trimmed,mad,skew,kurtosis,se,IQR,Q0.1,Q0.25,Q0.75,Q0.9
+      trim=.1, interp=F, skew=T, type=3, ranges=T, IQR=T, quant=c(.10, .90)
+    )[statSet], silent=T)
+    ## psych::describe returns the following values: vars,n,mean,sd,median,trimmed,mad,min,max,range,skew,kurtosis,se,IQR,Q0.1,Q0.9
+    ## Of which the followings are kept: mean,sd,median,trimmed,mad,skew,kurtosis,se,IQR,Q0.1,Q0.9
     if(any(c(class(s1),class(s2))=="try-error")){
       message(paste0("Fragment matching on the peptide '", peptide, "' returned an unexpected error!"))
-      return(rep(NA, 26))
+      return(rep(NA, length(statSet)*2))
     }
-    return(as.numeric(c(s1, s1-s2))) ## A numeric vector of length 26
+    return(as.numeric(c(s1, s1-s2))) ## A numeric vector of length 22
   }
-  statNameSet <- c("Mean","SD","Median","TrimmedMean10","MedAbsDev","Skew","Kurtosis","SE","IQR","Q10","Q25","Q75","Q90")
-  statNameSet <- expand.grid(statNameSet, c("FR", "Diff"))
-  statNameSet <- apply(statNameSet, 1, function(v){paste0(v[1], "_", v[2])}) ## A character vector of length 26
   
   ## Combinations of parameters
   parameterGrid <- expand.grid(peptideSet, aaIndexIDSet, alignTypeSet, TCRParameterSet, stringsAsFactors=F)
@@ -172,8 +173,8 @@ Features_rTPCP <- function(peptideSet, TCRSet,
     dt.lst <- lapply(dt.lst, function(dt){dt[,"Peptide":=NULL]})
     names(dt.lst) <- NULL
     dt <- do.call("cbind", dt.lst)
-    dt <- data.frame("Peptide"=pept, dt, stringsAsFactors=F)
-    dt <- data.table::as.data.table(dt)
+    colnames(dt) <- paste0("rTPCP_", colnames(dt))
+    dt <- dt[, "Peptide":=pept]
     return(dt)
   })
   names(dt_feature_list) <- paramSet

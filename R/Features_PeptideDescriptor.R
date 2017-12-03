@@ -4,6 +4,7 @@
 #' 
 #' @param peptideSet A set of peptide sequences.
 #' @param fragLenSet A set of the lengths of TCR sequence fragments to be matched against the peptide set.
+#' @importFrom Biostrings AA_STANDARD
 #' @importFrom stringr str_sub
 #' @importFrom matrixStats rowMins
 #' @importFrom matrixStats rowMaxs
@@ -14,6 +15,7 @@
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
 #' @importFrom dplyr bind_rows
+#' @importFrom dplyr left_join
 #' @importFrom tidyr gather
 #' @importFrom tidyr spread
 #' @importFrom tidyr unite
@@ -89,6 +91,15 @@ Features_PeptideDescriptor <- function(peptideSet, fragLenSet=5){
     tidyr::gather(Stat, Value, -Peptide, -FragLen, -AADescriptor) %>%
     tidyr::unite(Feature, AADescriptor, Stat, FragLen, sep="_") %>%
     tidyr::spread(Feature, Value)
+  colnames(df_feature) <- paste0("PeptDesc_", colnames(df_feature))
+  colnames(df_feature)[1] <- "Peptide"
+  
+  # Basic information of peptides
+  df_basic <- data.frame("Peptide"=peptideSet, "Peptide_Length"=nchar(peptideSet))
+  for(aa in Biostrings::AA_STANDARD){
+    df_basic[[paste0("Peptide_Contain", aa)]] <- as.numeric(stringr::str_detect(peptideSet, aa))
+  }
+  df_feature <- suppressWarnings(dplyr::left_join(df_basic, df_feature, by="Peptide"))
   
   # Output
   parallel::stopCluster(cl)

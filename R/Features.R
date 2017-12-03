@@ -19,13 +19,13 @@ Features <- function(
 ){
   # Feature calculation
   message("Peptide descriptor analysis.")
-  df_feature_pepDesc <- Features_PeptideDescriptor(peptideSet, fragLenSet) ## A single dataframe
+  df_feature_peptDesc <- Features_PeptideDescriptor(peptideSet, fragLenSet) ## A single dataframe
   gc();gc()
   message("rTPCP analysis.")
-  df_feature_rTPCP <- Features_rTPCP(peptideSet, TCRSet, aaIndexIDSet, alignTypeSet, fragLenSet, TCRFragDepthSet, seedSet) ## A list of dataframes
+  dt_feature_rTPCP <- Features_rTPCP(peptideSet, TCRSet, aaIndexIDSet, alignTypeSet, fragLenSet, TCRFragDepthSet, seedSet) ## A list of datatables
   gc();gc()
   
   # Output
-  df_feature_list <- lapply(df_feature_rTPCP, function(dt){cbind(df_feature_pepDesc, dt[,-"Peptide"])})
+  df_feature_list <- lapply(dt_feature_rTPCP, function(dt){cbind(df_feature_peptDesc, dt[,"Peptide":=NULL])})
   return(df_feature_list)
 }
