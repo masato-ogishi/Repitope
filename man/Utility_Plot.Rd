@@ -3,19 +3,13 @@
 \name{Utility_Plot}
 \alias{Utility_Plot}
 \alias{savePDF}
-\alias{Utility_Plot}
-\alias{saveCurrentGraphicPDF}
 \title{Plot saving utilities}
 \usage{
-savePDF(graphicObject = ggplot2::last_plot(), outputFileName, width, height,
-  pointsize = 12, useDingbats = F,
-  ghostScriptPath = "C:/gs/gs9.16/bin/gswin32c.exe")
-
-saveCurrentGraphicPDF(outputFileName, width, height, pointsize = 12,
-  useDingbats = F, ghostScriptPath = "C:/gs/gs9.16/bin/gswin32c.exe")
+savePDF(graphicObject = NULL, outputFileName = "plot.pdf", width = 8,
+  height = 5, pointsize = 12, useDingbats = F)
 }
 \arguments{
-\item{graphicObject}{The plot object to be saved.}
+\item{graphicObject}{The plot object to be saved. If missing, the most recently depicted plot will be saved.}
 
 \item{outputFileName}{The name of the exported PDF file}
 
@@ -26,10 +20,7 @@ saveCurrentGraphicPDF(outputFileName, width, height, pointsize = 12,
 \item{pointsize}{A pointsize}
 
 \item{useDingbats}{Logical indicating whether points shuold be replaced with the Dingbat font.}
-
-\item{ghostScriptPath}{The file path to the GhostScript.exe file.}
 }
 \description{
-\code{savePDF} saves a plot to a PDF file.\cr
-\code{saveCurrentGraphicPDF} saves the plot currently on the graphics device to a PDF file.
+Plot saving utilities
 }

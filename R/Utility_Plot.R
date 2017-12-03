@@ -1,43 +1,37 @@
 #' Plot saving utilities
 #' 
-#' \code{savePDF} saves a plot to a PDF file.\cr
-#' \code{saveCurrentGraphicPDF} saves the plot currently on the graphics device to a PDF file.
-#' 
-#' @param graphicObject The plot object to be saved.
+#' @param graphicObject The plot object to be saved. If missing, the most recently depicted plot will be saved.
 #' @param outputFileName The name of the exported PDF file
 #' @param width A plot width
 #' @param height A plot height
 #' @param pointsize A pointsize
 #' @param useDingbats Logical indicating whether points shuold be replaced with the Dingbat font.
-#' @param ghostScriptPath The file path to the GhostScript.exe file.
 #' @importFrom ggplot2 last_plot
 #' @importFrom stringr str_detect
-#' @importFrom grDevices dev.copy2pdf
-#' @importFrom grDevices embedFonts
 #' @export
 #' @rdname Utility_Plot
 #' @name Utility_Plot
-savePDF <- function(graphicObject=ggplot2::last_plot(), outputFileName, width, height,
-                    pointsize=12, useDingbats=F, ghostScriptPath="C:/gs/gs9.16/bin/gswin32c.exe"){
-  Sys.setenv(R_GSCMD=ghostScriptPath)
-  .gsOption <- "-sFONTPATH=C:/Windows/Fonts -dSubsetFonts=true -dEmbedAllFonts=true"
-  windowsFonts(Helvetica=windowsFont("Helvetica"))
+savePDF <- function(graphicObject=NULL, outputFileName="plot.pdf", 
+                    width=8, height=5,
+                    pointsize=12, useDingbats=F){
   out <- ifelse(stringr::str_detect(outputFileName, ".pdf$"), outputFileName, paste0(outputFileName, ".pdf"))
+  if(is.null(graphicObject)){
+    message("Retrieving the last plot depicted...")
+    graphicObject <- ggplot2::last_plot()
+  }
   print(graphicObject)
-  grDevices::dev.copy2pdf(file=out, width=width, height=height, pointsize=pointsize, family="Helvetica", useDingbats=useDingbats)
-  grDevices::embedFonts(out, outfile=out, options=.gsOption)
-}
-#' @export
-#' @rdname Utility_Plot
-#' @name Utility_Plot
-saveCurrentGraphicPDF <- function(outputFileName, width, height,
-                                  pointsize=12, useDingbats=F, ghostScriptPath="C:/gs/gs9.16/bin/gswin32c.exe"){
-  Sys.setenv(R_GSCMD=ghostScriptPath)
-  .gsOption <- "-sFONTPATH=C:/Windows/Fonts -dSubsetFonts=true -dEmbedAllFonts=true"
-  windowsFonts(Helvetica=windowsFont("Helvetica"))
-  out <- ifelse(stringr::str_detect(outputFileName, ".pdf$"), outputFileName, paste0(outputFileName, ".pdf"))
-  grDevices::dev.copy2pdf(file=out, width=width, height=height, pointsize=pointsize, family="Helvetica", useDingbats=useDingbats)
-  grDevices::embedFonts(out, outfile=out, options=.gsOption)
+  
+  OS <- Sys.info()[["sysname"]]
+  if(OS=="Windows"){
+    .gsPath <- "C:/gs/gs9.16/bin/gswin32c.exe"
+    .gsOption <- "-sFONTPATH=C:/Windows/Fonts -dSubsetFonts=true -dEmbedAllFonts=true"
+    Sys.setenv(R_GSCMD=.gsPath)
+    grDevices::windowsFonts(Helvetica=grDevices::windowsFont("Helvetica"))
+    grDevices::dev.copy2pdf(file=out, width=width, height=height, pointsize=pointsize, family="Helvetica", useDingbats=useDingbats)
+    grDevices::embedFonts(out, outfile=out, options=.gsOption)
+  }else{
+    grDevices::dev.copy2pdf(file=out, width=width, height=height, pointsize=pointsize, useDingbats=useDingbats)
+  }
 }
 
 #' Publication-ready ggplot scales
@@ -64,19 +58,17 @@ scale_fill_Publication <- function() {
 
 #' The publication-ready ggplot theme
 #' @param base_size The base font size.
-#' @import ggplot2
-#' @importFrom grDevices windowsFonts
-#' @importFrom grDevices windowsFont
-#' @importFrom grid gpar
-#' @importFrom grid polylineGrob
-#' @importFrom utils modifyList
 #' @importFrom ggthemes theme_foundation
+#' @import ggplot2
 #' @export
 #' @rdname Utility_Plot_ggplot-theme
 theme_Publication <-
   function(base_size=18) {
-    # Translation of a device-independent R graphics font family name to a windows font description
-    windowsFonts(Helvetica=windowsFont("Helvetica"))
+    OS <- Sys.info()[["sysname"]]
+    if(OS=="Windows"){
+      # Translation of a device-independent R graphics font family name to a windows font description
+      grDevices::windowsFonts(Helvetica=grDevices::windowsFont("Helvetica"))
+    }
     
     # The preset ggplot parameters
     .pt <- 1 / 0.352777778
