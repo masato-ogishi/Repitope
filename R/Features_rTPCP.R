@@ -17,6 +17,7 @@
 #' @importFrom tidyr separate
 #' @importFrom magrittr set_colnames
 #' @importFrom lubridate seconds_to_period
+#' @importFrom lubridate now
 #' @importFrom stringr str_sub
 #' @importFrom stringr str_replace_all
 #' @importFrom stringr fixed
@@ -143,18 +144,21 @@ Features_rTPCP <- function(peptideSet, TCRSet,
     tm.remain <- round(tm.elapsed*100/j - tm.elapsed)
     cat("\r ", j, "% elapsed = ", as.character(lubridate::seconds_to_period(tm.elapsed)), ", remaining ~ ", as.character(lubridate::seconds_to_period(tm.remain)), sep="")
   }
+  mat <- as.data.frame(mat) %>% magrittr::set_colnames(statNameSet)
+  parameterGrid <- parameterGrid %>%
+    magrittr::set_colnames(c("Peptide","AAIndexID","Alignment","TCRParameter"))
+  ymdt <- stringr::str_replace_all(stringr::str_replace_all(stringr::str_replace_all(lubridate::now(), stringr::fixed(":"), "."), " ", "."), "-", ".")
+  readr::write_csv(dplyr::bind_cols(parameterGrid, mat), paste0("FragmentMatchMatrix_", ymdt, ".csv.gz")
   message("Fragment matching was finished. (Memory occupied = ", memory.size(), "[Mb])")
   gc();gc()
   
   ## Final formatting
   message("Data formatting...")
   parameterGrid <- parameterGrid %>%
-    magrittr::set_colnames(c("Peptide","AAIndexID","Alignment","TCRParameter")) %>%
     tidyr::separate(TCRParameter, into=c("FragLen", "Depth", "Seed"), sep="_") %>%
     dplyr::mutate(FragLen=as.numeric(FragLen), Depth=as.numeric(Depth), Seed=as.numeric(Seed))
   gc();gc()
-  dt_feature_list <- dplyr::bind_cols(parameterGrid, as.data.frame(mat)) %>%
-    magrittr::set_colnames(c("Peptide","AAIndexID","Alignment","FragLen","Depth","Seed",statNameSet)) %>%
+  dt_feature_list <- dplyr::bind_cols(parameterGrid, mat) %>%
     data.table::as.data.table() %>%
     split(by=c("AAIndexID", "FragLen"), sorted=T)
   dt_feature_list <- mapply(

@@ -75,7 +75,7 @@ Features_Preprocess <- function(featureDFList, metadataDF){
     set.seed(seed)
     df_train_features <- dplyr::select(df_train, -Peptide, -Immunogenicity, -Cluster)
     rfeCtrl <- caret::rfeControl(functions=caret::rfFuncs, method="cv", number=10, verbose=T)
-    rfeRes <- caret::rfe(df_train_features, df_train[["Immunogenicity"]], sizes=2^(4:8), rfeControl=rfeCtrl)
+    rfeRes <- caret::rfe(df_train_features, df_train[["Immunogenicity"]], sizes=100, metric="Kappa", rfeControl=rfeCtrl)
     rfeFeatureSet <- caret::predictors(rfeRes)
     print(rfeRes)
     

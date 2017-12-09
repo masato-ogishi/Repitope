@@ -19,21 +19,17 @@ Features_ErrorCorrect <- function(
   aaIndexIDSet="all", alignTypeSet="global-local", 
   fragLenSet=4:6, TCRFragDepthSet=10000, seedSet=1:5
 ){
-  errorPeptideList <- lapply(featureDFList, function(df){df[which(complete.cases(df)==F),][["Peptide"]]})
-  featureDFList_ErrorCorrect <- lapply(errorPeptideList, function(peptSet){
-    if(rlang::is_empty(peptSet)){
-      return(NULL)
+  featureDFList_ErrorCorrect <- lapply(featureDFList, function(df){
+    errPeptSet <- df[which(complete.cases(df)==F),][["Peptide"]]
+    message("Error peptides: ", paste0(errPeptSet, collapse=", "))
+    if(rlang::is_empty(errPeptSet)){
+      return(DescTools::Sort(df, ord="Peptide"))
     }else{
-      Features(peptideSet=peptSet, TCRSet, aaIndexIDSet, alignTypeSet, fragLenSet, TCRFragDepthSet,seedSet)
+      df_EC <- Features(peptideSet=errPeptSet, TCRSet, aaIndexIDSet, alignTypeSet, fragLenSet, TCRFragDepthSet, seedSet)
+      df_Org <- dplyr::filter(df, !Peptide %in% errPeptSet)
+      df_EC <- DescTools::Sort(dplyr::bind_rows(df_Org, df_EC), ord="Peptide")
+      return(df_EC)
     }
   })
-  featureDFList_ErrorCorrect <- mapply(
-    function(org, errCor){
-      if(is.null(errCor)){
-        DescTools::Sort(org, ord="Peptide")
-      }else{
-        DescTools::Sort(dplyr::bind_rows(dplyr::filter(org, !Peptide %in% errCor$"Peptide"), errCor), ord="Peptide")
-      }
-    }, featureDFList, featureDFList_ErrorCorrect, SIMPLIFY=F)
   return(featureDFList_ErrorCorrect)
 }

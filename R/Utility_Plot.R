@@ -11,16 +11,12 @@
 #' @export
 #' @rdname Utility_Plot
 #' @name Utility_Plot
-savePDF <- function(graphicObject=NULL, outputFileName="plot.pdf", 
-                    width=8, height=5,
-                    pointsize=12, useDingbats=F){
+savePDF <- function(graphicObject=NULL, outputFileName="plot.pdf", width=8, height=5, pointsize=12, useDingbats=F){
   out <- ifelse(stringr::str_detect(outputFileName, ".pdf$"), outputFileName, paste0(outputFileName, ".pdf"))
   if(is.null(graphicObject)){
     message("Retrieving the last plot depicted...")
     graphicObject <- ggplot2::last_plot()
   }
-  print(graphicObject)
-  
   OS <- Sys.info()[["sysname"]]
   if(OS=="Windows"){
     .gsPath <- "C:/gs/gs9.16/bin/gswin32c.exe"
