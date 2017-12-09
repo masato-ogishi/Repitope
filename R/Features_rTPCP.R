@@ -148,7 +148,7 @@ Features_rTPCP <- function(peptideSet, TCRSet,
   parameterGrid <- parameterGrid %>%
     magrittr::set_colnames(c("Peptide","AAIndexID","Alignment","TCRParameter"))
   ymdt <- stringr::str_replace_all(stringr::str_replace_all(stringr::str_replace_all(lubridate::now(), stringr::fixed(":"), "."), " ", "."), "-", ".")
-  readr::write_csv(dplyr::bind_cols(parameterGrid, mat), paste0("FragmentMatchMatrix_", ymdt, ".csv.gz")
+  readr::write_csv(dplyr::bind_cols(parameterGrid, mat), paste0("FragmentMatchMatrix_", ymdt, ".csv.gz"))
   message("Fragment matching was finished. (Memory occupied = ", memory.size(), "[Mb])")
   gc();gc()
   
