@@ -6,13 +6,13 @@ Author: Masato Ogishi
 Maintainer: Masato Ogishi <oogishi-tky@umin.ac.jp>
 Description: In sillico prediction of peptide immunogenicity is a critical component of precision immunotherapy.
     Sequence-based features have been extensively explored to construct immunogenicity prediction model.
-    Here, we developped a novel framework, which we termed 'repertoire-wide TCR-peptide contact profile', that yields far better classification between epitopes (immunogenic MHC-loaded peptides) and MHC ligands (non-immunogenic MHC-loaded peptides).
-Depends: R (>= 3.4.2) 
+    Here, we developped a framework, termed 'repertoire-wide TCR-peptide contact profile', that enables accurate distinction between epitopes (immunogenic MHC-loaded peptides) and MHC ligands (non-immunogenic MHC-loaded peptides).
+Depends: R (>= 3.4.3) 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
-Imports: tidyverse (>= 1.1.1),
+Imports: tidyverse (>= 1.2.1),
     rlang (>= 0.1.2),
     readr (>= 1.1.1),
     dplyr (>= 0.7.3),
