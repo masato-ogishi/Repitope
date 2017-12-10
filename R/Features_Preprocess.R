@@ -8,7 +8,6 @@
 #' @importFrom dplyr mutate
 #' @importFrom dplyr left_join
 #' @importFrom dplyr select
-#' @importFrom dplyr bind_rows
 #' @importFrom tidyr drop_na
 #' @importFrom stringr str_split
 #' @importFrom stringr fixed

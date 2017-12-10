@@ -14,7 +14,6 @@
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
-#' @importFrom dplyr bind_rows
 #' @importFrom dplyr left_join
 #' @importFrom tidyr gather
 #' @importFrom tidyr spread
@@ -25,9 +24,10 @@
 #' @importFrom parallel detectCores
 #' @importFrom parallel makeCluster
 #' @importFrom parallel clusterEvalQ
-#' @importFrom pbapply pbapply
 #' @importFrom parallel clusterExport
 #' @importFrom parallel stopCluster
+#' @importFrom pbapply pbapply
+#' @importFrom data.table rbindlist
 #' @import Peptides
 #' @export
 #' @rdname Features_PeptideDescriptor
@@ -87,7 +87,7 @@ Features_PeptideDescriptor <- function(peptideSet, fragLenSet=5){
   )
   message("Parallelized fragment descriptor calculation was finished. (Memory occupied = ", memory.size(), "[Mb])")
   gc();gc();
-  df_feature <- suppressWarnings(dplyr::bind_rows(df_feature)) %>%
+  df_feature <- data.table::rbindlist(df_feature) %>%
     tidyr::gather(Stat, Value, -Peptide, -FragLen, -AADescriptor) %>%
     tidyr::unite(Feature, AADescriptor, Stat, FragLen, sep="_") %>%
     tidyr::spread(Feature, Value)

@@ -10,7 +10,8 @@
 #' @importFrom rlang is_empty
 #' @importFrom DescTools Sort
 #' @importFrom dplyr filter
-#' @importFrom dplyr bind_rows
+#' @importFrom data.table rbindlist
+#' @importFrom tibble as_tibble
 #' @export
 #' @rdname Features_ErrorCorrect
 #' @name Features_ErrorCorrect
@@ -27,7 +28,7 @@ Features_ErrorCorrect <- function(
     }else{
       df_EC <- Features(peptideSet=errPeptSet, TCRSet, aaIndexIDSet, alignTypeSet, fragLenSet, TCRFragDepthSet, seedSet)
       df_Org <- dplyr::filter(df, !Peptide %in% errPeptSet)
-      df_EC <- DescTools::Sort(dplyr::bind_rows(df_Org, df_EC), ord="Peptide")
+      df_EC <- tibble::as_tibble(DescTools::Sort(data.table::rbindlist(list(df_Org, df_EC)), ord="Peptide"))
       return(df_EC)
     }
   })
