@@ -1,7 +1,7 @@
 #' Repertoire-wide TCR-peptide contact profile (rTPCP) analysis.
-#' 
+#'
 #' Calculates descriptive statistics of repertoire-wide TCR-peptide pairwise contact potentials.
-#' 
+#'
 #' @param peptideSet A set of peptide sequences.
 #' @param TCRSet Either a set of TCR sequences (as a character vector) or a list of sets of TCR sequences. If provided as a character vector, TCR sequences are randomly down-sampled to 10000, using \code{seedSet} to create a list. If provided as a list, it must be the same length with the seedSet.
 #' @param aaIndexIDSet A set of AAIndexIDs indicating the pairwise matching score matrix to be used. A set of AAIndex-derived matrices can be retrieved by \code{AACPMatrix}. Set "all" to select all AAIndexIDs.
@@ -35,12 +35,12 @@
 #' @export
 #' @rdname Features_rTPCP
 #' @name Features_rTPCP
-Features_rTPCP <- function(peptideSet, TCRSet, 
-                           aaIndexIDSet="all", alignTypeSet="global-local", 
+Features_rTPCP <- function(peptideSet, TCRSet,
+                           aaIndexIDSet="all", alignTypeSet="global-local",
                            fragLenSet=5, TCRFragDepthSet=10000, seedSet=1:5){
   time.start <- proc.time()
-  
-  # TCR fragment dictionary to be matched. 
+
+  # TCR fragment dictionary to be matched.
   # Note: parallelization is avoided because this process uses random seeds...
   fragmentDictionary <- function(sequenceSet, fragLen, depth, seed){
     set.seed(seed)
@@ -80,7 +80,7 @@ Features_rTPCP <- function(peptideSet, TCRSet,
                            function(v){paste0(v[1], "_", v[2], "_", v[3])})
   names(TCRFragDictSet.List) <- TCRParameterSet
   message("Preparation of TCR fragment dictionary was finished.")
-    
+
   # AAIndex-derived pairwise matching matrices
   aaIndexMatrixFormat <- function(aaIndexID, pairMatInverse=T){
     pairMat <- dplyr::filter(AACPMatrix, AAIndexID==aaIndexID)$data[[1]]
@@ -95,7 +95,7 @@ Features_rTPCP <- function(peptideSet, TCRSet,
   names(pairMatSet) <- aaIndexIDSet
 
   # Fragment matching
-  
+
   ## Working function
   statSet <- c("mean","sd","median","trimmed","mad","skew","kurtosis","se","IQR","Q0.1","Q0.9")
   statNameSet <- c("Mean","SD","Median","TrimmedMean10","MedAbsDev","Skew","Kurtosis","SE","IQR","Q10","Q90")
@@ -103,13 +103,13 @@ Features_rTPCP <- function(peptideSet, TCRSet,
   statNameSet <- apply(statNameSet, 1, function(v){paste0(v[1], "_", v[2])}) ## A character vector of length 22
   fragmentMatchingStats <- function(peptide, AAIndexID, alignType, TCRParameterString){
     s1 <- try(psych::describe(
-      Biostrings::pairwiseAlignment(pattern=TCRFragDictSet.List[[TCRParameterString]][["FR"]], subject=peptide, 
-                                    substitutionMatrix=pairMatSet[[AAIndexID]], type=alignType, scoreOnly=T), 
+      Biostrings::pairwiseAlignment(pattern=TCRFragDictSet.List[[TCRParameterString]][["FR"]], subject=peptide,
+                                    substitutionMatrix=pairMatSet[[AAIndexID]], type=alignType, scoreOnly=T),
       trim=.1, interp=F, skew=T, type=3, ranges=T, IQR=T, quant=c(.10, .90)
     )[statSet], silent=T)
     s2 <- try(psych::describe(
-      Biostrings::pairwiseAlignment(pattern=TCRFragDictSet.List[[TCRParameterString]][["Mock"]], subject=peptide, 
-                                    substitutionMatrix=pairMatSet[[AAIndexID]], type=alignType, scoreOnly=T), 
+      Biostrings::pairwiseAlignment(pattern=TCRFragDictSet.List[[TCRParameterString]][["Mock"]], subject=peptide,
+                                    substitutionMatrix=pairMatSet[[AAIndexID]], type=alignType, scoreOnly=T),
       trim=.1, interp=F, skew=T, type=3, ranges=T, IQR=T, quant=c(.10, .90)
     )[statSet], silent=T)
     ## psych::describe returns the following values: vars,n,mean,sd,median,trimmed,mad,min,max,range,skew,kurtosis,se,IQR,Q0.1,Q0.9
@@ -120,47 +120,47 @@ Features_rTPCP <- function(peptideSet, TCRSet,
     }
     return(as.numeric(c(s1, s1-s2))) ## A numeric vector of length 22
   }
-  
+
   ## Combinations of parameters
-  parameterGrid <- expand.grid(peptideSet, aaIndexIDSet, alignTypeSet, TCRParameterSet, stringsAsFactors=F)
+  parameterGrid <- expand.grid(peptideSet, aaIndexIDSet, alignTypeSet, TCRParameterSet, stringsAsFactors=F) %>%
+    magrittr::set_colnames(c("Peptide","AAIndexID","Alignment","TCRParameter"))
   paramCombN <- nrow(parameterGrid)
   message("Number of parameter combinations = ", paramCombN)
   gc();gc()
-  
-  ## Non-parallelized fragment matching calculation
-  ### Note: parallelization using foreach is slower than substitution-only loop...
-  ### Note: pbapply::timerProgressBar is a bit slow...
+
+  ## Parallelized fragment matching calculation
   message("Fragment matching was started. (Memory occupied = ", memory.size(), "[Mb])")
-  mat <- matrix(nrow=paramCombN, ncol=length(statNameSet))
-  id.lst <- parallel::splitIndices(paramCombN, 100)
-  tm.elapsed <- 0
-  for(j in 1:100){
-    tm.start <- proc.time()
-    for(i in id.lst[[j]]){
-      mat[i,] <- fragmentMatchingStats(parameterGrid[i,1], parameterGrid[i,2], parameterGrid[i,3], parameterGrid[i,4])
-    }
-    tm.end <- proc.time()
-    tm.elapsed <- round(tm.elapsed + (tm.end-tm.start)[3])
-    tm.remain <- round(tm.elapsed*100/j - tm.elapsed)
-    cat("\r ", j, "% elapsed = ", as.character(lubridate::seconds_to_period(tm.elapsed)), ", remaining ~ ", as.character(lubridate::seconds_to_period(tm.remain)), sep="")
-  }
-  mat <- as.data.frame(mat) %>% magrittr::set_colnames(statNameSet)
-  parameterGrid <- parameterGrid %>%
-    magrittr::set_colnames(c("Peptide","AAIndexID","Alignment","TCRParameter"))
-  ymdt <- stringr::str_replace_all(stringr::str_replace_all(stringr::str_replace_all(lubridate::now(), stringr::fixed(":"), "."), " ", "."), "-", ".")
-  readr::write_csv(dplyr::bind_cols(parameterGrid, mat), paste0("FragmentMatchMatrix_", ymdt, ".csv.gz"))
+  cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
+  invisible(parallel::clusterEvalQ(cl, {
+    library(psych)
+    library(Biostrings)
+  }))
+  parallel::clusterExport(
+    cl,
+    list("parameterGrid", "fragmentMatchingStats", "TCRFragDictSet.List", "pairMatSet", "statSet"),
+    envir=environment()
+  )
+  dt_feature <- pbapply::pblapply(
+    1:paramCombN,
+    function(i){fragmentMatchingStats(parameterGrid[i,1], parameterGrid[i,2], parameterGrid[i,3], parameterGrid[i,4])},
+    cl=cl
+  ) %>% data.table::as.data.table() %>% data.table::transpose() %>% magrittr::set_colnames(statNameSet)
   message("Fragment matching was finished. (Memory occupied = ", memory.size(), "[Mb])")
   gc();gc()
-  
+  parameterGrid <- cbind(
+    data.table::as.data.table(parameterGrid),
+    data.table::as.data.table(stringr::str_split(parameterGrid$"TCRParameter", "_", simplify=T)) %>%
+      magrittr::set_colnames(c("FragLen","Depth","Seed"))
+  )
+  parameterGrid <- parameterGrid[,"TCRParameter":=NULL]
+  dt_feature <- cbind(parameterGrid, dt_feature)
+  ymdt <- stringr::str_replace_all(stringr::str_replace_all(stringr::str_replace_all(lubridate::now(), stringr::fixed(":"), "."), " ", "."), "-", ".")
+  readr::write_csv(dt_feature, paste0("FragmentMatchMatrix_", ymdt, ".csv.gz"))
+  gc();gc()
+
   ## Final formatting
   message("Data formatting...")
-  parameterGrid <- parameterGrid %>%
-    tidyr::separate(TCRParameter, into=c("FragLen", "Depth", "Seed"), sep="_") %>%
-    dplyr::mutate(FragLen=as.numeric(FragLen), Depth=as.numeric(Depth), Seed=as.numeric(Seed))
-  gc();gc()
-  dt_feature_list <- dplyr::bind_cols(parameterGrid, mat) %>%
-    data.table::as.data.table() %>%
-    split(by=c("AAIndexID", "FragLen"), sorted=T)
+  dt_feature_list <- dt_feature %>% split(by=c("AAIndexID", "FragLen"), sorted=T)
   dt_feature_list <- mapply(
     function(dt, nm){
       dt.meta <- dt[, c("Peptide", "AAIndexID", "Alignment", "FragLen", "Depth", "Seed")]
@@ -183,7 +183,7 @@ Features_rTPCP <- function(peptideSet, TCRSet,
   })
   names(dt_feature_list) <- paramSet
   gc();gc()
-  
+
   # Output
   time.end <- proc.time()
   message("Overall time required = ", format((time.end-time.start)[3], nsmall=2), "[sec]")
