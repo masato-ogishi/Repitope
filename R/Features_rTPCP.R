@@ -13,25 +13,29 @@
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
-#' @importFrom dplyr bind_cols
-#' @importFrom tidyr separate
 #' @importFrom magrittr set_colnames
 #' @importFrom lubridate seconds_to_period
 #' @importFrom lubridate now
 #' @importFrom stringr str_sub
 #' @importFrom stringr str_replace_all
+#' @importFrom stringr str_split
 #' @importFrom stringr fixed
 #' @importFrom purrr flatten
 #' @importFrom data.table as.data.table
+#' @importFrom data.table transpose
 #' @importFrom Kmisc str_rev
 #' @importFrom Biostrings pairwiseAlignment
 #' @importFrom Biostrings AA_STANDARD
 #' @importFrom psych describe
+#' @importFrom parallel detectCores
 #' @importFrom parallel splitIndices
+#' @importFrom parallel detectCores
+#' @importFrom parallel makeCluster
+#' @importFrom parallel clusterEvalQ
+#' @importFrom parallel clusterExport
+#' @importFrom parallel stopCluster
 #' @importFrom pbapply pbapply
 #' @importFrom pbapply pblapply
-#' @importFrom pbapply timerProgressBar
-#' @importFrom pbapply setTimerProgressBar
 #' @export
 #' @rdname Features_rTPCP
 #' @name Features_rTPCP
@@ -94,7 +98,7 @@ Features_rTPCP <- function(peptideSet, TCRSet,
   aaIndexIDSet <- c(aaIndexIDSet, paste0(aaIndexIDSet, "inv"))
   names(pairMatSet) <- aaIndexIDSet
 
-  # Fragment matching
+  # Fragment matching analysis
 
   ## Working function
   statSet <- c("mean","sd","median","trimmed","mad","skew","kurtosis","se","IQR","Q0.1","Q0.9")
@@ -128,7 +132,7 @@ Features_rTPCP <- function(peptideSet, TCRSet,
   message("Number of parameter combinations = ", paramCombN)
   gc();gc()
 
-  ## Parallelized fragment matching calculation
+  ## Parallelized fragment matching
   message("Fragment matching was started. (Memory occupied = ", memory.size(), "[Mb])")
   cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
   invisible(parallel::clusterEvalQ(cl, {
@@ -145,8 +149,12 @@ Features_rTPCP <- function(peptideSet, TCRSet,
     function(i){fragmentMatchingStats(parameterGrid[i,1], parameterGrid[i,2], parameterGrid[i,3], parameterGrid[i,4])},
     cl=cl
   ) %>% data.table::as.data.table() %>% data.table::transpose() %>% magrittr::set_colnames(statNameSet)
+  parallel::stopCluster(cl)
   message("Fragment matching was finished. (Memory occupied = ", memory.size(), "[Mb])")
   gc();gc()
+
+  ## Final formatting
+  message("Data formatting...")
   parameterGrid <- cbind(
     data.table::as.data.table(parameterGrid),
     data.table::as.data.table(stringr::str_split(parameterGrid$"TCRParameter", "_", simplify=T)) %>%
@@ -154,12 +162,11 @@ Features_rTPCP <- function(peptideSet, TCRSet,
   )
   parameterGrid <- parameterGrid[,"TCRParameter":=NULL]
   dt_feature <- cbind(parameterGrid, dt_feature)
+
   ymdt <- stringr::str_replace_all(stringr::str_replace_all(stringr::str_replace_all(lubridate::now(), stringr::fixed(":"), "."), " ", "."), "-", ".")
   readr::write_csv(dt_feature, paste0("FragmentMatchMatrix_", ymdt, ".csv.gz"))
   gc();gc()
 
-  ## Final formatting
-  message("Data formatting...")
   dt_feature_list <- dt_feature %>% split(by=c("AAIndexID", "FragLen"), sorted=T)
   dt_feature_list <- mapply(
     function(dt, nm){

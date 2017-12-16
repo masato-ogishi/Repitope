@@ -1,7 +1,7 @@
 #' Descriptive statistics of peptide fragment descriptors.
-#' 
+#'
 #' Calculates descriptive statistics using peptide descriptors.
-#' 
+#'
 #' @param peptideSet A set of peptide sequences.
 #' @param fragLenSet A set of the lengths of TCR sequence fragments to be matched against the peptide set.
 #' @importFrom Biostrings AA_STANDARD
@@ -18,6 +18,7 @@
 #' @importFrom tidyr gather
 #' @importFrom tidyr spread
 #' @importFrom tidyr unite
+#' @importFrom data.table rbindlist
 #' @importFrom parallel splitIndices
 #' @importFrom parallel detectCores
 #' @importFrom parallel splitIndices
@@ -27,14 +28,13 @@
 #' @importFrom parallel clusterExport
 #' @importFrom parallel stopCluster
 #' @importFrom pbapply pbapply
-#' @importFrom data.table rbindlist
 #' @import Peptides
 #' @export
 #' @rdname Features_PeptideDescriptor
 #' @name Features_PeptideDescriptor
 Features_PeptideDescriptor <- function(peptideSet, fragLenSet=5){
   time.start <- proc.time()
-  
+
   # Working functions
   peptideDescriptor.Batch <- function(peptide){
     unlist(list(
@@ -61,30 +61,29 @@ Features_PeptideDescriptor <- function(peptideSet, fragLenSet=5){
     d <- sapply(f[nchar(f)==fragLen], function(s){peptideDescriptor.Batch(s)})
     data.frame("Peptide"=peptide,
                "FragLen"=fragLen,
-               "AADescriptor"=peptideDescriptor.NameSet, 
-               "Min"=matrixStats::rowMins(d), 
-               "Max"=matrixStats::rowMaxs(d), 
+               "AADescriptor"=peptideDescriptor.NameSet,
+               "Min"=matrixStats::rowMins(d),
+               "Max"=matrixStats::rowMaxs(d),
                "Mean"=matrixStats::rowMeans2(d),
-               "Median"=matrixStats::rowMedians(d)) 
+               "Median"=matrixStats::rowMedians(d))
   }
-  
-  # Parallelization
+
+  # Parallelized calculation of descriptive statistics
   cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
   invisible(parallel::clusterEvalQ(cl, {
     library(Peptides)
     library(matrixStats)
   }))
-  
-  # Descriptive statistics of peptide fragment descriptors
   parameterGrid <- expand.grid(peptideSet, fragLenSet, stringsAsFactors=F)
   message("Parallelized fragment descriptor calculation was started. (Memory occupied = ", memory.size(), "[Mb])")
-  parallel::clusterExport(cl, list("parameterGrid", "peptideDescriptor.FragStat.Single", "peptideDescriptor.Batch", "peptideDescriptor.NameSet"), 
+  parallel::clusterExport(cl, list("parameterGrid", "peptideDescriptor.FragStat.Single", "peptideDescriptor.Batch", "peptideDescriptor.NameSet"),
                           envir=environment())
   df_feature <- pbapply::pbapply(
-    parameterGrid, 1, 
+    parameterGrid, 1,
     function(v){peptideDescriptor.FragStat.Single(v[1], as.numeric(v[2]))},
     cl=cl
   )
+  parallel::stopCluster(cl)
   message("Parallelized fragment descriptor calculation was finished. (Memory occupied = ", memory.size(), "[Mb])")
   gc();gc();
   df_feature <- data.table::rbindlist(df_feature) %>%
@@ -93,16 +92,15 @@ Features_PeptideDescriptor <- function(peptideSet, fragLenSet=5){
     tidyr::spread(Feature, Value)
   colnames(df_feature) <- paste0("PeptDesc_", colnames(df_feature))
   colnames(df_feature)[1] <- "Peptide"
-  
+
   # Basic information of peptides
   df_basic <- data.frame("Peptide"=peptideSet, "Peptide_Length"=nchar(peptideSet))
   for(aa in Biostrings::AA_STANDARD){
     df_basic[[paste0("Peptide_Contain", aa)]] <- as.numeric(stringr::str_detect(peptideSet, aa))
   }
   df_feature <- suppressWarnings(dplyr::left_join(df_basic, df_feature, by="Peptide"))
-  
+
   # Output
-  parallel::stopCluster(cl)
   time.end <- proc.time()
   message("Overall time required = ", format((time.end-time.start)[3], nsmall=2), "[sec]")
   return(df_feature)
