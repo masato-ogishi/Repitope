@@ -21,7 +21,7 @@ Features_ErrorCorrect <- function(
   fragLenSet=4:6, TCRFragDepthSet=10000, seedSet=1:5
 ){
   featureDFList_ErrorCorrect <- lapply(featureDFList, function(df){
-    errPeptSet <- df[which(complete.cases(df)==F),][["Peptide"]]
+    errPeptSet <- as.character(df[which(complete.cases(df)==F),][["Peptide"]])
     message("Error peptides: ", paste0(errPeptSet, collapse=", "))
     if(rlang::is_empty(errPeptSet)){
       return(DescTools::Sort(df, ord="Peptide"))
