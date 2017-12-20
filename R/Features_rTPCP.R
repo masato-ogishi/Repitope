@@ -14,8 +14,6 @@
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
 #' @importFrom magrittr set_colnames
-#' @importFrom lubridate seconds_to_period
-#' @importFrom lubridate now
 #' @importFrom stringr str_sub
 #' @importFrom stringr str_replace_all
 #' @importFrom stringr str_split
@@ -162,11 +160,6 @@ Features_rTPCP <- function(peptideSet, TCRSet,
   )
   parameterGrid <- parameterGrid[,"TCRParameter":=NULL]
   dt_feature <- cbind(parameterGrid, dt_feature)
-
-  ymdt <- stringr::str_replace_all(stringr::str_replace_all(stringr::str_replace_all(lubridate::now(), stringr::fixed(":"), "."), " ", "."), "-", ".")
-  readr::write_csv(dt_feature, paste0("FragmentMatchMatrix_", ymdt, ".csv.gz"))
-  gc();gc()
-
   dt_feature_list <- dt_feature %>% split(by=c("AAIndexID", "FragLen"), sorted=T)
   dt_feature_list <- mapply(
     function(dt, nm){
