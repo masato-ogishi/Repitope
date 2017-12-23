@@ -1,11 +1,11 @@
 Package: Repitope
 Type: Package
 Title: Epitope prediction from TCR-peptide contact profiles
-Version: 0.1.3
+Version: 0.1.4
 Author: Masato Ogishi
 Maintainer: Masato Ogishi <oogishi-tky@umin.ac.jp>
 Description: In sillico prediction of peptide immunogenicity is a critical component of precision immunotherapy.
-    Sequence-based features have been extensively explored to construct immunogenicity prediction model.
+    Although sequence-based prediction models have been extensively investigated, none has ever achieved clinically meaningful fidelity.
     Here, we developped a framework, termed 'repertoire-wide TCR-peptide contact profile', that enables accurate distinction between epitopes (immunogenic MHC-loaded peptides) and MHC ligands (non-immunogenic MHC-loaded peptides).
 Depends: R (>= 3.4.3) 
 License: MIT + file LICENSE
@@ -26,7 +26,7 @@ Imports: tidyverse (>= 1.2.1),
     ggsci (>= 2.8),
     gtools (>= 3.5.0),
     scales (>= 0.4.1),
-    parallel (>= 3.4.1),
+    parallel (>= 3.4.3),
     pbapply (>= 1.3-3),
     snow (>= 0.4-2),
     caret (>= 6.0-78),

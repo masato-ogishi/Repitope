@@ -30,9 +30,9 @@
 #' @importFrom pbapply pbapply
 #' @import Peptides
 #' @export
-#' @rdname Features_PeptideDescriptor
-#' @name Features_PeptideDescriptor
-Features_PeptideDescriptor <- function(peptideSet, fragLenSet=5){
+#' @rdname Features
+#' @name Features
+Features_PeptideDescriptor <- function(peptideSet, fragLenSet=3:8){
   time.start <- proc.time()
 
   # Working functions

@@ -4,19 +4,20 @@
 #'
 #' @param peptideSet A set of peptide sequences.
 #' @param TCRSet Either a set of TCR sequences (as a character vector) or a list of sets of TCR sequences. If provided as a list, it must be the same length with the seedSet.
-#' @param aaIndexIDSet A set of AAIndexIDs indicating the pairwise matching score matrix to be used. A set of AAIndex-derived matrices can be retrieved by \code{AACPMatrix}. Set "all" to select all AAIndexIDs.
 #' @param fragLenSet A set of the lengths of TCR sequence fragments to be matched against the peptide set.
+#' @param aaIndexIDSet A set of AAIndexIDs indicating the pairwise matching score matrix to be used. A set of AAIndex-derived matrices can be retrieved by \code{AACPMatrix}. Set "all" to select all AAIndexIDs.
 #' @param alignTypeSet A set of alignment-type strings directly passed to the \code{type} argument of the \code{pairwiseAlignment} function in the \code{Biostrings} package.
+#' @param TCRFragDepthSet A set of the numbers of TCR fragments to be matched. This should be kept constant for comparison.
 #' @param seedSet A set of random seeds.
-#' @param TCRFragDepthSet A set of the numbers of TCR fragments to be matched.
 #' @importFrom tibble as_tibble
 #' @export
 #' @rdname Features
 #' @name Features
 Features <- function(
   peptideSet, TCRSet,
-  aaIndexIDSet="all", alignTypeSet="global-local",
-  fragLenSet=4:6, TCRFragDepthSet=10000, seedSet=1:5
+  fragLenSet=3:8, aaIndexIDSet="all",
+  alignTypeSet="global-local", TCRFragDepthSet=10000,
+  seedSet=1:5
 ){
   # Feature calculation
   message("Peptide descriptor analysis.")

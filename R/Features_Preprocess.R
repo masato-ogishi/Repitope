@@ -20,6 +20,13 @@
 #' @importFrom caret rfFuncs
 #' @importFrom caret rfe
 #' @importFrom caret predictors
+#' @importFrom parallel detectCores
+#' @importFrom parallel splitIndices
+#' @importFrom parallel detectCores
+#' @importFrom parallel makeCluster
+#' @importFrom parallel clusterEvalQ
+#' @importFrom parallel clusterExport
+#' @importFrom parallel stopCluster
 #' @export
 #' @rdname Features_Preprocess
 #' @name Features_Preprocess
@@ -73,11 +80,23 @@ Features_Preprocess <- function(featureDFList, metadataDF){
     # Recursive feature elimination
     cat("Recursive feature elimination.\n")
     set.seed(seed)
+    seeds <- vector(mode="list", length=11)
+    for(i in 1:10) seeds[[i]] <- sample.int(10000, 2)
+    seeds[[11]] <- sample.int(10000, 1)
+    df_train_outcomes <- df_train[["Immunogenicity"]]
     df_train_features <- dplyr::select(df_train, -Peptide, -Immunogenicity, -Cluster)
-    rfeCtrl <- caret::rfeControl(functions=caret::rfFuncs, method="cv", number=10, verbose=T)
-    rfeRes <- caret::rfe(df_train_features, df_train[["Immunogenicity"]], sizes=100, metric="Kappa", rfeControl=rfeCtrl)
+    cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
+    invisible(parallel::clusterEvalQ(cl, {library(caret)}))
+    parallel::clusterExport(
+      cl,
+      list("df_train_features", "seeds"),
+      envir=environment()
+    )
+    rfeCtrl <- caret::rfeControl(functions=caret::rfFuncs, method="cv", number=10, verbose=T, seeds=seeds, allowParallel=T)
+    rfeRes <- caret::rfe(df_train_features, df_train_outcomes, sizes=100, metric="Kappa", rfeControl=rfeCtrl)
     rfeFeatureSet <- caret::predictors(rfeRes)
     print(rfeRes)
+    parallel::stopCluster(cl)
 
     df <- dplyr::select(df, Peptide, Immunogenicity, Cluster, rfeFeatureSet)
     df_train <- dplyr::select(df_train, Peptide, Immunogenicity, Cluster, rfeFeatureSet)
