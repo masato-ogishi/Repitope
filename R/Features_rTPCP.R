@@ -25,6 +25,7 @@
 #' @importFrom Biostrings pairwiseAlignment
 #' @importFrom Biostrings AA_STANDARD
 #' @importFrom psych describe
+#' @importFrom scales rescale
 #' @importFrom parallel detectCores
 #' @importFrom parallel splitIndices
 #' @importFrom parallel detectCores
@@ -42,8 +43,22 @@ Features_rTPCP <- function(peptideSet, TCRSet,
                            fragLenSet=5, TCRFragDepthSet=10000, seedSet=1:5){
   time.start <- proc.time()
 
-  # TCR fragment dictionary to be matched.
-  # Note: parallelization is avoided because this process uses random seeds...
+  # AAIndex-derived pairwise matching matrices
+  aaIndexMatrixFormat <- function(aaIndexID, pairMatInverse=T){
+    pairMat <- dplyr::filter(AACPMatrix, AAIndexID==aaIndexID)$data[[1]]
+    pairMat <- as.matrix(pairMat)
+    rownames(pairMat) <- colnames(pairMat)
+    if(pairMatInverse){ pairMat <- -pairMat }
+    return(scales::rescale(pairMat))
+  }
+  if(identical(aaIndexIDSet, "all")) aaIndexIDSet <- AACPMatrix$AAIndexID
+  pairMatSet <- c(lapply(aaIndexIDSet, function(a){aaIndexMatrixFormat(a, F)}),
+                  lapply(aaIndexIDSet, function(a){aaIndexMatrixFormat(a, T)}))
+  aaIndexIDSet <- c(aaIndexIDSet, paste0(aaIndexIDSet, "inv"))
+  names(pairMatSet) <- aaIndexIDSet
+
+  # TCR fragment dictionary.
+  ## Note: parallelization is avoided because this process uses random seeds...
   fragmentDictionary <- function(sequenceSet, fragLen, depth, seed){
     set.seed(seed)
     s <- c(sequenceSet, Kmisc::str_rev(sequenceSet))
@@ -83,19 +98,6 @@ Features_rTPCP <- function(peptideSet, TCRSet,
   names(TCRFragDictSet.List) <- TCRParameterSet
   message("Preparation of TCR fragment dictionary was finished.")
 
-  # AAIndex-derived pairwise matching matrices
-  aaIndexMatrixFormat <- function(aaIndexID, pairMatInverse=T){
-    pairMat <- dplyr::filter(AACPMatrix, AAIndexID==aaIndexID)$data[[1]]
-    pairMat <- as.matrix(pairMat)
-    rownames(pairMat) <- colnames(pairMat)
-    if(pairMatInverse){ pairMat <- -pairMat }
-    pairMat
-  }
-  if(identical(aaIndexIDSet, "all")) aaIndexIDSet <- AACPMatrix$AAIndexID
-  pairMatSet <- c(lapply(aaIndexIDSet, function(a){aaIndexMatrixFormat(a, F)}), lapply(aaIndexIDSet, function(a){aaIndexMatrixFormat(a, T)}))
-  aaIndexIDSet <- c(aaIndexIDSet, paste0(aaIndexIDSet, "inv"))
-  names(pairMatSet) <- aaIndexIDSet
-
   # Fragment matching analysis
 
   ## Working function
@@ -106,12 +108,14 @@ Features_rTPCP <- function(peptideSet, TCRSet,
   fragmentMatchingStats <- function(peptide, AAIndexID, alignType, TCRParameterString){
     s1 <- try(psych::describe(
       Biostrings::pairwiseAlignment(pattern=TCRFragDictSet.List[[TCRParameterString]][["FR"]], subject=peptide,
-                                    substitutionMatrix=pairMatSet[[AAIndexID]], type=alignType, scoreOnly=T),
+                                    substitutionMatrix=pairMatSet[[AAIndexID]], type=alignType, gapOpening=100, gapExtension=100,
+                                    scoreOnly=T),
       trim=.1, interp=F, skew=T, type=3, ranges=T, IQR=T, quant=c(.10, .90)
     )[statSet], silent=T)
     s2 <- try(psych::describe(
       Biostrings::pairwiseAlignment(pattern=TCRFragDictSet.List[[TCRParameterString]][["Mock"]], subject=peptide,
-                                    substitutionMatrix=pairMatSet[[AAIndexID]], type=alignType, scoreOnly=T),
+                                    substitutionMatrix=pairMatSet[[AAIndexID]], type=alignType, gapOpening=100, gapExtension=100,
+                                    scoreOnly=T),
       trim=.1, interp=F, skew=T, type=3, ranges=T, IQR=T, quant=c(.10, .90)
     )[statSet], silent=T)
     ## psych::describe returns the following values: vars,n,mean,sd,median,trimmed,mad,min,max,range,skew,kurtosis,se,IQR,Q0.1,Q0.9
