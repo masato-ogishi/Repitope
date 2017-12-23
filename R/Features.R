@@ -24,7 +24,7 @@ Features <- function(
   df_feature_peptDesc <- Features_PeptideDescriptor(peptideSet, fragLenSet) ## A single dataframe
   gc();gc()
   message("rTPCP analysis.")
-  dt_feature_rTPCP <- Features_rTPCP(peptideSet, TCRSet, aaIndexIDSet, alignTypeSet, fragLenSet, TCRFragDepthSet, seedSet) ## A list of datatables
+  dt_feature_rTPCP <- Features_rTPCP(peptideSet, TCRSet, fragLenSet, aaIndexIDSet, alignTypeSet, TCRFragDepthSet, seedSet) ## A list of datatables
   gc();gc()
 
   # Output
