@@ -1,5 +1,5 @@
 #' Public XCR clonotypes in the similarity network
-#' 
+#'
 #' @param aaStringSet A set of XCR clonotype sequences (converted as an AAStringSet object).
 #' @param longerAAStringSet A set of XCR clonotype sequences. Should be one amino acid longer than \code{shorterAAStringSet}.
 #' @param shorterAAStringSet A set of XCR clonotype sequences. Should be one amino acid shorter than \code{longerAAStringSet}.
@@ -7,12 +7,13 @@
 #' @param sizeThresholdSet A set of integers specifying the maximum numbers of clonotypes retained as public clonotypes. Based on the degree distribution, appropriate degree threshold will be internally calculated.
 #' @param outputFileHeader A path for saving the outputs from the public clonotype analysis.
 #' @importFrom dplyr %>%
-#' @importFrom dplyr bind_rows
 #' @importFrom dplyr rename
 #' @importFrom dplyr filter
 #' @importFrom dplyr select
+#' @importFrom dplyr bind_rows
 #' @importFrom pbapply timerProgressBar
 #' @importFrom pbapply setTimerProgressBar
+#' @importFrom stringr str_sub
 #' @importFrom S4Vectors nchar
 #' @importFrom S4Vectors elementNROWS
 #' @importFrom Biostrings AAStringSet
@@ -55,8 +56,10 @@ distMat_Auto <- function(aaStringSet){
 #' @rdname TCRAnalysis_PublicClonotypes
 #' @name TCRAnalysis_PublicClonotypes
 distMat_Juxtaposed <- function(longerAAStringSet, shorterAAStringSet){
-  leng_longer <- unique(S4Vectors::nchar(longerAAStringSet))
-  leng_shorter <- unique(S4Vectors::nchar(shorterAAStringSet))
+  longerSeq <- as.character(longerAAStringSet)
+  shorterSeq <- as.character(shorterAAStringSet)
+  leng_longer <- unique(nchar(longerSeq))
+  leng_shorter <- unique(nchar(shorterSeq))
   if(length(leng_longer)>=2){
     message("Input longer sequences must be of the same length!")
     return(NULL)
@@ -73,24 +76,14 @@ distMat_Juxtaposed <- function(longerAAStringSet, shorterAAStringSet){
     message("The length difference between longer and shorter sequences must be one amino acid!")
     return(NULL)
   }
-  insertOneGap <- function(sequenceSet){
-    matrix(unlist(lapply(0:nchar(sequenceSet[[1]]), function(i){gsub(paste0('^(.{',i,'})(.*)$'), '\\1X\\2', sequenceSet)})), nrow=length(sequenceSet))
-  } ## Consider indels manually, because 'with.indels=T' is not currently supported for 'vmatchPattern...
-  shorterSequenceSet.gapped <- insertOneGap(as.character(shorterAAStringSet))
+  longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
+  longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
   DistMat.juxt <- Matrix::sparseMatrix(c(), c(), x=F, dims=c(length(shorterAAStringSet), length(longerAAStringSet)))
   pbQ <- length(shorterAAStringSet)>1000
   if(pbQ) pb <- pbapply::timerProgressBar(min=1, max=length(shorterAAStringSet), char="+", style=1)
-  rowSumsOrSum <- function(x){ifelse(is.matrix(x), rowSums(x), sum(x))}
   for(i in 1:length(shorterAAStringSet)){
     if(pbQ) pbapply::setTimerProgressBar(pb, i)
-    DistMat.juxt[i,] <- rowSumsOrSum(sapply(shorterSequenceSet.gapped[i,], function(s){
-      S4Vectors::elementNROWS(
-        Biostrings::vmatchPattern(
-          pattern=s, subject=longerAAStringSet,
-          max.mismatch=1, min.mismatch=0, with.indels=F
-        )
-      )
-    }))!=0
+    DistMat.juxt[i,] <- rowSums(longerSeq.degenerate==shorterSeq[[i]])!=0
   }
   DistMat.juxt <- Matrix::t(DistMat.juxt)
   return(DistMat.juxt) # An m x n matrix: m = length(longerAAStringSet), n = length(shorterAAStringSet)
@@ -104,25 +97,25 @@ singleAASimilarityNetwork <- function(aaStringSet){
     message("Input sequences are converted to AAStringSet object.")
     aaStringSet <- Biostrings::AAStringSet(aaStringSet)
   }
-  
+
   # Serialized adjacency matrix calculation
   aaStringSetList <- split(aaStringSet, S4Vectors::nchar(aaStringSet))
   sequenceLengthPairGrid <- suppressWarnings(dplyr::bind_rows(
     data.frame(V1=names(aaStringSetList), V2=names(aaStringSetList), Type="Auto"),
     data.frame(as.data.frame(t(combn(names(aaStringSetList), 2))), Type="Juxtaposed")
-  )) %>% 
+  )) %>%
     dplyr::rename(V2="V1", V1="V2") %>%
     dplyr::select(V1, V2, Type) %>%
     dplyr::filter((as.numeric(V1)-as.numeric(V2)) %in% c(0, 1)) ## V1>=V2
   sequenceLengthPairN <- nrow(sequenceLengthPairGrid)
-  
+
   ends <- as.numeric(cumsum(table(S4Vectors::nchar(aaStringSet))))
   starts <- (c(0, ends)+1)[1:length(ends)]
   positionGrid <- as.data.frame(t(data.frame(starts, ends)))
   colnames(positionGrid) <- names(aaStringSetList)
-  
+
   DistMat <- Matrix::sparseMatrix(c(), c(), x=F, dims=rep(length(aaStringSet), 2))
-  
+
   message(paste0("Number of sequence length pairs = ", sequenceLengthPairN))
   for(i in which(sequenceLengthPairGrid$"Type"=="Auto")){
     message(paste0("Pair ", i, "/", sequenceLengthPairN, " | Auto: sequence length = ", sequenceLengthPairGrid[i,1]))
@@ -142,7 +135,7 @@ singleAASimilarityNetwork <- function(aaStringSet){
     DistMat[p1, p2] <- distMat_Juxtaposed(s1, s2)
   }
   DistMat <- DistMat|Matrix::t(DistMat) ## Symmetricalization
-  
+
   # Similarity network
   DistMat %>%
     igraph::graph_from_adjacency_matrix(mode="undirected", weighted=NULL, diag=F) %>%
@@ -157,10 +150,10 @@ publicClonotypeAnalysis <- function(simNet, sizeThresholdSet, outputFileHeader="
   gList <- igraph::decompose(simNet)
   gSizeList <- sapply(gList, function(g){length(igraph::V(g))})
   message("Node size of the largest connected component:", max(gSizeList))
-  igraph::write_graph(gList[[which(gSizeList==max(gSizeList))]], 
+  igraph::write_graph(gList[[which(gSizeList==max(gSizeList))]],
                       file=paste0(outputFileHeader, "LargestConnected.graphml"),
                       format="graphml")
-  
+
   # Split by degree
   dg <- igraph::degree(simNet)
   message("Node with the maximum degree: ", igraph::V(simNet)$"label"[dg==max(dg)], ", degree = ", max(dg))
@@ -169,12 +162,12 @@ publicClonotypeAnalysis <- function(simNet, sizeThresholdSet, outputFileHeader="
     gSub <- suppressWarnings(igraph::subgraph(simNet, which(dg>=minDegree)))
     message("Upper limit of the number of nodes = ", th, ", The minimum degree threshold = ", minDegree, "\n",
         "The number of nodes selected = ", length(igraph::V(gSub)))
-    igraph::write_graph(gSub, 
+    igraph::write_graph(gSub,
                         file=paste0(outputFileHeader, "Degree", minDegree, ".graphml"),
                         format="graphml")
     clones <- igraph::V(gSub)$"label"
-    write.table(clones, 
-                file=paste0(outputFileHeader, "PubClones", th, ".txt"), 
+    write.table(clones,
+                file=paste0(outputFileHeader, "PubClones", th, ".txt"),
                 quote=F, sep="\t", row.names=F, col.names=F)
     return(clones)
   }
