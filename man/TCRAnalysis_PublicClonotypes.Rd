@@ -8,6 +8,8 @@
 \alias{TCRAnalysis_PublicClonotypes}
 \alias{singleAASimilarityNetwork}
 \alias{TCRAnalysis_PublicClonotypes}
+\alias{singleAAConnectedSequencePairs}
+\alias{TCRAnalysis_PublicClonotypes}
 \alias{publicClonotypeAnalysis}
 \title{Public XCR clonotypes in the similarity network}
 \usage{
@@ -16,6 +18,8 @@ distMat_Auto(aaStringSet)
 distMat_Juxtaposed(longerAAStringSet, shorterAAStringSet)
 
 singleAASimilarityNetwork(aaStringSet)
+
+singleAAConnectedSequencePairs(simNet)
 
 publicClonotypeAnalysis(simNet, sizeThresholdSet,
   outputFileHeader = "./Graph/Graph_")

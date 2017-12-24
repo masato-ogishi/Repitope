@@ -10,6 +10,7 @@
 #' @importFrom dplyr rename
 #' @importFrom dplyr filter
 #' @importFrom dplyr select
+#' @importFrom dplyr if_else
 #' @importFrom dplyr bind_rows
 #' @importFrom pbapply timerProgressBar
 #' @importFrom pbapply setTimerProgressBar
@@ -23,31 +24,50 @@
 #' @importFrom igraph set_vertex_attr
 #' @importFrom igraph graph_from_adjacency_matrix
 #' @importFrom igraph simplify
+#' @importFrom igraph get.edgelist
 #' @importFrom igraph decompose
 #' @importFrom igraph V
 #' @importFrom igraph write_graph
 #' @importFrom igraph degree
 #' @importFrom igraph subgraph
+#' @importFrom DescTools Sort
 #' @export
 #' @rdname TCRAnalysis_PublicClonotypes
 #' @name TCRAnalysis_PublicClonotypes
 distMat_Auto <- function(aaStringSet){
+  # Input check...
+  if(class(aaStringSet)!="AAStringSet"){
+    message("Input sequences are converted to AAStringSet object.")
+    aaStringSet <- Biostrings::AAStringSet(aaStringSet)
+  }
   if(length(unique(S4Vectors::nchar(aaStringSet)))>=2){
     message("Input sequences must be of the same length!")
     return(NULL)
   }
+
   sequenceSet <- as.character(aaStringSet)
   DistMat.auto <- Matrix::sparseMatrix(c(), c(), x=F, dims=c(length(aaStringSet), length(aaStringSet)))
   pbQ <- length(aaStringSet)>1000
-  if(pbQ) pb <- pbapply::timerProgressBar(min=1, max=length(aaStringSet), char="+", style=1)
-  for(i in 1:length(aaStringSet)){
-    if(pbQ) pbapply::setTimerProgressBar(pb, i)
-    DistMat.auto[i, 1:i] <- S4Vectors::elementNROWS(
-      Biostrings::vmatchPattern(
-        pattern=sequenceSet[[i]], subject=aaStringSet[1:i],
-        max.mismatch=1, min.mismatch=0, with.indels=F
-      )
-    )!=0
+  if(pbQ){
+    pb <- pbapply::timerProgressBar(min=1, max=length(aaStringSet), char="+", style=1)
+    for(i in 1:length(aaStringSet)){
+      pbapply::setTimerProgressBar(pb, i)
+      DistMat.auto[i, 1:i] <- S4Vectors::elementNROWS(
+        Biostrings::vmatchPattern(
+          pattern=sequenceSet[[i]], subject=aaStringSet[1:i],
+          max.mismatch=1, min.mismatch=0, with.indels=F
+        )
+      )!=0
+    }
+  }else{
+    for(i in 1:length(aaStringSet)){
+      DistMat.auto[i, 1:i] <- S4Vectors::elementNROWS(
+        Biostrings::vmatchPattern(
+          pattern=sequenceSet[[i]], subject=aaStringSet[1:i],
+          max.mismatch=1, min.mismatch=0, with.indels=F
+        )
+      )!=0
+    }
   }
   diag(DistMat.auto) <- F
   return(DistMat.auto)  # An m x m triangular matrix: m = length(aaStringSet)
@@ -56,6 +76,15 @@ distMat_Auto <- function(aaStringSet){
 #' @rdname TCRAnalysis_PublicClonotypes
 #' @name TCRAnalysis_PublicClonotypes
 distMat_Juxtaposed <- function(longerAAStringSet, shorterAAStringSet){
+  # Input check...
+  if(class(longerAAStringSet)!="AAStringSet"){
+    message("Input sequences are converted to AAStringSet object.")
+    longerAAStringSet <- Biostrings::AAStringSet(longerAAStringSet)
+  }
+  if(class(shorterAAStringSet)!="AAStringSet"){
+    message("Input sequences are converted to AAStringSet object.")
+    shorterAAStringSet <- Biostrings::AAStringSet(shorterAAStringSet)
+  }
   longerSeq <- as.character(longerAAStringSet)
   shorterSeq <- as.character(shorterAAStringSet)
   leng_longer <- unique(nchar(longerSeq))
@@ -76,14 +105,21 @@ distMat_Juxtaposed <- function(longerAAStringSet, shorterAAStringSet){
     message("The length difference between longer and shorter sequences must be one amino acid!")
     return(NULL)
   }
+
   longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
   longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
   DistMat.juxt <- Matrix::sparseMatrix(c(), c(), x=F, dims=c(length(shorterAAStringSet), length(longerAAStringSet)))
   pbQ <- length(shorterAAStringSet)>1000
-  if(pbQ) pb <- pbapply::timerProgressBar(min=1, max=length(shorterAAStringSet), char="+", style=1)
-  for(i in 1:length(shorterAAStringSet)){
-    if(pbQ) pbapply::setTimerProgressBar(pb, i)
-    DistMat.juxt[i,] <- rowSums(longerSeq.degenerate==shorterSeq[[i]])!=0
+  if(pbQ){
+    pb <- pbapply::timerProgressBar(min=1, max=length(shorterAAStringSet), char="+", style=1)
+    for(i in 1:length(shorterAAStringSet)){
+      pbapply::setTimerProgressBar(pb, i)
+      DistMat.juxt[i,] <- rowSums(longerSeq.degenerate==shorterSeq[[i]])!=0
+    }
+  }else{
+    for(i in 1:length(shorterAAStringSet)){
+      DistMat.juxt[i,] <- rowSums(longerSeq.degenerate==shorterSeq[[i]])!=0
+    }
   }
   DistMat.juxt <- Matrix::t(DistMat.juxt)
   return(DistMat.juxt) # An m x n matrix: m = length(longerAAStringSet), n = length(shorterAAStringSet)
@@ -125,7 +161,7 @@ singleAASimilarityNetwork <- function(aaStringSet){
     DistMat[p1, p1] <- distMat_Auto(s1)
   }
   for(i in which(sequenceLengthPairGrid$"Type"=="Juxtaposed")){
-    message(paste0("Pair ", i, "/", sequenceLengthPairN, " | Juxtaposed: sequence lengths = ", sequenceLengthPairGrid[i,1], " and ", sequenceLengthPairGrid[i,2]))
+    message(paste0("Pair ", i, "/", sequenceLengthPairN, " | Juxtaposed: sequence length pair = ", sequenceLengthPairGrid[i,1], " and ", sequenceLengthPairGrid[i,2]))
     s1 <- aaStringSetList[[sequenceLengthPairGrid[i,1]]]
     p1 <- positionGrid[[sequenceLengthPairGrid[i,1]]]
     p1 <- seq(p1[1], p1[2])
@@ -145,6 +181,17 @@ singleAASimilarityNetwork <- function(aaStringSet){
 #' @export
 #' @rdname TCRAnalysis_PublicClonotypes
 #' @name TCRAnalysis_PublicClonotypes
+singleAAConnectedSequencePairs <- function(simNet){
+  df <- as.data.frame(igraph::get.edgelist(simNet))
+  colnames(df) <- c("Node1","Node2")
+  df[["AASeq1"]] <- igraph::V(simNet)$label[df$"Node1"]
+  df[["AASeq2"]] <- igraph::V(simNet)$label[df$"Node2"]
+  df[["Type"]] <- dplyr::if_else(nchar(df$"AASeq1")==nchar(df$"AASeq2"), "Substitution", "Indel")
+  return(df)
+}
+#' @export
+#' @rdname TCRAnalysis_PublicClonotypes
+#' @name TCRAnalysis_PublicClonotypes
 publicClonotypeAnalysis <- function(simNet, sizeThresholdSet, outputFileHeader="./Graph/Graph_"){
   # The largest connected component
   gList <- igraph::decompose(simNet)
@@ -156,12 +203,24 @@ publicClonotypeAnalysis <- function(simNet, sizeThresholdSet, outputFileHeader="
 
   # Split by degree
   dg <- igraph::degree(simNet)
+  dg.df <- DescTools::Sort(data.frame("AASeq"=igraph::V(simNet)$"label", "Degree"=dg), ord="Degree", decreasing=T)
   message("Node with the maximum degree: ", igraph::V(simNet)$"label"[dg==max(dg)], ", degree = ", max(dg))
   subgraphByDegree <- function(th){
-    minDegree <- as.numeric(min(names(which(cumsum(rev(table(dg)))<=th))))
+    minDegree <- dg.df[th,][["Degree"]]
     gSub <- suppressWarnings(igraph::subgraph(simNet, which(dg>=minDegree)))
-    message("Upper limit of the number of nodes = ", th, ", The minimum degree threshold = ", minDegree, "\n",
-        "The number of nodes selected = ", length(igraph::V(gSub)))
+    message(
+      "Upper limit of the number of nodes = ", th, "\n",
+      "The minimum degree threshold = ", minDegree, "\n",
+      "The number of nodes selected = ", length(igraph::V(gSub))
+    )
+    sink(paste0(outputFileHeader, "PubCloneAnalysis_Log", th, ".txt"))
+    cat("Public clonotype analysis.\n")
+    cat(
+      "Upper limit of the number of nodes = ", th, "\n",
+      "The minimum degree threshold = ", minDegree, "\n",
+      "The number of nodes selected = ", length(igraph::V(gSub))
+    )
+    sink()
     igraph::write_graph(gSub,
                         file=paste0(outputFileHeader, "Degree", minDegree, ".graphml"),
                         format="graphml")
