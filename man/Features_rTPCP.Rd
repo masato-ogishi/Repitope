@@ -4,20 +4,19 @@
 \alias{Features_rTPCP}
 \title{Repertoire-wide TCR-peptide contact profile (rTPCP) analysis.}
 \usage{
-Features_rTPCP(peptideSet, TCRSet, aaIndexIDSet = "all",
-  alignTypeSet = "global-local", fragLenSet = 5, TCRFragDepthSet = 10000,
-  seedSet = 1:5)
+Features_rTPCP(peptideSet, TCRSet, fragLenSet = 3:8, aaIndexIDSet = "all",
+  alignTypeSet = "global-local", TCRFragDepthSet = 10000, seedSet = 1:5)
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}
 
 \item{TCRSet}{Either a set of TCR sequences (as a character vector) or a list of sets of TCR sequences. If provided as a character vector, TCR sequences are randomly down-sampled to 10000, using \code{seedSet} to create a list. If provided as a list, it must be the same length with the seedSet.}
 
+\item{fragLenSet}{A set of the lengths of TCR sequence fragments to be matched against the peptide set.}
+
 \item{aaIndexIDSet}{A set of AAIndexIDs indicating the pairwise matching score matrix to be used. A set of AAIndex-derived matrices can be retrieved by \code{AACPMatrix}. Set "all" to select all AAIndexIDs.}
 
 \item{alignTypeSet}{A set of alignment-type strings directly passed to the \code{type} argument of the \code{pairwiseAlignment} function in the \code{Biostrings} package.}
-
-\item{fragLenSet}{A set of the lengths of TCR sequence fragments to be matched against the peptide set.}
 
 \item{TCRFragDepthSet}{A set of the numbers of TCR fragments to be matched. This should be kept constant for comparison.}
 

@@ -4,7 +4,7 @@
 \alias{Features_PeptideDescriptor}
 \title{Descriptive statistics of peptide fragment descriptors.}
 \usage{
-Features_PeptideDescriptor(peptideSet, fragLenSet = 5)
+Features_PeptideDescriptor(peptideSet, fragLenSet = 3:8)
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}

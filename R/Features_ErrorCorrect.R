@@ -13,8 +13,8 @@
 #' @importFrom data.table rbindlist
 #' @importFrom tibble as_tibble
 #' @export
-#' @rdname Features
-#' @name Features
+#' @rdname Features_ErrorCorrect
+#' @name Features_ErrorCorrect
 Features_ErrorCorrect <- function(
   featureDFList, TCRSet,
   fragLenSet=3:8, aaIndexIDSet="all",

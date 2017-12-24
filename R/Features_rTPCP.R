@@ -36,8 +36,8 @@
 #' @importFrom pbapply pbapply
 #' @importFrom pbapply pblapply
 #' @export
-#' @rdname Features
-#' @name Features
+#' @rdname Features_rTPCP
+#' @name Features_rTPCP
 Features_rTPCP <- function(
   peptideSet, TCRSet,
   fragLenSet=3:8, aaIndexIDSet="all",
