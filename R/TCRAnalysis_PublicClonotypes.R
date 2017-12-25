@@ -59,6 +59,7 @@ distMat_Auto <- function(aaStringSet){
         )
       )!=0
     }
+    cat("\n")
   }else{
     for(i in 1:length(aaStringSet)){
       DistMat.auto[i, 1:i] <- S4Vectors::elementNROWS(
@@ -116,6 +117,7 @@ distMat_Juxtaposed <- function(longerAAStringSet, shorterAAStringSet){
       pbapply::setTimerProgressBar(pb, i)
       DistMat.juxt[i,] <- rowSums(longerSeq.degenerate==shorterSeq[[i]])!=0
     }
+    cat("\n")
   }else{
     for(i in 1:length(shorterAAStringSet)){
       DistMat.juxt[i,] <- rowSums(longerSeq.degenerate==shorterSeq[[i]])!=0
@@ -214,11 +216,11 @@ publicClonotypeAnalysis <- function(simNet, sizeThresholdSet, outputFileHeader="
       "The number of nodes selected = ", length(igraph::V(gSub))
     )
     sink(paste0(outputFileHeader, "PubCloneAnalysis_Log", th, ".txt"))
-    cat("Public clonotype analysis.\n")
+    cat("Public clonotype analysis.\n", sep="")
     cat(
       "Upper limit of the number of nodes = ", th, "\n",
       "The minimum degree threshold = ", minDegree, "\n",
-      "The number of nodes selected = ", length(igraph::V(gSub))
+      "The number of nodes selected = ", length(igraph::V(gSub)), sep=""
     )
     sink()
     igraph::write_graph(gSub,
