@@ -138,12 +138,15 @@ singleAASimilarityNetwork <- function(aaStringSet){
 
   # Serialized adjacency matrix calculation
   aaStringSetList <- split(aaStringSet, S4Vectors::nchar(aaStringSet))
-  sequenceLengthPairGrid <- suppressWarnings(dplyr::bind_rows(
-    data.frame(V1=names(aaStringSetList), V2=names(aaStringSetList), Type="Auto"),
-    data.frame(as.data.frame(t(combn(names(aaStringSetList), 2))), Type="Juxtaposed")
-  )) %>%
-    dplyr::rename(V2="V1", V1="V2") %>%
-    dplyr::select(V1, V2, Type) %>%
+  if(length(names(aaStringSetList))>=2){
+    sequenceLengthPairGrid <- suppressWarnings(dplyr::bind_rows(
+      data.frame(V1=names(aaStringSetList), V2=names(aaStringSetList), Type="Auto"),
+      data.frame(as.data.frame(t(combn(names(aaStringSetList), 2))), Type="Juxtaposed")
+    )) %>% dplyr::rename(V2="V1", V1="V2") %>% dplyr::select(V1, V2, Type)
+  }else{
+    sequenceLengthPairGrid <- data.frame(V1=names(aaStringSetList), V2=names(aaStringSetList), Type="Auto")
+  }
+  sequenceLengthPairGrid <- sequenceLengthPairGrid %>%
     dplyr::filter((as.numeric(V1)-as.numeric(V2)) %in% c(0, 1)) ## V1>=V2
   sequenceLengthPairN <- nrow(sequenceLengthPairGrid)
 
