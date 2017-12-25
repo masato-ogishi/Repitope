@@ -135,6 +135,10 @@ singleAASimilarityNetwork <- function(aaStringSet){
     message("Input sequences are converted to AAStringSet object.")
     aaStringSet <- Biostrings::AAStringSet(aaStringSet)
   }
+  if(length(unique(aaStringSet))!=length(aaStringSet)){
+    message("Duplicates are removed from the input sequences.")
+    aaStringSet <- unique(aaStringSet)
+  }
 
   # Serialized adjacency matrix calculation
   aaStringSetList <- split(aaStringSet, S4Vectors::nchar(aaStringSet))
