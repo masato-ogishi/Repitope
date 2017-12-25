@@ -91,6 +91,7 @@ Immunogenicity_AutoML <- function(
   destDir="./Results/", LeaderBoardName="LeaderBoard.csv", H2OModelName="BestH2OModel",
   seed=12345, max_mem_size="6G", nthreads=6
 ){
+  # Working environment
   set.seed(seed)
   dir.create(destDir, showWarnings=F, recursive=T)
   h2o::h2o.init(ip="localhost", max_mem_size=max_mem_size, nthreads=nthreads)
@@ -99,11 +100,11 @@ Immunogenicity_AutoML <- function(
   trainDF$"Immunogenicity" <- factor(trainDF$"Immunogenicity", levels=c("Positive", "Negative"))
   testDF$"Immunogenicity" <- factor(testDF$"Immunogenicity", levels=c("Positive", "Negative"))
 
-  # Down-sampling to avoid class imbalance
+  # Down-sampling to minimize the effect of class imbalance
   trainDF <- caret::downSample(dplyr::select(trainDF, -Immunogenicity), trainDF$"Immunogenicity", yname="Immunogenicity") %>%
     dplyr::select(Immunogenicity, setdiff(colnames(.), "Immunogenicity"))
 
-  # Train immunogenicity classifiers
+  # Train classifiers
   df_train <- h2o::as.h2o(trainDF)
   df_test <- h2o::as.h2o(testDF)
   aml <- h2o::h2o.automl(
@@ -159,18 +160,20 @@ Immunogenicity_Prediction <- function(
   # Probability distribution plot
   thr <- pROC::coords(pROC::roc(predDF$"Immunogenicity", predDF$"Positive"), "b", ret="t", best.method="youden")[1] ## Two or more threshold could sometimes be returned... The first one is the lowest, meaning maximum sensitivity for P.aeruginosa.
   probPlot <- ggplot(data=predDF, aes_string(x="Immunogenicity", y="Positive")) +
-    geom_jitter(width=0.2) + geom_hline(yintercept=thr, color="grey50", size=1) +
+    geom_violin(trim=F) +
+    stat_summary(fun.data=mean_sdl, mult=1, geom="pointrange", color="red") +
+    geom_hline(yintercept=thr, color="grey50", size=1) +
     xlab(NULL) + ylab("Immunogenicity score") +
     plotUtility::theme_Publication()
-  plotUtility::savePDF(probPlot, outputFileName=file.path(destDir, paste0(PredictionHeader, "JitterPlot_Seed", seed, ".pdf")))
+  plotUtility::savePDF(probPlot, outputFileName=file.path(destDir, paste0(PredictionHeader, "ViolinPlot_Seed", seed, ".pdf")), w=5, h=5)
 
-  # Classifier plots
+  # Classifier performance plots
   rocPlot <- classifierplots::roc_plot(2-as.numeric(predDF$"Immunogenicity"), predDF$"Positive") +
     plotUtility::theme_Publication()
   plotUtility::savePDF(rocPlot, outputFileName=file.path(destDir, paste0(PredictionHeader, "ROCPlot_Seed", seed, ".pdf")))
   calibPlot <- classifierplots::calibration_plot(2-as.numeric(predDF$"Immunogenicity"), predDF$"Positive") +
     plotUtility::theme_Publication()
-  plotUtility::savePDF(calibPlot, outputFileName=file.path(destDir, paste0(PredictionHeader, "CalibrationPlot_Seed", seed, ".pdf")))
+  plotUtility::savePDF(calibPlot, outputFileName=file.path(destDir, paste0(PredictionHeader, "CalibrationPlot_Seed", seed, ".pdf")), w=5, h=5)
 
   return(predDF)
 }
