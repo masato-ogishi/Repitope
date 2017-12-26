@@ -12,7 +12,7 @@
 Immunogenicity(preprocessedDFList, destDir = "./Results/",
   max_mem_size = "6G", nthreads = 6)
 
-Immunogenicity_AutoML(trainDF, testDF, destDir = "./Results/",
+Immunogenicity_AutoML(trainDF, testDF, validDF, destDir = "./Results/",
   LeaderBoardName = "LeaderBoard.csv", H2OModelName = "BestH2OModel",
   seed = 12345, max_mem_size = "6G", nthreads = 6)
 
@@ -32,6 +32,8 @@ Immunogenicity_Prediction(evalDF, destDir = "./Results/",
 \item{trainDF}{A dataframe for model training.}
 
 \item{testDF}{A dataframe for hold-out validation.}
+
+\item{validDF}{A dataframe for leaderboard scoring.}
 
 \item{LeaderBoardName}{The file name of the leader board to be saved. The file format must be CSV. If you want to skip saving, set \code{NULL}.}
 
