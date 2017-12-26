@@ -160,15 +160,15 @@ Immunogenicity_Prediction <- function(
     geom_hline(yintercept=thr, color="grey50", size=1) +
     xlab(NULL) + ylab("Immunogenicity score") +
     plotUtility::theme_Publication()
-  plotUtility::savePDF(probPlot, outputFileName=file.path(destDir, paste0(PredictionHeader, "ViolinPlot_Seed", seed, ".pdf")), w=5, h=5)
+  plotUtility::savePDF(probPlot, outputFileName=file.path(destDir, paste0(PredictionHeader, "ViolinPlot_Seed", seed, ".pdf")), width=5, height=5)
 
   # Classifier performance plots
   rocPlot <- classifierplots::roc_plot(2-as.numeric(predDF$"Immunogenicity"), predDF$"Positive") +
     plotUtility::theme_Publication()
-  plotUtility::savePDF(rocPlot, outputFileName=file.path(destDir, paste0(PredictionHeader, "ROCPlot_Seed", seed, ".pdf")))
+  plotUtility::savePDF(rocPlot, outputFileName=file.path(destDir, paste0(PredictionHeader, "ROCPlot_Seed", seed, ".pdf")), width=5, height=5)
   calibPlot <- classifierplots::calibration_plot(2-as.numeric(predDF$"Immunogenicity"), predDF$"Positive") +
     plotUtility::theme_Publication()
-  plotUtility::savePDF(calibPlot, outputFileName=file.path(destDir, paste0(PredictionHeader, "CalibrationPlot_Seed", seed, ".pdf")), w=5, h=5)
+  plotUtility::savePDF(calibPlot, outputFileName=file.path(destDir, paste0(PredictionHeader, "CalibrationPlot_Seed", seed, ".pdf")), width=5, height=5)
 
   return(predDF)
 }
