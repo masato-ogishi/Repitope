@@ -7,6 +7,7 @@
 #' @param testDF A dataframe for hold-out validation.
 #' @param validDF A dataframe for leaderboard scoring.
 #' @param evalDF A dataframe for evaluation.
+#' @param featureSet A set of features to be used for model training. If "all", all features in the training dataframe except "Immunogenicity", "Peptide", and "Cluster" will be used.
 #' @param destDir A directory for saving outputs.
 #' @param LeaderBoardName The file name of the leader board to be saved. The file format must be CSV. If you want to skip saving, set \code{NULL}.
 #' @param H2OModelName The file name of the best H2O model to be saved. No file extension is required. If you want to skip saving, set \code{NULL}.
@@ -35,7 +36,7 @@
 #' @rdname ImmunogenicityPrediction
 #' @name ImmunogenicityPrediction
 Immunogenicity <- function(
-  preprocessedDFList, destDir="./Results/", max_mem_size="6G", nthreads=6
+  preprocessedDFList, featureSet="all", destDir="./Results/", max_mem_size="6G", nthreads=6
 ){
   dir.create(destDir, showWarnings=F, recursive=T)
 
@@ -53,6 +54,7 @@ Immunogenicity <- function(
     if(skipQ==F){
       df_lb_list[[i]] <- Immunogenicity_AutoML(
         preprocessedDFList$"train"[[i]], preprocessedDFList$"test"[[i]], preprocessedDFList$"valid"[[i]],
+        featureSet=featureSet,
         destDir=destDir, LeaderBoardName=NULL, H2OModelName=modName,
         seed=s, max_mem_size=max_mem_size, nthreads=nthreads
       ) %>% dplyr::mutate("Parameter"=param, "Seed"=s)
@@ -79,7 +81,7 @@ Immunogenicity <- function(
 #' @rdname ImmunogenicityPrediction
 #' @name ImmunogenicityPrediction
 Immunogenicity_AutoML <- function(
-  trainDF, testDF, validDF,
+  trainDF, testDF, validDF, featureSet="all",
   destDir="./Results/", LeaderBoardName="LeaderBoard.csv", H2OModelName="BestH2OModel",
   seed=12345, max_mem_size="6G", nthreads=6
 ){
@@ -101,8 +103,13 @@ Immunogenicity_AutoML <- function(
   df_train <- h2o::as.h2o(trainDF)
   df_test <- h2o::as.h2o(testDF)
   df_valid <- h2o::as.h2o(validDF)
+  if(identical(featureSet, "all")){
+    featureSet <- setdiff(colnames(trainDF), c("Immunogenicity", "Peptide", "Cluster"))
+  }else{
+    featureSet <- setdiff(as.character(as.vector(featureSet)), c("Immunogenicity", "Peptide", "Cluster"))
+  } ## remove metadata to avoid leakage
   aml <- h2o::h2o.automl(
-    x=setdiff(colnames(trainDF), c("Immunogenicity", "Peptide", "Cluster")),  ## remove metadata to avoid leakage
+    x=featureSet,
     y="Immunogenicity",
     training_frame=df_train,
     validation_frame=df_test,

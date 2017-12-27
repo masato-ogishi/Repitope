@@ -78,6 +78,8 @@ Features_Preprocess <- function(featureDFList, metadataDF){
     df_valid <- predict(pp_train, dplyr::select(df_valid, Peptide, Immunogenicity, Cluster, featureSet))
 
     # Recursive feature elimination
+    is.installed <- function(mypkg){is.element(mypkg, installed.packages()[,1])}
+    if(!is.installed("randomForest")){install.packages("randomForest")}
     cat("Recursive feature elimination.\n")
     set.seed(seed)
     seeds <- vector(mode="list", length=11)
@@ -85,14 +87,10 @@ Features_Preprocess <- function(featureDFList, metadataDF){
     seeds[[11]] <- sample.int(10000, 1)
     df_train_outcomes <- df_train[["Immunogenicity"]]
     df_train_features <- dplyr::select(df_train, -Peptide, -Immunogenicity, -Cluster)
-    cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
-    invisible(parallel::clusterEvalQ(cl, {library(caret)}))
-    parallel::clusterExport(
-      cl,
-      list("df_train_features", "seeds"),
-      envir=environment()
-    )
     rfeCtrl <- caret::rfeControl(functions=caret::rfFuncs, method="cv", number=10, verbose=T, seeds=seeds, allowParallel=T)
+    cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
+    invisible(parallel::clusterEvalQ(cl, {library(caret); library(randomForest)}))
+    parallel::clusterExport(cl, list("df_train_features", "df_train_outcomes", "rfeCtrl"), envir=environment())
     rfeRes <- caret::rfe(df_train_features, df_train_outcomes, sizes=100, metric="Kappa", rfeControl=rfeCtrl)
     rfeFeatureSet <- caret::predictors(rfeRes)
     print(rfeRes)
