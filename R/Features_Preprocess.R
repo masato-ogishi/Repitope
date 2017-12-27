@@ -102,29 +102,26 @@ Features_Preprocess <- function(featureDFList, metadataDF){
     df_valid <- dplyr::select(df_valid, Peptide, Immunogenicity, Cluster, rfeFeatureSet)
 
     # Output
-    list("df"=df, "df_train"=df_train, "df_test"=df_test, "df_valid"=df_valid, "rfeRes"=rfeRes)
+    list("df"=df, "df_train"=df_train, "df_test"=df_test, "df_valid"=df_valid, "rfeRes"=rfeRes, "pp_train"=pp_train)
   }
 
   # Batch preprocessing
   params <- as.data.frame(stringr::str_split(names(featureDFList), stringr::fixed("."), simplify=T), stringsAsFactors=F)
   seedSet <- as.numeric(params[[rev(colnames(params))[1]]])
   l <- length(featureDFList)
-  df_list <- rlang::set_names(as.list(numeric(l)), names(featureDFList))
-  df_train_list <- rlang::set_names(as.list(numeric(l)), names(featureDFList))
-  df_test_list <- rlang::set_names(as.list(numeric(l)), names(featureDFList))
-  df_valid_list <- rlang::set_names(as.list(numeric(l)), names(featureDFList))
-  rfeRes_list <- rlang::set_names(as.list(numeric(l)), names(featureDFList))
-  for(i in 1:l){
+  resList <- lapply(1:l, function(i){
     time.start <- proc.time()
     message("Parameter set ", i, "/", l, ": ", names(featureDFList)[[i]])
     res <- Features_Preprocess_Single(featureDFList[[i]], metadataDF, seed=seedSet[[i]])
-    df_list[[i]] <- res[["df"]]
-    df_train_list[[i]] <- res[["df_train"]]
-    df_test_list[[i]] <- res[["df_test"]]
-    df_valid_list[[i]] <- res[["df_valid"]]
-    rfeRes_list[[i]] <- res[["rfeRes"]]
     time.end <- proc.time()
     message("Overall time required = ", format((time.end-time.start)[3], nsmall=2), "[sec]")
-  }
-  tibble::as_tibble(list("df"=df_list, "train"=df_train_list, "test"=df_test_list, "valid"=df_valid_list, "rfeRes"=rfeRes_list))
+    return(res)
+  })
+  items <- names(resList[[1]])
+  resList <- lapply(items, function(item){
+    res <- lapply(1:l, function(i){resList[[i]][[item]]})
+    names(res) <- names(featureDFList)
+  })
+  names(resList) <- items
+  return(tibble::as_tibble(resList))
 }
