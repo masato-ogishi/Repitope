@@ -23,5 +23,7 @@ Features(peptideSet, TCRSet, fragLenSet = 3:8, aaIndexIDSet = "all",
 \item{seedSet}{A set of random seeds.}
 }
 \description{
-A wrapper of \code{Features_PeptideDescriptor} and \code{Features_rTPCP}, generating a list of dataframes of peptide features calculated with different parameter sets.
+\code{Features_PeptideDescriptor} calculates descriptive statistics using peptide descriptors.\cr
+\code{Features_rTPCP} calculates descriptive statistics of repertoire-wide TCR-peptide pairwise contact potentials.\cr
+\code{Features} is a wrapper function, generating a list of dataframes of peptide features calculated with different parameter sets.
 }

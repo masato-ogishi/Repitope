@@ -1,6 +1,8 @@
 #' Descriptive statistics of peptide fragment descriptors.
 #'
-#' Calculates descriptive statistics using peptide descriptors.
+#' \code{Features_PeptideDescriptor} calculates descriptive statistics using peptide descriptors.\cr
+#' \code{Features_rTPCP} calculates descriptive statistics of repertoire-wide TCR-peptide pairwise contact potentials.\cr
+#' \code{Features} is a wrapper function, generating a list of dataframes of peptide features calculated with different parameter sets.
 #'
 #' @param peptideSet A set of peptide sequences.
 #' @param fragLenSet A set of the lengths of TCR sequence fragments to be matched against the peptide set.

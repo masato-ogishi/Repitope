@@ -12,5 +12,7 @@ Features_PeptideDescriptor(peptideSet, fragLenSet = 3:8)
 \item{fragLenSet}{A set of the lengths of TCR sequence fragments to be matched against the peptide set.}
 }
 \description{
-Calculates descriptive statistics using peptide descriptors.
+\code{Features_PeptideDescriptor} calculates descriptive statistics using peptide descriptors.\cr
+\code{Features_rTPCP} calculates descriptive statistics of repertoire-wide TCR-peptide pairwise contact potentials.\cr
+\code{Features} is a wrapper function, generating a list of dataframes of peptide features calculated with different parameter sets.
 }

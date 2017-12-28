@@ -1,6 +1,8 @@
 #' Generate peptide features for immunogenicity prediction.
 #'
-#' A wrapper of \code{Features_PeptideDescriptor} and \code{Features_rTPCP}, generating a list of dataframes of peptide features calculated with different parameter sets.
+#' \code{Features_PeptideDescriptor} calculates descriptive statistics using peptide descriptors.\cr
+#' \code{Features_rTPCP} calculates descriptive statistics of repertoire-wide TCR-peptide pairwise contact potentials.\cr
+#' \code{Features} is a wrapper function, generating a list of dataframes of peptide features calculated with different parameter sets.
 #'
 #' @param peptideSet A set of peptide sequences.
 #' @param TCRSet Either a set of TCR sequences (as a character vector) or a list of sets of TCR sequences. If provided as a list, it must be the same length with the seedSet.
