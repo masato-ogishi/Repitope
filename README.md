@@ -11,6 +11,7 @@ Installation
 
 ``` r
 if(!require(devtools)) install.packages("devtools")
+devtools::install_github("masato-ogishi/plotUtility")
 devtools::install_github("masato-ogishi/Repitope")
 
 # Alternatively, please download this repository as a Zip file, unzip it to the directory you want, and run the following command.
