@@ -23,10 +23,11 @@ Features_ExtractRandomComponent <- function(featureDFList){
   df_list <- lapply(featureDFList, extract.random.rTPCP)
   df_pept <- df_list[[1]][[1]]
   df_rTPCP_list <- lapply(df_list, function(l){l[[2]]})
-  df_rTPCP_list_diff <- c(df_rTPCP_list[length(df_rTPCP_list)], df_rTPCP_list)[1:length(df_rTPCP_list)] ## 5,1,2,3,4
+  df_rTPCP_list_diff <- c(df_rTPCP_list, df_rTPCP_list[1])[-1] ## 2,3,4,5,1
   df_rTPCP_list_diff <- mapply(function(d.x, d.y){d.diff <- d.x - d.y; colnames(d.diff) <- gsub("FR_", "Diff_", colnames(d.diff)); d.diff},
-                               df_rTPCP_list, df_rTPCP_list_diff, SIMPLIFY=F) ## 1-5,2-1,3-2,4-3,5-4
+                               df_rTPCP_list, df_rTPCP_list_diff, SIMPLIFY=F) ## 1-2, 2-3, 3-4, 4-5, 5-1
   df_list <- lapply(1:length(df_list), function(i){dplyr::bind_cols(df_pept, df_rTPCP_list[[i]], df_rTPCP_list_diff[[i]])})
+  names(df_list) <- names(featureDFList)
   rm(list=setdiff(ls(), "df_list"))
   gc();gc()
   return(df_list)

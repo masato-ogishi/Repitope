@@ -107,7 +107,7 @@ Features_Preprocess <- function(featureDFList, metadataDF){
 
   # Batch preprocessing
   params <- as.data.frame(stringr::str_split(names(featureDFList), stringr::fixed("."), simplify=T), stringsAsFactors=F)
-  seedSet <- as.numeric(params[[rev(colnames(params))[1]]])
+  seedSet <- as.numeric(as.character(params[[rev(colnames(params))[1]]]))
   l <- length(featureDFList)
   resList <- lapply(1:l, function(i){
     time.start <- proc.time()
