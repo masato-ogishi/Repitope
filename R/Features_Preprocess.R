@@ -108,7 +108,7 @@ Features_Preprocess <- function(featureDFList, metadataDFList, preprocessedDFLis
     paramDF, 1,
     function(v){
       s <- as.numeric(as.character(rev(unlist(stringr::str_split(v[[2]], stringr::fixed("."))))[1]))
-      Features_Split_Single(featureDFList[[v[[1]]]], metadataDFList[[v[[1]]]], s)
+      Features_Split_Single(featureDFList[[v[2]]], metadataDFList[[v[1]]], s)
     }
   )
   names(splitFeatureDFList) <- conbinedParamSet
