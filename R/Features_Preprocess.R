@@ -10,6 +10,7 @@
 #' @importFrom dplyr mutate
 #' @importFrom dplyr left_join
 #' @importFrom dplyr select
+#' @importFrom data.table as.data.table
 #' @importFrom tidyr drop_na
 #' @importFrom stringr str_split
 #' @importFrom stringr fixed
@@ -71,7 +72,8 @@ Features_Preprocess <- function(featureDFList, metadataDFList, preprocessedDFLis
     # Combine metadata
     df <- dplyr::left_join(metadataDF, featureDF, by="Peptide") %>%
       tidyr::drop_na() %>%
-      dplyr::mutate(Immunogenicity=factor(Immunogenicity, levels=c("Positive", "Negative")))
+      dplyr::mutate(Immunogenicity=factor(Immunogenicity, levels=c("Positive", "Negative"))) %>%
+      data.table::as.data.table()
 
     # Randomly choose one epitope per each cluster [Minor class is prioritized]
     set.seed(seed)
@@ -88,7 +90,8 @@ Features_Preprocess <- function(featureDFList, metadataDFList, preprocessedDFLis
       dplyr::distinct(Cluster, .keep_all=T) %>%
       dplyr::distinct(Peptide, .keep_all=T) %>%
       DescTools::Sort(ord=c("Peptide", "Cluster")) %>%
-      dplyr::mutate(Immunogenicity=factor(Immunogenicity, levels=c("Positive", "Negative")))
+      dplyr::mutate(Immunogenicity=factor(Immunogenicity, levels=c("Positive", "Negative"))) %>%
+      data.table::as.data.table()
 
     # Random data splitting
     set.seed(seed)
@@ -100,6 +103,8 @@ Features_Preprocess <- function(featureDFList, metadataDFList, preprocessedDFLis
     df_valid <- df_test[-testID,] ## Proportion == 0.1
 
     # Output
+    rm(list=setdiff(ls(), c("df", "df_train", "df_test", "df_valid")))
+    gc();gc()
     list("df"=df, "df_train"=df_train, "df_test"=df_test, "df_valid"=df_valid)
   }
   message("Splitting dataframes...")
@@ -131,12 +136,12 @@ Features_Preprocess <- function(featureDFList, metadataDFList, preprocessedDFLis
       caretSeeds(s, number=10)
     }
   )
-  Features_Preprocess_Single <- function(splitFeatureDFList, seeds){
-    # Data
-    df <- splitFeatureDFList$"df"
-    df_train <- splitFeatureDFList$"df_train"
-    df_test <- splitFeatureDFList$"df_test"
-    df_valid <- splitFeatureDFList$"df_valid"
+  Features_Preprocess_Single <- function(df, df_train, df_test, df_valid, seeds){
+    # Dataframes to datatables
+    df <- df %>% data.table::as.data.table()
+    df_train <- df_train %>% data.table::as.data.table()
+    df_test <- df_test %>% data.table::as.data.table()
+    df_valid <- df_valid %>% data.table::as.data.table()
 
     # Preprocessing [variance and correlation]
     df_train_features <- dplyr::select(df_train, -Peptide, -Immunogenicity, -Cluster)
@@ -163,6 +168,8 @@ Features_Preprocess <- function(featureDFList, metadataDFList, preprocessedDFLis
     df_valid <- dplyr::select(df_valid, Peptide, Immunogenicity, Cluster, rfeFeatureSet)
 
     # Output
+    rm(list=setdiff(ls(), c("df", "df_train", "df_test", "df_valid", "rfeRes", "pp_train")))
+    gc();gc()
     list("df"=df, "df_train"=df_train, "df_test"=df_test, "df_valid"=df_valid, "rfeRes"=rfeRes, "pp_train"=pp_train)
   }
 
@@ -171,7 +178,10 @@ Features_Preprocess <- function(featureDFList, metadataDFList, preprocessedDFLis
   if(is.null(coreN)){
     preprocessedDFList <- pbapply::pblapply(
       1:length(conbinedParamSet),
-      function(i){Features_Preprocess_Single(splitFeatureDFList[[i]], caretSeedsList[[i]])}
+      function(i){Features_Preprocess_Single(
+        splitFeatureDFList[[i]][["df"]], splitFeatureDFList[[i]][["df_train"]],
+        splitFeatureDFList[[i]][["df_test"]], splitFeatureDFList[[i]][["df_valid"]], caretSeedsList[[i]]
+      )}
     )
     names(preprocessedDFList) <- conbinedParamSet
   }else{
