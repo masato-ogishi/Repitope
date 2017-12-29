@@ -110,33 +110,19 @@ Features_Preprocess <- function(featureDFList, metadataDFList, preprocessedDFLis
   message("Splitting dataframes...")
   paramDF <- expand.grid(names(metadataDFList), names(featureDFList), stringsAsFactors=F)
   conbinedParamSet <- apply(paramDF, 1, function(v){paste0(v, collapse=".")})
-  splitFeatureDFList <- pbapply::pbapply(
+  preprocessedDFList <- pbapply::pbapply(
     paramDF, 1,
     function(v){
       s <- as.numeric(as.character(rev(unlist(stringr::str_split(v[[2]], stringr::fixed("."))))[1]))
       Features_Split_Single(featureDFList[[v[2]]], metadataDFList[[v[1]]], s)
     }
   )
-  names(splitFeatureDFList) <- conbinedParamSet
+  names(preprocessedDFList) <- conbinedParamSet
   gc();gc()
 
   # Preprocessing
-  caretSeeds <- function(seed, number){
-    set.seed(seed)
-    seeds <- vector(mode="list", length=number+1)
-    for(i in 1:number) seeds[[i]] <- sample.int(10000, 2)
-    seeds[[number+1]] <- sample.int(10000, 1)
-    return(seeds)
-  }
-  message("Generating random seeds...")
-  caretSeedsList <- pbapply::pblapply(
-    conbinedParamSet,
-    function(param){
-      s <- as.numeric(as.character(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]))
-      caretSeeds(s, number=10)
-    }
-  )
-  Features_Preprocess_Single <- function(df, df_train, df_test, df_valid, seeds){
+  ## Note: parallelization should be disabled, because of extremely high memory burdens...
+  Features_Preprocess_Single <- function(df, df_train, df_test, df_valid){
     # Dataframes to datatables
     df <- df %>% data.table::as.data.table()
     df_train <- df_train %>% data.table::as.data.table()
@@ -154,6 +140,44 @@ Features_Preprocess <- function(featureDFList, metadataDFList, preprocessedDFLis
     df_train <- predict(pp_train, dplyr::select(df_train, Peptide, Immunogenicity, Cluster, featureSet))
     df_test <- predict(pp_train, dplyr::select(df_test, Peptide, Immunogenicity, Cluster, featureSet))
     df_valid <- predict(pp_train, dplyr::select(df_valid, Peptide, Immunogenicity, Cluster, featureSet))
+
+    # Output
+    rm(list=setdiff(ls(), c("df", "df_train", "df_test", "df_valid", "pp_train")))
+    gc();gc()
+    list("df"=df, "df_train"=df_train, "df_test"=df_test, "df_valid"=df_valid, "pp_train"=pp_train)
+  }
+  message("Preprocessing...")
+  preprocessedDFList <- pbapply::pblapply(
+    1:length(conbinedParamSet),
+    function(i){Features_Preprocess_Single(
+      preprocessedDFList[[i]][["df"]], preprocessedDFList[[i]][["df_train"]],
+      preprocessedDFList[[i]][["df_test"]], preprocessedDFList[[i]][["df_valid"]]
+    )}
+  )
+  names(preprocessedDFList) <- conbinedParamSet
+  gc();gc()
+
+  # Recursive feature elimination
+  caretSeeds <- function(seed, number){
+    set.seed(seed)
+    seeds <- vector(mode="list", length=number+1)
+    for(i in 1:number) seeds[[i]] <- sample.int(10000, 2)
+    seeds[[number+1]] <- sample.int(10000, 1)
+    return(seeds)
+  }
+  caretSeedsList <- pbapply::pblapply(
+    conbinedParamSet,
+    function(param){
+      s <- as.numeric(as.character(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]))
+      caretSeeds(s, number=10)
+    }
+  )
+  Features_RFE_Single <- function(df, df_train, df_test, df_valid, pp_train, seeds){
+    # Dataframes to datatables
+    df <- df %>% data.table::as.data.table()
+    df_train <- df_train %>% data.table::as.data.table()
+    df_test <- df_test %>% data.table::as.data.table()
+    df_valid <- df_valid %>% data.table::as.data.table()
 
     # Recursive feature elimination
     df_train_outcomes <- df_train[["Immunogenicity"]]
@@ -174,29 +198,32 @@ Features_Preprocess <- function(featureDFList, metadataDFList, preprocessedDFLis
   }
 
   ## Parallelization
-  message("Preprocessing was started. (Memory occupied = ", memory.size(), "[Mb])")
+  message("Recursive feature elimination...")
   if(is.null(coreN)){
     preprocessedDFList <- pbapply::pblapply(
       1:length(conbinedParamSet),
-      function(i){Features_Preprocess_Single(
-        splitFeatureDFList[[i]][["df"]], splitFeatureDFList[[i]][["df_train"]],
-        splitFeatureDFList[[i]][["df_test"]], splitFeatureDFList[[i]][["df_valid"]], caretSeedsList[[i]]
+      function(i){Features_RFE_Single(
+        preprocessedDFList[[i]][["df"]], preprocessedDFList[[i]][["df_train"]],
+        preprocessedDFList[[i]][["df_test"]], preprocessedDFList[[i]][["df_valid"]],
+        preprocessedDFList[[i]][["pp_train"]], caretSeedsList[[i]]
       )}
     )
-    names(preprocessedDFList) <- conbinedParamSet
   }else{
     cl <- parallel::makeCluster(coreN, type="SOCK")
     invisible(parallel::clusterEvalQ(cl, {library(tidyverse); library(caret); library(randomForest)}))
-    parallel::clusterExport(cl, list("Features_Preprocess_Single", "splitFeatureDFList", "caretSeedsList"), envir=environment())
+    parallel::clusterExport(cl, list("Features_RFE_Single", "preprocessedDFList", "caretSeedsList"), envir=environment())
     preprocessedDFList <- pbapply::pblapply(
       1:length(conbinedParamSet),
-      function(i){Features_Preprocess_Single(splitFeatureDFList[[i]], caretSeedsList[[i]])},
+      function(i){Features_RFE_Single(
+        preprocessedDFList[[i]][["df"]], preprocessedDFList[[i]][["df_train"]],
+        preprocessedDFList[[i]][["df_test"]], preprocessedDFList[[i]][["df_valid"]],
+        preprocessedDFList[[i]][["pp_train"]], caretSeedsList[[i]]
+      )},
       cl=cl
     )
-    names(preprocessedDFList) <- conbinedParamSet
     parallel::stopCluster(cl)
   }
-  message("Preprocessing was finished. (Memory occupied = ", memory.size(), "[Mb])")
+  names(preprocessedDFList) <- conbinedParamSet
   gc();gc()
 
   # Output
