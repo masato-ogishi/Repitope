@@ -5,7 +5,8 @@
 \title{Generate peptide features for immunogenicity prediction.}
 \usage{
 Features(peptideSet, TCRSet, fragLenSet = 3:8, aaIndexIDSet = "all",
-  alignTypeSet = "global-local", TCRFragDepthSet = 10000, seedSet = 1:5)
+  alignTypeSet = "global-local", TCRFragDepthSet = 10000, seedSet = 1:5,
+  coreN = parallel::detectCores())
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}
@@ -21,6 +22,8 @@ Features(peptideSet, TCRSet, fragLenSet = 3:8, aaIndexIDSet = "all",
 \item{TCRFragDepthSet}{A set of the numbers of TCR fragments to be matched. This should be kept constant for comparison.}
 
 \item{seedSet}{A set of random seeds.}
+
+\item{coreN}{The number of cores to be used for parallelization.}
 }
 \description{
 \code{Features_PeptideDescriptor} calculates descriptive statistics using peptide descriptors.\cr

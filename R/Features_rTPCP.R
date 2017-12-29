@@ -11,6 +11,7 @@
 #' @param alignTypeSet A set of alignment-type strings directly passed to the \code{type} argument of the \code{pairwiseAlignment} function in the \code{Biostrings} package.
 #' @param TCRFragDepthSet A set of the numbers of TCR fragments to be matched. This should be kept constant for comparison.
 #' @param seedSet A set of random seeds.
+#' @param coreN The number of cores to be used for parallelization.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
@@ -44,7 +45,8 @@ Features_rTPCP <- function(
   peptideSet, TCRSet,
   fragLenSet=3:8, aaIndexIDSet="all",
   alignTypeSet="global-local", TCRFragDepthSet=10000,
-  seedSet=1:5
+  seedSet=1:5,
+  coreN=parallel::detectCores()
 ){
   time.start <- proc.time()
 
@@ -141,7 +143,7 @@ Features_rTPCP <- function(
 
   ## Parallelized fragment matching
   message("Fragment matching was started. (Memory occupied = ", memory.size(), "[Mb])")
-  cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
+  cl <- parallel::makeCluster(coreN, type="SOCK")
   invisible(parallel::clusterEvalQ(cl, {
     library(psych)
     library(Biostrings)

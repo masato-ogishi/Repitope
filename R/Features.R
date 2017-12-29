@@ -11,7 +11,9 @@
 #' @param alignTypeSet A set of alignment-type strings directly passed to the \code{type} argument of the \code{pairwiseAlignment} function in the \code{Biostrings} package.
 #' @param TCRFragDepthSet A set of the numbers of TCR fragments to be matched. This should be kept constant for comparison.
 #' @param seedSet A set of random seeds.
+#' @param coreN The number of cores to be used for parallelization.
 #' @importFrom tibble as_tibble
+#' @importFrom parallel detectCores
 #' @export
 #' @rdname Features
 #' @name Features
@@ -19,14 +21,15 @@ Features <- function(
   peptideSet, TCRSet,
   fragLenSet=3:8, aaIndexIDSet="all",
   alignTypeSet="global-local", TCRFragDepthSet=10000,
-  seedSet=1:5
+  seedSet=1:5,
+  coreN=parallel::detectCores()
 ){
   # Feature calculation
   message("Peptide descriptor analysis.")
   df_feature_peptDesc <- Features_PeptideDescriptor(peptideSet, fragLenSet) ## A single dataframe
   gc();gc()
   message("rTPCP analysis.")
-  dt_feature_rTPCP <- Features_rTPCP(peptideSet, TCRSet, fragLenSet, aaIndexIDSet, alignTypeSet, TCRFragDepthSet, seedSet) ## A list of datatables
+  dt_feature_rTPCP <- Features_rTPCP(peptideSet, TCRSet, fragLenSet, aaIndexIDSet, alignTypeSet, TCRFragDepthSet, seedSet, coreN) ## A list of datatables
   gc();gc()
 
   # Output

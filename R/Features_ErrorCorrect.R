@@ -7,11 +7,13 @@
 #' @param alignTypeSet A set of alignment-type strings directly passed to the \code{type} argument of the \code{pairwiseAlignment} function in the \code{Biostrings} package.
 #' @param TCRFragDepthSet A set of the numbers of TCR fragments to be matched. This should be kept constant for comparison.
 #' @param seedSet A set of random seeds.
+#' @param coreN The number of cores to be used for parallelization.
 #' @importFrom rlang is_empty
 #' @importFrom DescTools Sort
 #' @importFrom dplyr filter
 #' @importFrom data.table rbindlist
 #' @importFrom tibble as_tibble
+#' @importFrom parallel detectCores
 #' @export
 #' @rdname Features_ErrorCorrect
 #' @name Features_ErrorCorrect
@@ -19,12 +21,13 @@ Features_ErrorCorrect <- function(
   featureDFList, TCRSet,
   fragLenSet=3:8, aaIndexIDSet="all",
   alignTypeSet="global-local", TCRFragDepthSet=10000,
-  seedSet=1:5
+  seedSet=1:5,
+  coreN=parallel::detectCores()
 ){
   errPeptSet <- sort(unique(unlist(lapply(featureDFList, function(df){as.character(df[which(complete.cases(df)==F),][["Peptide"]])}))))
   message("Error peptides: ", paste0(errPeptSet, collapse=", "))
   if(rlang::is_empty(errPeptSet)){ return(featureDFList) }
-  featureDFList_ErrorCorrect <- Features(peptideSet=errPeptSet, TCRSet, aaIndexIDSet, alignTypeSet, fragLenSet, TCRFragDepthSet, seedSet)
+  featureDFList_ErrorCorrect <- Features(peptideSet=errPeptSet, TCRSet, aaIndexIDSet, alignTypeSet, fragLenSet, TCRFragDepthSet, seedSet, coreN)
   featureDFList_Others <- lapply(featureDFList, function(df){dplyr::filter(df, !Peptide %in% errPeptSet)})
   featureDFList_ErrorCorrect <- mapply(function(df_Org, df_EC){tibble::as_tibble(DescTools::Sort(data.table::rbindlist(list(df_Org, df_EC)), ord="Peptide"))},
                                        featureDFList_Others, featureDFList_ErrorCorrect, SIMPLIFY=F)
