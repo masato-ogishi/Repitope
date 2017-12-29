@@ -12,7 +12,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
-Imports: tidyverse (>= 1.2.1),
+Imports: plotUtility,
+    tidyverse (>= 1.2.1),
     rlang (>= 0.1.2),
     readr (>= 1.1.1),
     dplyr (>= 0.7.3),
@@ -46,4 +47,4 @@ Imports: tidyverse (>= 1.2.1),
     classifierplots (>= 1.3.3),
     h2o (>= 3.16.0.2),
     pROC (>= 1.10.0),
-    plotUtility
+    zoo (>= 1.8-0)
