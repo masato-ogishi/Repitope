@@ -11,7 +11,7 @@
 #' @param alignTypeSet A set of alignment-type strings directly passed to the \code{type} argument of the \code{pairwiseAlignment} function in the \code{Biostrings} package.
 #' @param TCRFragDepthSet A set of the numbers of TCR fragments to be matched. This should be kept constant for comparison.
 #' @param seedSet A set of random seeds.
-#' @param coreN The number of cores to be used for parallelization.
+#' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.
 #' @importFrom tibble as_tibble
 #' @importFrom parallel detectCores
 #' @export

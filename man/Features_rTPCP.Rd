@@ -23,7 +23,7 @@ Features_rTPCP(peptideSet, TCRSet, fragLenSet = 3:8, aaIndexIDSet = "all",
 
 \item{seedSet}{A set of random seeds.}
 
-\item{coreN}{The number of cores to be used for parallelization.}
+\item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.}
 }
 \description{
 \code{Features_PeptideDescriptor} calculates descriptive statistics using peptide descriptors.\cr

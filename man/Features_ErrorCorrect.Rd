@@ -23,7 +23,7 @@ Features_ErrorCorrect(featureDFList, TCRSet, fragLenSet = 3:8,
 
 \item{seedSet}{A set of random seeds.}
 
-\item{coreN}{The number of cores to be used for parallelization.}
+\item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.}
 }
 \description{
 Correct errors in the peptide feature dataframes.

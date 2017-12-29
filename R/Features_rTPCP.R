@@ -11,7 +11,7 @@
 #' @param alignTypeSet A set of alignment-type strings directly passed to the \code{type} argument of the \code{pairwiseAlignment} function in the \code{Biostrings} package.
 #' @param TCRFragDepthSet A set of the numbers of TCR fragments to be matched. This should be kept constant for comparison.
 #' @param seedSet A set of random seeds.
-#' @param coreN The number of cores to be used for parallelization.
+#' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
@@ -143,22 +143,26 @@ Features_rTPCP <- function(
 
   ## Parallelized fragment matching
   message("Fragment matching was started. (Memory occupied = ", memory.size(), "[Mb])")
-  cl <- parallel::makeCluster(coreN, type="SOCK")
-  invisible(parallel::clusterEvalQ(cl, {
-    library(psych)
-    library(Biostrings)
-  }))
-  parallel::clusterExport(
-    cl,
-    list("parameterGrid", "fragmentMatchingStats", "TCRFragDictSet.List", "pairMatSet", "statSet"),
-    envir=environment()
-  )
-  dt_feature <- pbapply::pblapply(
-    1:paramCombN,
-    function(i){fragmentMatchingStats(parameterGrid[i,1], parameterGrid[i,2], parameterGrid[i,3], parameterGrid[i,4])},
-    cl=cl
-  ) %>% data.table::as.data.table() %>% data.table::transpose() %>% magrittr::set_colnames(statNameSet)
-  parallel::stopCluster(cl)
+  if(is.null(coreN)){
+    dt_feature <- pbapply::pblapply(
+      1:paramCombN,
+      function(i){fragmentMatchingStats(parameterGrid[i,1], parameterGrid[i,2], parameterGrid[i,3], parameterGrid[i,4])}
+    ) %>% data.table::as.data.table() %>% data.table::transpose() %>% magrittr::set_colnames(statNameSet)
+  }else{
+    cl <- parallel::makeCluster(coreN, type="SOCK")
+    invisible(parallel::clusterEvalQ(cl, {library(psych); library(Biostrings)}))
+    parallel::clusterExport(
+      cl,
+      list("parameterGrid", "fragmentMatchingStats", "TCRFragDictSet.List", "pairMatSet", "statSet"),
+      envir=environment()
+    )
+    dt_feature <- pbapply::pblapply(
+      1:paramCombN,
+      function(i){fragmentMatchingStats(parameterGrid[i,1], parameterGrid[i,2], parameterGrid[i,3], parameterGrid[i,4])},
+      cl=cl
+    ) %>% data.table::as.data.table() %>% data.table::transpose() %>% magrittr::set_colnames(statNameSet)
+    parallel::stopCluster(cl)
+  }
   message("Fragment matching was finished. (Memory occupied = ", memory.size(), "[Mb])")
   gc();gc()
 
