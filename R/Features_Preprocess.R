@@ -132,16 +132,17 @@ Features_Preprocess <- function(featureDFList, metadataDFList, preprocessedDFLis
   )
   Features_Preprocess_Single <- function(splitFeatureDFList, seeds){
     # Data
+    df <- splitFeatureDFList$"df"
     df_train <- splitFeatureDFList$"df_train"
     df_test <- splitFeatureDFList$"df_test"
     df_valid <- splitFeatureDFList$"df_valid"
 
     # Preprocessing [variance and correlation]
     df_train_features <- dplyr::select(df_train, -Peptide, -Immunogenicity, -Cluster)
-    df_train_features <- predict(caret::preProcess(df_train_features, method=c("nzv", "corr"), verbose=T), df_train_features)
+    df_train_features <- predict(caret::preProcess(df_train_features, method=c("nzv", "corr"), verbose=F), df_train_features)
     featureSet <- colnames(df_train_features)
     featureSet_dummy <- grep("Peptide_", featureSet, value=T)
-    pp_train <- caret::preProcess(dplyr::select(df_train_features, setdiff(featureSet, featureSet_dummy)), method=c("center", "scale"), verbose=T)
+    pp_train <- caret::preProcess(dplyr::select(df_train_features, setdiff(featureSet, featureSet_dummy)), method=c("center", "scale"), verbose=F)
 
     df <- predict(pp_train, dplyr::select(df, Peptide, Immunogenicity, Cluster, featureSet))
     df_train <- predict(pp_train, dplyr::select(df_train, Peptide, Immunogenicity, Cluster, featureSet))
@@ -151,7 +152,7 @@ Features_Preprocess <- function(featureDFList, metadataDFList, preprocessedDFLis
     # Recursive feature elimination
     df_train_outcomes <- df_train[["Immunogenicity"]]
     df_train_features <- dplyr::select(df_train, -Peptide, -Immunogenicity, -Cluster)
-    rfeCtrl <- caret::rfeControl(functions=caret::rfFuncs, method="cv", number=10, verbose=T, seeds=seeds, allowParallel=T)
+    rfeCtrl <- caret::rfeControl(functions=caret::rfFuncs, method="cv", number=10, verbose=F, seeds=seeds, allowParallel=T)
     rfeRes <- caret::rfe(df_train_features, df_train_outcomes, sizes=100, metric="Kappa", rfeControl=rfeCtrl)
     rfeFeatureSet <- caret::predictors(rfeRes)
 
