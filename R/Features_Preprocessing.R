@@ -285,7 +285,7 @@ Features_FeatureSelection <- function(preprocessedDFList, coreN=parallel::detect
   time.start <- proc.time()
   conbinedParamSet <- names(preprocessedDFList)
   preprocessedDTList <- foreach::foreach(i=1:length(conbinedParamSet)) %do% {
-    cat(i, "/", length(conbinedParamSet), ":", conbinedParamSet[i], sep="")
+    cat(i, "/", length(conbinedParamSet), ": ", conbinedParamSet[i], "\n", sep="")
     res <- list("dt"=preprocessedDFList[[i]][["dt"]], "pp_train"=preprocessedDFList[[i]][["pp_train"]], "sbfRes"=NULL, "rfeRes"=NULL)
     message("1. Selection by filtering.")
     res <- modifyList(res, Features_SBF_Single(
