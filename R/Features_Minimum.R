@@ -31,7 +31,7 @@ Features_Minimum <- function(peptideSet, TCRSet, metadataDFList, preprocessedDFL
   )
 
   # Preprocessing
-  preprocessedDFList <- Features_Preprocess(featureDFList, metadataDFList, preprocessedDFList_reference, coreN)
+  preprocessedDFList <- Features_Preprocess_ByReference(featureDFList, metadataDFList, preprocessedDFList_reference, coreN)
 
   # Output
   list("featureDFList"=featureDFList,

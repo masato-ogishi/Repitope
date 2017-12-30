@@ -9,9 +9,12 @@
 #' @rdname Dataset_EpitopeDataset
 #' @examples
 #' ## Data derived from the "Calis1" dataset.
-#' dplyr::filter(EpitopeDataset, stringr::str_detect(Dataset, "Calis1"))
+#' df.calis1 <- dplyr::filter(EpitopeDataset, stringr::str_detect(Dataset, "Calis1"))
 #'
 #' ## Data restricted on the HLA-A2 molecule.
-#' dplyr::filter(EpitopeDataset, stringr::str_detect(MHC, stringr::fixed("A*02"))|stringr::str_detect(MHC, "A02")|stringr::str_detect(MHC, "A2$")|stringr::str_detect(MHC, stringr::fixed("A2|")))
-#'
+#' df <- compressedToLongFormat(EpitopeDataset, "MHC")
+#' df$"MHC" <- standardizeHLAString(df$"MHC")
+#' df.hla.a2 <- df.long %>%
+#'   dplyr::filter(stringr::str_detect(MHC, "A02")|stringr::str_detect(MHC, "A2$")) %>%
+#'   dplyr::distinct(Peptide, .keep_all=T)
 "EpitopeDataset"

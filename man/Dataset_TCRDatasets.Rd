@@ -4,10 +4,22 @@
 \name{Dataset_TCRDatasets}
 \alias{Dataset_TCRDatasets}
 \alias{TCRSet}
+\alias{Dataset_TCRDatasets}
+\alias{TCRSet_CD8}
+\alias{Dataset_TCRDatasets}
+\alias{TCRSet_PubClones10000}
+\alias{Dataset_TCRDatasets}
+\alias{TCRSet_CD8_PubClones10000}
 \title{Compiled datasets of human TCR beta CDR3 sequences}
 \format{A character vector.}
 \usage{
 TCRSet
+
+TCRSet_CD8
+
+TCRSet_PubClones10000
+
+TCRSet_CD8_PubClones10000
 }
 \description{
 \code{TCRSet} is a combined human TCR repertoire derived from unsorted T cells. TCR clonotypes observed in at least 22 out of 218 datasets were retained.

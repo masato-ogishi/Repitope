@@ -24,6 +24,24 @@
 #' )
 #'
 "TCRSet"
+
+#' @format A character vector.
+#' @docType data
+#' @keywords datasets
+#' @name Dataset_TCRDatasets
+#' @rdname Dataset_TCRDatasets
 "TCRSet_CD8"
+
+#' @format A character vector.
+#' @docType data
+#' @keywords datasets
+#' @name Dataset_TCRDatasets
+#' @rdname Dataset_TCRDatasets
 "TCRSet_PubClones10000"
+
+#' @format A character vector.
+#' @docType data
+#' @keywords datasets
+#' @name Dataset_TCRDatasets
+#' @rdname Dataset_TCRDatasets
 "TCRSet_CD8_PubClones10000"
