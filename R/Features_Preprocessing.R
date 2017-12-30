@@ -130,20 +130,18 @@ Features_Preprocess <- function(splitDFList, coreN=parallel::detectCores()){
     }else{
       removedFeatureSet <- caret::nearZeroVar(dt, saveMetrics=F, names=T, foreach=T, allowParallel=T)
     }
-    dt <- dt[, -removedFeatureSet, with=F]
+    if(length(removedFeatureSet)>0) dt <- dt[, -removedFeatureSet, with=F]
     message(length(removedFeatureSet), " features were removed based on their variances.")
-    gc();gc()
     message("Correlation-based feature elimination.")
-    corMat <- bigcov::bigcov(dt, center=T, scale=T, num_splits=3, verbose=2)
+    corMat <- bigcov::bigcov(dt, center=T, scale=T, num_splits=10, verbose=2)
     removedFeatureSet <- caret::findCorrelation(corMat, cutoff=0.6, verbose=F, names=T)
-    dt <- dt[, -removedFeatureSet, with=F]
+    if(length(removedFeatureSet)>0) dt <- dt[, -removedFeatureSet, with=F]
     message(length(removedFeatureSet), " features were removed based on their correlations.")
-    gc();gc()
 
     # Rescaling
     featureSet <- colnames(dt)
     dummyFeatureSet <- grep("Peptide_", colnames(dt), value=T)
-    dt <- dt[, -dummyFeatureSet, with=F]
+    if(length(dummyFeatureSet)>0) dt <- dt[, -dummyFeatureSet, with=F]
     pp_train <- caret::preProcess(dt, method=c("center", "scale"), verbose=T)
     dt <- data.table::as.data.table(df)
     dt <- dt[, c("DataType", "Peptide", "Immunogenicity", "Cluster", featureSet), with=F]
