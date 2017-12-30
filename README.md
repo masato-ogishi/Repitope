@@ -11,11 +11,18 @@ Installation
 
 ``` r
 if(!require(devtools)) install.packages("devtools")
-devtools::install_github("masato-ogishi/plotUtility")
-devtools::install_github("masato-ogishi/Repitope")
 
-# Alternatively, please download this repository as a Zip file, unzip it to the directory you want, and run the following command.
-devtools::install_local("path/to/the/unzipped/folder")
+# Other github packages
+devtools::install_github("kaneplusplus/bigmemory")
+devtools::install_github("kaneplusplus/bigtabulate")
+devtools::install_github("kaneplusplus/biganalytics")
+devtools::install_github("kaneplusplus/bigalgebra")
+devtools::install_github("kaneplusplus/synchronicity")
+devtools::install_github("variani/bigcov")
+devtools::install_github("masato-ogishi/plotUtility")
+
+# Repitope
+devtools::install_github("masato-ogishi/Repitope")
 ```
 
 -   You might be prompted to install some packages before installling Repitope. Follow the message(s).
