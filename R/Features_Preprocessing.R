@@ -115,7 +115,7 @@ Features_SplitDF <- function(featureDFList, metadataDFList){
 #' @export
 #' @rdname Features_Preprocessing
 #' @name Features_Preprocessing
-Features_Preprocess <- function(splitDFList){
+Features_Preprocess <- function(splitDFList, coreN=parallel::detectCores()){
   Features_Preprocess_Single <- function(df, coreN=NULL){
     # Feature elimination by variances and correlations
     dt <- data.table::as.data.table(df)
@@ -158,7 +158,7 @@ Features_Preprocess <- function(splitDFList){
   conbinedParamSet <- names(splitDFList)
   preprocessedDTList <- foreach::foreach(i=1:length(conbinedParamSet)) %do% {
     cat(i, "/", length(conbinedParamSet), ": ", conbinedParamSet[i], "\n", sep="")
-    Features_Preprocess_Single(splitDFList[[i]])
+    Features_Preprocess_Single(splitDFList[[i]], coreN=coreN)
   }
   names(preprocessedDTList) <- conbinedParamSet
   time.end <- proc.time()
