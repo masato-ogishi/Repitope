@@ -116,13 +116,20 @@ Features_SplitDF <- function(featureDFList, metadataDFList){
 #' @rdname Features_Preprocessing
 #' @name Features_Preprocessing
 Features_Preprocess <- function(splitDFList){
-  Features_Preprocess_Single <- function(df){
+  Features_Preprocess_Single <- function(df, coreN=NULL){
     # Feature elimination by variances and correlations
     dt <- data.table::as.data.table(df)
     dt <- dt[DataType=="Train", ,]
     dt <- dt[, -c("DataType", "Peptide", "Immunogenicity", "Cluster"), with=F]
     message("Variance-based feature elimination.")
-    removedFeatureSet <- caret::nearZeroVar(dt, saveMetrics=F, names=T, foreach=T, allowParallel=T)
+    if(!is.null(coreN)){
+      cl <- parallel::makeCluster(coreN, type='SOCK')
+      doParallel::registerDoParallel(cl)
+      removedFeatureSet <- caret::nearZeroVar(dt, saveMetrics=F, names=T, foreach=T, allowParallel=T)
+      parallel::stopCluster(cl)
+    }else{
+      removedFeatureSet <- caret::nearZeroVar(dt, saveMetrics=F, names=T, foreach=T, allowParallel=T)
+    }
     dt <- dt[, -removedFeatureSet, with=F]
     message(length(removedFeatureSet), " features were removed based on their variances.")
     gc();gc()
@@ -150,7 +157,7 @@ Features_Preprocess <- function(splitDFList){
   time.start <- proc.time()
   conbinedParamSet <- names(splitDFList)
   preprocessedDTList <- foreach::foreach(i=1:length(conbinedParamSet)) %do% {
-    cat(i, "/", length(conbinedParamSet), ":", conbinedParamSet[i], sep="")
+    cat(i, "/", length(conbinedParamSet), ": ", conbinedParamSet[i], "\n", sep="")
     Features_Preprocess_Single(splitDFList[[i]])
   }
   names(preprocessedDTList) <- conbinedParamSet
