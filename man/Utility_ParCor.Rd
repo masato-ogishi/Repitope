@@ -5,15 +5,10 @@
 \alias{parCor}
 \title{Parallelized correlation matrix calculation.}
 \usage{
-parCor(data, center = T, scale = T, num_splits = parallel::detectCores(),
-  verbose = 2)
+parCor(mat, num_splits = parallel::detectCores(), verbose = 2)
 }
 \arguments{
-\item{data}{A matrix, a data.frame, or a data.table.}
-
-\item{center}{A logical. Passed to \code{base::scale} for centering the input data.}
-
-\item{scale}{A logical. Passed to \code{base::scale} for scaling the input data.}
+\item{mat}{A matrix. A data.frame or a data.table is internally converted into a matrix.}
 
 \item{num_splits}{The number of chunk blocks. Default setting is the number of core (for parallelization).}
 

@@ -134,9 +134,9 @@ Features_Preprocess <- function(splitDFList, coreN=parallel::detectCores()){
     message(length(removedFeatureSet), " features were removed based on their variances.")
     message("Correlation-based feature elimination.")
     if(!is.null(coreN)){
-      corMat <- parCor(dt, center=T, scale=T, num_splits=coreN, verbose=2)
+      corMat <- parCor(dt, num_splits=coreN, verbose=2)
     }else{
-      corMat <- cor(as.matrix(dt))
+      corMat <- parCor(dt, num_splits=1, verbose=2)
     }
     removedFeatureSet <- caret::findCorrelation(corMat, cutoff=0.6, verbose=F, names=T)
     if(length(removedFeatureSet)>0) dt <- dt[, -removedFeatureSet, with=F]
