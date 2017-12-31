@@ -7,12 +7,12 @@
 \alias{saveFeatureDFList}
 \title{Feature dataframes In/Out.}
 \usage{
-readFeatureDFList(featureDFFileNameList)
+readFeatureDFList(featureDFFileNames)
 
 saveFeatureDFList(featureDFList, fileNameHeader)
 }
 \arguments{
-\item{featureDFFileNameList}{A set of binary file names with ".fst" extensions.}
+\item{featureDFFileNames}{A character vector of binary file names with either ".fst" or ".rds" extensions.}
 
 \item{featureDFList}{A named list of feature dataframes.}
 

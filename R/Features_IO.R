@@ -1,6 +1,6 @@
 #' Feature dataframes In/Out.
 #'
-#' @param featureDFFileNameList A set of binary file names with ".fst" extensions.
+#' @param featureDFFileNames A character vector of binary file names with either ".fst" or ".rds" extensions.
 #' @param featureDFList A named list of feature dataframes.
 #' @param fileNameHeader A file name header.
 #' @importFrom fst read.fst
@@ -9,10 +9,21 @@
 #' @export
 #' @rdname Features_IO
 #' @name Features_IO
-readFeatureDFList <- function(featureDFFileNameList){
-  paramSet <- gsub(".fst$", "", basename(featureDFFileNameList))
+readFeatureDFList <- function(featureDFFileNames){
+  paramSet <- gsub(".rds$", "", gsub(".fst$", "", basename(featureDFFileNames)))
   paramSet <- as.character(t(as.data.frame(strsplit(paramSet, "_", fixed=T), stringsAsFactors=F))[,2])
-  featureDFList <- pbapply::pblapply(featureDFFileNameList, fst::read.fst, as.data.table=T)
+  featureDFList <- pbapply::pblapply(
+    featureDFFileNames,
+    function(f){
+      if(grep(".fst$", basename(f))==1){
+        fst::read.fst(f, as.data.table=T)
+      }else if(grep(".rds$", basename(f))==1){
+        readRDS(f)
+      }else{
+        NULL
+      }
+    }
+  )
   names(featureDFList) <- paramSet
   return(featureDFList)
 }

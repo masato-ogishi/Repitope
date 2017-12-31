@@ -19,7 +19,6 @@
 #' @importFrom data.table :=
 #' @importFrom data.table setcolorder
 #' @importFrom data.table setorder
-#' @importFrom bigcov bigcov
 #' @importFrom parallel detectCores
 #' @importFrom parallel splitIndices
 #' @importFrom parallel detectCores
@@ -119,7 +118,7 @@ Features_Preprocess <- function(splitDFList, coreN=parallel::detectCores()){
   Features_Preprocess_Single <- function(df, coreN=NULL){
     # Feature elimination by variances and correlations
     dt <- data.table::as.data.table(df)
-    dt <- dt[DataType=="Train", ,]
+    dt <- dt[DataType=="Train", ]
     dt <- dt[, -c("DataType", "Peptide", "Immunogenicity", "Cluster"), with=F]
     message("Variance-based feature elimination.")
     if(!is.null(coreN)){
@@ -295,14 +294,19 @@ Features_FeatureSelection <- function(preprocessedDFList, coreN=parallel::detect
   conbinedParamSet <- names(preprocessedDFList)
   preprocessedDTList <- foreach::foreach(i=1:length(conbinedParamSet)) %do% {
     cat(i, "/", length(conbinedParamSet), ": ", conbinedParamSet[i], "\n", sep="")
-    res <- list("dt"=preprocessedDFList[[i]][["dt"]], "pp_train"=preprocessedDFList[[i]][["pp_train"]], "sbfRes"=NULL, "rfeRes"=NULL)
-    message("1. Selection by filtering.")
+    res <- list(
+      "dt"=preprocessedDFList[[i]][["dt"]],
+      "pp_train"=preprocessedDFList[[i]][["pp_train"]],
+      "sbfRes"=NULL,
+      "rfeRes"=NULL
+    )
+    message("Selection by filtering.")
     res <- modifyList(res, Features_SBF_Single(
       res$"dt",
       seeds=caretSeedsList[[i]],
       coreN=coreN
     ))
-    message("2. Recursive feature elimination.")
+    message("Recursive feature elimination.")
     res <- modifyList(res, Features_RFE_Single(
       res$"dt",
       seeds=caretSeedsList[[i]],
