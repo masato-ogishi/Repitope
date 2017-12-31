@@ -23,7 +23,11 @@ saveFeatureDFList <- function(featureDFList, fileNameHeader){
   pbapply::pblapply(
     1:length(featureDFList),
     function(i){
-      fst::write.fst(featureDFList[[i]], paste0(fileNameHeader, names(featureDFList)[i], ".fst"))
+      if(is.data.frame(featureDFList[[i]])){
+        fst::write.fst(featureDFList[[i]], paste0(fileNameHeader, names(featureDFList)[i], ".fst"))
+      }else{
+        saveRDS(featureDFList[[i]], paste0(fileNameHeader, names(featureDFList)[i], ".rds"))
+      }
     }
   )
 }
