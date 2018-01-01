@@ -17,6 +17,8 @@ readFeatureDFList <- function(featureDFFileNames){
   pos.rds <- which(stringr::str_detect(basename(featureDFFileNames), ".rds"))
   files.fst <- featureDFFileNames[pos.fst]
   files.rds <- featureDFFileNames[pos.rds]
+  featureDFList.fst <- NULL
+  featureDFList.rds <- NULL
   if(length(files.fst)>=1){
     message("Reading fst files...")
     featureDFList.fst <- pbapply::pblapply(files.fst, function(f){fst::read.fst(f, as.data.table=T)})
