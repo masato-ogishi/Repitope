@@ -6,6 +6,7 @@
 #' @param numSet An attribute for the verteces.
 #' @param directed Should the network be converted from undirected to directed? Directions are determined by the \code{numSet} provided.
 #' @param weighted Should the network be converted to weihted? Edge weights are determined by the \code{numSet} provided.
+#' @param forceMutType Should mutational types be annotated? A little bit time-consuming.
 #' @param simNet A similarity network object.
 #' @param sizeThresholdSet A set of integers specifying the maximum numbers of clonotypes retained as public clonotypes. Based on the degree distribution, appropriate degree threshold will be internally calculated.
 #' @param outputFileHeader A path for saving the outputs from the public clonotype analysis.
@@ -127,7 +128,7 @@ distMat_Juxtaposed <- function(longerAAStringSet, shorterAAStringSet){
 #' @export
 #' @rdname TCRAnalysis_PublicClonotypes
 #' @name TCRAnalysis_PublicClonotypes
-singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weighted=T){
+singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weighted=T, forceMutType=F){
   # Internally used workflows
   net_main <- function(aaStringSet){
     ## Input check...
@@ -188,7 +189,7 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
       igraph::simplify()
     return(simNet)
   }
-  net_pairs_DF <- function(simpleSimNet){
+  net_pairs_DF <- function(simpleSimNet, forceMutType=F){
     ## Get peptide pairs
     df <- as.data.frame(igraph::as_edgelist(simpleSimNet, names=T))
     colnames(df) <- c("Node1","Node2")
@@ -227,7 +228,9 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
       }
     }
     message("Annotating mutational types and patterns...")
-    df[["MutType"]] <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutType(df$"AASeq1"[i], df$"AASeq2"[i])}))
+    if(forceMutType==T|nrow(df)<=50000){
+      df[["MutType"]] <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutType(df$"AASeq1"[i], df$"AASeq2"[i])}))
+    } ## a bit slow...
     df[["MutPattern"]] <- dplyr::if_else(nchar(df$"AASeq1")==nchar(df$"AASeq2"), "Substitution", "Indel")
 
     ## Output
@@ -236,7 +239,7 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
 
   # A basic, non-directional, non-weighted network
   simNet <- net_main(aaStringSet)
-  simNet_PairsDF <- net_pairs_DF(simNet)
+  simNet_PairsDF <- net_pairs_DF(simNet, forceMutType=forceMutType)
   if(is.null(numSet)){
     return(list("SimilarityNetwork"=simNet, "PairsDF"=simNet_PairsDF))
   }

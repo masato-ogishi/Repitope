@@ -16,7 +16,7 @@ distMat_Auto(aaStringSet)
 distMat_Juxtaposed(longerAAStringSet, shorterAAStringSet)
 
 singleAASimilarityNetwork(aaStringSet, numSet = NULL, directed = T,
-  weighted = T)
+  weighted = T, forceMutType = F)
 
 publicClonotypeAnalysis(simNet, sizeThresholdSet = 10000,
   outputFileHeader = "./Graph/Graph_")
@@ -33,6 +33,8 @@ publicClonotypeAnalysis(simNet, sizeThresholdSet = 10000,
 \item{directed}{Should the network be converted from undirected to directed? Directions are determined by the \code{numSet} provided.}
 
 \item{weighted}{Should the network be converted to weihted? Edge weights are determined by the \code{numSet} provided.}
+
+\item{forceMutType}{Should mutational types be annotated? A little bit time-consuming.}
 
 \item{simNet}{A similarity network object.}
 
