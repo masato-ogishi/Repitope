@@ -18,7 +18,7 @@ parCor <- function(mat, num_splits=parallel::detectCores(), verbose=2){
   # Input check
   if(!any(class(mat)=="matrix")){
     mat <- try(as.matrix(mat), silent=T)
-    if(identical(mat, "try-error")){
+    if(identical(class(mat), "try-error")){
       message("The input mat cannot be converted into matrix!")
       return(NULL)
     }
