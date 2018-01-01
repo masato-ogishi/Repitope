@@ -116,21 +116,10 @@ Features_SplitDF <- function(featureDFList, metadataDFList){
 #' @name Features_Preprocessing
 Features_Preprocess <- function(splitDFList, coreN=parallel::detectCores()){
   Features_Preprocess_Single <- function(df, coreN=NULL){
-    # Feature elimination by variances and correlations
+    # Correlation-based feature elimination using the training subdataset
     dt <- data.table::as.data.table(df)
     dt <- dt[DataType=="Train", ]
     dt <- dt[, -c("DataType", "Peptide", "Immunogenicity", "Cluster"), with=F]
-    message("Variance-based feature elimination.")
-    if(!is.null(coreN)){
-      cl <- parallel::makeCluster(coreN, type='SOCK')
-      doParallel::registerDoParallel(cl)
-      removedFeatureSet <- caret::nearZeroVar(dt, saveMetrics=F, names=T, foreach=T, allowParallel=T)
-      parallel::stopCluster(cl)
-    }else{
-      removedFeatureSet <- caret::nearZeroVar(dt, saveMetrics=F, names=T, foreach=T, allowParallel=T)
-    }
-    if(length(removedFeatureSet)>0) dt <- dt[, -removedFeatureSet, with=F]
-    message(length(removedFeatureSet), " features were removed based on their variances.")
     message("Correlation-based feature elimination.")
     if(!is.null(coreN)){
       corMat <- parCor(dt, num_splits=coreN, verbose=2)
