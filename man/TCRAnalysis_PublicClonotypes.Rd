@@ -8,8 +8,6 @@
 \alias{TCRAnalysis_PublicClonotypes}
 \alias{singleAASimilarityNetwork}
 \alias{TCRAnalysis_PublicClonotypes}
-\alias{singleAAConnectedSequencePairs}
-\alias{TCRAnalysis_PublicClonotypes}
 \alias{publicClonotypeAnalysis}
 \title{Public XCR clonotypes in the similarity network}
 \usage{
@@ -17,11 +15,10 @@ distMat_Auto(aaStringSet)
 
 distMat_Juxtaposed(longerAAStringSet, shorterAAStringSet)
 
-singleAASimilarityNetwork(aaStringSet)
+singleAASimilarityNetwork(aaStringSet, numSet = NULL, directed = T,
+  weighted = T)
 
-singleAAConnectedSequencePairs(simNet)
-
-publicClonotypeAnalysis(simNet, sizeThresholdSet,
+publicClonotypeAnalysis(simNet, sizeThresholdSet = 10000,
   outputFileHeader = "./Graph/Graph_")
 }
 \arguments{
@@ -30,6 +27,12 @@ publicClonotypeAnalysis(simNet, sizeThresholdSet,
 \item{longerAAStringSet}{A set of XCR clonotype sequences. Should be one amino acid longer than \code{shorterAAStringSet}.}
 
 \item{shorterAAStringSet}{A set of XCR clonotype sequences. Should be one amino acid shorter than \code{longerAAStringSet}.}
+
+\item{numSet}{An attribute for the verteces.}
+
+\item{directed}{Should the network be converted from undirected to directed? Directions are determined by the \code{numSet} provided.}
+
+\item{weighted}{Should the network be converted to weihted? Edge weights are determined by the \code{numSet} provided.}
 
 \item{simNet}{A similarity network object.}
 

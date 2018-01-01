@@ -3,6 +3,9 @@
 #' @param aaStringSet A set of XCR clonotype sequences (converted as an AAStringSet object).
 #' @param longerAAStringSet A set of XCR clonotype sequences. Should be one amino acid longer than \code{shorterAAStringSet}.
 #' @param shorterAAStringSet A set of XCR clonotype sequences. Should be one amino acid shorter than \code{longerAAStringSet}.
+#' @param numSet An attribute for the verteces.
+#' @param directed Should the network be converted from undirected to directed? Directions are determined by the \code{numSet} provided.
+#' @param weighted Should the network be converted to weihted? Edge weights are determined by the \code{numSet} provided.
 #' @param simNet A similarity network object.
 #' @param sizeThresholdSet A set of integers specifying the maximum numbers of clonotypes retained as public clonotypes. Based on the degree distribution, appropriate degree threshold will be internally calculated.
 #' @param outputFileHeader A path for saving the outputs from the public clonotype analysis.
@@ -12,25 +15,30 @@
 #' @importFrom dplyr select
 #' @importFrom dplyr if_else
 #' @importFrom dplyr bind_rows
-#' @importFrom pbapply timerProgressBar
-#' @importFrom pbapply setTimerProgressBar
+#' @importFrom dplyr inner_join
+#' @importFrom DescTools Sort
 #' @importFrom stringr str_sub
 #' @importFrom S4Vectors nchar
-#' @importFrom S4Vectors elementNROWS
 #' @importFrom Biostrings AAStringSet
-#' @importFrom Biostrings vmatchPattern
+#' @importFrom Biostrings pairwiseAlignment
+#' @importFrom Biostrings mismatchTable
+#' @importFrom stringdist stringdist
 #' @importFrom Matrix sparseMatrix
 #' @importFrom Matrix t
 #' @importFrom igraph set_vertex_attr
 #' @importFrom igraph graph_from_adjacency_matrix
+#' @importFrom igraph graph_from_data_frame
 #' @importFrom igraph simplify
-#' @importFrom igraph get.edgelist
+#' @importFrom igraph as_edgelist
 #' @importFrom igraph decompose
 #' @importFrom igraph V
+#' @importFrom igraph E
 #' @importFrom igraph write_graph
 #' @importFrom igraph degree
 #' @importFrom igraph subgraph
-#' @importFrom DescTools Sort
+#' @importFrom pbapply timerProgressBar
+#' @importFrom pbapply setTimerProgressBar
+#' @importFrom pbapply pblapply
 #' @export
 #' @rdname TCRAnalysis_PublicClonotypes
 #' @name TCRAnalysis_PublicClonotypes
@@ -52,22 +60,12 @@ distMat_Auto <- function(aaStringSet){
     pb <- pbapply::timerProgressBar(min=1, max=length(aaStringSet), char="+", style=1)
     for(i in 1:length(aaStringSet)){
       pbapply::setTimerProgressBar(pb, i)
-      DistMat.auto[i, 1:i] <- S4Vectors::elementNROWS(
-        Biostrings::vmatchPattern(
-          pattern=sequenceSet[[i]], subject=aaStringSet[1:i],
-          max.mismatch=1, min.mismatch=0, with.indels=F
-        )
-      )!=0
+      DistMat.auto[i, 1:i] <- stringdist::stringdist(sequenceSet[[i]], aaStringSet[1:i], method="hamming")<=1
     }
     cat("\n")
   }else{
     for(i in 1:length(aaStringSet)){
-      DistMat.auto[i, 1:i] <- S4Vectors::elementNROWS(
-        Biostrings::vmatchPattern(
-          pattern=sequenceSet[[i]], subject=aaStringSet[1:i],
-          max.mismatch=1, min.mismatch=0, with.indels=F
-        )
-      )!=0
+      DistMat.auto[i, 1:i] <- stringdist::stringdist(sequenceSet[[i]], aaStringSet[1:i], method="hamming")<=1
     }
   }
   diag(DistMat.auto) <- F
@@ -129,79 +127,144 @@ distMat_Juxtaposed <- function(longerAAStringSet, shorterAAStringSet){
 #' @export
 #' @rdname TCRAnalysis_PublicClonotypes
 #' @name TCRAnalysis_PublicClonotypes
-singleAASimilarityNetwork <- function(aaStringSet){
-  # Input check...
-  if(class(aaStringSet)!="AAStringSet"){
-    message("Input sequences are converted to AAStringSet object.")
-    aaStringSet <- Biostrings::AAStringSet(aaStringSet)
+singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weighted=T){
+  # Internally used workflows
+  net_main <- function(aaStringSet){
+    ## Input check...
+    if(class(aaStringSet)!="AAStringSet"){
+      message("Input sequences are converted to AAStringSet object.")
+      aaStringSet <- Biostrings::AAStringSet(aaStringSet)
+    }
+    if(length(unique(aaStringSet))!=length(aaStringSet)){
+      message("Duplicates are removed from the input sequences.")
+      aaStringSet <- unique(aaStringSet)
+    }
+
+    ## Serialized adjacency matrix calculation
+    aaStringSetList <- split(aaStringSet, S4Vectors::nchar(aaStringSet))
+    if(length(names(aaStringSetList))>=2){
+      sequenceLengthPairGrid <- suppressWarnings(dplyr::bind_rows(
+        data.frame(V1=names(aaStringSetList), V2=names(aaStringSetList), Type="Auto"),
+        data.frame(as.data.frame(t(combn(names(aaStringSetList), 2))), Type="Juxtaposed")
+      )) %>% dplyr::rename(V2="V1", V1="V2") %>% dplyr::select(V1, V2, Type)
+    }else{
+      sequenceLengthPairGrid <- data.frame(V1=names(aaStringSetList), V2=names(aaStringSetList), Type="Auto")
+    }
+    sequenceLengthPairGrid <- sequenceLengthPairGrid %>%
+      dplyr::filter((as.numeric(V1)-as.numeric(V2)) %in% c(0, 1)) ## V1>=V2
+    sequenceLengthPairN <- nrow(sequenceLengthPairGrid)
+
+    ends <- as.numeric(cumsum(table(S4Vectors::nchar(aaStringSet))))
+    starts <- (c(0, ends)+1)[1:length(ends)]
+    positionGrid <- as.data.frame(t(data.frame(starts, ends)))
+    colnames(positionGrid) <- names(aaStringSetList)
+
+    DistMat <- Matrix::sparseMatrix(c(), c(), x=F, dims=rep(length(aaStringSet), 2))
+
+    message(paste0("Number of sequence length pairs = ", sequenceLengthPairN))
+    for(i in which(sequenceLengthPairGrid$"Type"=="Auto")){
+      message(paste0("Pair ", i, "/", sequenceLengthPairN, " | Auto: sequence length = ", sequenceLengthPairGrid[i,1]))
+      s1 <- aaStringSetList[[sequenceLengthPairGrid[i,1]]]
+      p1 <- positionGrid[[sequenceLengthPairGrid[i,1]]]
+      p1 <- seq(p1[1], p1[2])
+      DistMat[p1, p1] <- distMat_Auto(s1)
+    }
+    for(i in which(sequenceLengthPairGrid$"Type"=="Juxtaposed")){
+      message(paste0("Pair ", i, "/", sequenceLengthPairN, " | Juxtaposed: sequence length pair = ", sequenceLengthPairGrid[i,1], " and ", sequenceLengthPairGrid[i,2]))
+      s1 <- aaStringSetList[[sequenceLengthPairGrid[i,1]]]
+      p1 <- positionGrid[[sequenceLengthPairGrid[i,1]]]
+      p1 <- seq(p1[1], p1[2])
+      s2 <- aaStringSetList[[sequenceLengthPairGrid[i,2]]]
+      p2 <- positionGrid[[sequenceLengthPairGrid[i,2]]]
+      p2 <- seq(p2[1], p2[2])
+      DistMat[p1, p2] <- distMat_Juxtaposed(s1, s2)
+    }
+    DistMat <- DistMat|Matrix::t(DistMat) ## Symmetricalization
+
+    ## Similarity network
+    simNet <- DistMat %>%
+      igraph::graph_from_adjacency_matrix(mode="undirected", weighted=NULL, diag=F) %>%
+      igraph::set_vertex_attr("label", value=as.character(unlist(lapply(aaStringSetList, as.character)))) %>%
+      igraph::simplify()
+    return(simNet)
   }
-  if(length(unique(aaStringSet))!=length(aaStringSet)){
-    message("Duplicates are removed from the input sequences.")
-    aaStringSet <- unique(aaStringSet)
+  net_pairs_DF <- function(simpleSimNet){
+    ## Get peptide pairs
+    df <- as.data.frame(igraph::as_edgelist(simpleSimNet, names=T))
+    colnames(df) <- c("Node1","Node2")
+    df[["AASeq1"]] <- igraph::V(simpleSimNet)$label[df$"Node1"]
+    df[["AASeq2"]] <- igraph::V(simpleSimNet)$label[df$"Node2"]
+
+    ## Annotate mutational types and patterns
+    mutType <- function(pept1, pept2){
+      if(nchar(pept1)==nchar(pept2)){
+        pwal <- Biostrings::pairwiseAlignment(pattern=pept1, subject=pept2, type="global")
+        sbst <- Biostrings::mismatchTable(pwal)
+        sbst <- paste0(sbst$PatternSubstring, sbst$PatternStart, sbst$SubjectSubstring, collapse="")
+        return(sbst)
+      }
+      if(nchar(pept1)<nchar(pept2)){
+        shorterseq <- pept1
+        longerSeq <- pept2
+        leng_longer <- nchar(longerSeq)
+        longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
+        longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
+        del.pos <- which(longerSeq.degenerate==shorterseq)
+        sbst <- sapply(del.pos, function(p){paste0("-", p, substr(pept2, p, p), collapse="")})
+        sbst <- paste0(sbst, collapse="|")
+        return(sbst)
+      }
+      if(nchar(pept1)>nchar(pept2)){
+        shorterseq <- pept2
+        longerSeq <- pept1
+        leng_longer <- nchar(longerSeq)
+        longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
+        longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
+        del.pos <- which(longerSeq.degenerate==shorterseq)
+        sbst <- sapply(del.pos, function(p){paste0(substr(pept2, p, p), p, "-", collapse="")})
+        sbst <- paste0(sbst, collapse="|")
+        return(sbst)
+      }
+    }
+    message("Annotating mutational types and patterns...")
+    df[["MutType"]] <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutType(df$"AASeq1"[i], df$"AASeq2"[i])}))
+    df[["MutPattern"]] <- dplyr::if_else(nchar(df$"AASeq1")==nchar(df$"AASeq2"), "Substitution", "Indel")
+
+    ## Output
+    return(df)
   }
 
-  # Serialized adjacency matrix calculation
-  aaStringSetList <- split(aaStringSet, S4Vectors::nchar(aaStringSet))
-  if(length(names(aaStringSetList))>=2){
-    sequenceLengthPairGrid <- suppressWarnings(dplyr::bind_rows(
-      data.frame(V1=names(aaStringSetList), V2=names(aaStringSetList), Type="Auto"),
-      data.frame(as.data.frame(t(combn(names(aaStringSetList), 2))), Type="Juxtaposed")
-    )) %>% dplyr::rename(V2="V1", V1="V2") %>% dplyr::select(V1, V2, Type)
-  }else{
-    sequenceLengthPairGrid <- data.frame(V1=names(aaStringSetList), V2=names(aaStringSetList), Type="Auto")
+  # A basic, non-directional, non-weighted network
+  simNet <- net_main(aaStringSet)
+  simNet_PairsDF <- net_pairs_DF(simNet)
+  if(is.null(numSet)){
+    return(list("SimilarityNetwork"=simNet, "PairsDF"=simNet_PairsDF))
   }
-  sequenceLengthPairGrid <- sequenceLengthPairGrid %>%
-    dplyr::filter((as.numeric(V1)-as.numeric(V2)) %in% c(0, 1)) ## V1>=V2
-  sequenceLengthPairN <- nrow(sequenceLengthPairGrid)
 
-  ends <- as.numeric(cumsum(table(S4Vectors::nchar(aaStringSet))))
-  starts <- (c(0, ends)+1)[1:length(ends)]
-  positionGrid <- as.data.frame(t(data.frame(starts, ends)))
-  colnames(positionGrid) <- names(aaStringSetList)
-
-  DistMat <- Matrix::sparseMatrix(c(), c(), x=F, dims=rep(length(aaStringSet), 2))
-
-  message(paste0("Number of sequence length pairs = ", sequenceLengthPairN))
-  for(i in which(sequenceLengthPairGrid$"Type"=="Auto")){
-    message(paste0("Pair ", i, "/", sequenceLengthPairN, " | Auto: sequence length = ", sequenceLengthPairGrid[i,1]))
-    s1 <- aaStringSetList[[sequenceLengthPairGrid[i,1]]]
-    p1 <- positionGrid[[sequenceLengthPairGrid[i,1]]]
-    p1 <- seq(p1[1], p1[2])
-    DistMat[p1, p1] <- distMat_Auto(s1)
-  }
-  for(i in which(sequenceLengthPairGrid$"Type"=="Juxtaposed")){
-    message(paste0("Pair ", i, "/", sequenceLengthPairN, " | Juxtaposed: sequence length pair = ", sequenceLengthPairGrid[i,1], " and ", sequenceLengthPairGrid[i,2]))
-    s1 <- aaStringSetList[[sequenceLengthPairGrid[i,1]]]
-    p1 <- positionGrid[[sequenceLengthPairGrid[i,1]]]
-    p1 <- seq(p1[1], p1[2])
-    s2 <- aaStringSetList[[sequenceLengthPairGrid[i,2]]]
-    p2 <- positionGrid[[sequenceLengthPairGrid[i,2]]]
-    p2 <- seq(p2[1], p2[2])
-    DistMat[p1, p2] <- distMat_Juxtaposed(s1, s2)
-  }
-  DistMat <- DistMat|Matrix::t(DistMat) ## Symmetricalization
-
-  # Similarity network
-  DistMat %>%
-    igraph::graph_from_adjacency_matrix(mode="undirected", weighted=NULL, diag=F) %>%
-    igraph::set_vertex_attr("label", value=as.character(unlist(lapply(aaStringSetList, as.character)))) %>%
-    igraph::simplify()
+  # A directional, weighted network
+  df_num <- data.frame("Peptide"=as.character(aaStringSet), "Score"=numSet, stringsAsFactors=F)
+  simNet_PairsDF_Directional <- simNet_PairsDF %>%
+    dplyr::inner_join(df_num, by=c("AASeq1"="Peptide")) %>%
+    dplyr::inner_join(df_num, by=c("AASeq2"="Peptide")) %>%
+    dplyr::transmute(AASeq1, AASeq2, Score1=Score.x, Score2=Score.y, MutType, MutPattern)
+  simNet_PairsDF_Directional <- dplyr::bind_rows(
+    simNet_PairsDF_Directional,
+    dplyr::transmute(simNet_PairsDF_Directional, AASeq1=AASeq2, AASeq2=AASeq1, Score1=Score2, Score2=Score1, MutType, MutPattern)
+  )
+  simNet_Directional <- simNet_PairsDF_Directional %>%
+    dplyr::transmute(AASeq1, AASeq2, DeltaScore=Score1-Score2, MutType, MutPattern) %>%
+    igraph::graph_from_data_frame(directed=T)
+  simNet_Directional <- simNet_Directional %>%
+    igraph::set_vertex_attr("label", value=igraph::V(simNet_Directional)$name)
+  if(weighted==T) igraph::E(simNet_Directional)$weight <- igraph::E(simNet_Directional)$DeltaScore
+  return(list("SimilarityNetwork"=simNet, "PairsDF"=simNet_PairsDF,
+              "SimilarityNetwork_Directional"=simNet_Directional, "PairsDF_Directional"=simNet_PairsDF_Directional))
 }
+
 #' @export
 #' @rdname TCRAnalysis_PublicClonotypes
 #' @name TCRAnalysis_PublicClonotypes
-singleAAConnectedSequencePairs <- function(simNet){
-  df <- as.data.frame(igraph::get.edgelist(simNet))
-  colnames(df) <- c("Node1","Node2")
-  df[["AASeq1"]] <- igraph::V(simNet)$label[df$"Node1"]
-  df[["AASeq2"]] <- igraph::V(simNet)$label[df$"Node2"]
-  df[["Type"]] <- dplyr::if_else(nchar(df$"AASeq1")==nchar(df$"AASeq2"), "Substitution", "Indel")
-  return(df)
-}
-#' @export
-#' @rdname TCRAnalysis_PublicClonotypes
-#' @name TCRAnalysis_PublicClonotypes
-publicClonotypeAnalysis <- function(simNet, sizeThresholdSet, outputFileHeader="./Graph/Graph_"){
+publicClonotypeAnalysis <- function(simNet, sizeThresholdSet=10000, outputFileHeader="./Graph/Graph_"){
   # The largest connected component
   gList <- igraph::decompose(simNet)
   gSizeList <- sapply(gList, function(g){length(igraph::V(g))})
