@@ -3,6 +3,7 @@
 #' @param featureDFFileNames A character vector of binary file names with either ".fst" or ".rds" extensions.
 #' @param featureDFList A named list of feature dataframes.
 #' @param fileNameHeader A file name header.
+#' @importFrom stringr str_detect
 #' @importFrom fst read.fst
 #' @importFrom fst write.fst
 #' @importFrom pbapply pblapply
@@ -11,20 +12,21 @@
 #' @name Features_IO
 readFeatureDFList <- function(featureDFFileNames){
   paramSet <- gsub(".rds$", "", gsub(".fst$", "", basename(featureDFFileNames)))
-  paramSet <- as.character(t(as.data.frame(strsplit(paramSet, "_", fixed=T), stringsAsFactors=F))[,2])
-  featureDFList <- pbapply::pblapply(
-    featureDFFileNames,
-    function(f){
-      if(grep(".fst$", basename(f))==1){
-        fst::read.fst(f, as.data.table=T)
-      }else if(grep(".rds$", basename(f))==1){
-        readRDS(f)
-      }else{
-        NULL
-      }
-    }
-  )
-  names(featureDFList) <- paramSet
+  paramSet <- as.character(t(as.data.frame(strsplit(paramSet, "_", fixed = T), stringsAsFactors = F))[, 2])
+  pos.fst <- which(stringr::str_detect(basename(featureDFFileNames), ".fst"))
+  pos.rds <- which(stringr::str_detect(basename(featureDFFileNames), ".rds"))
+  files.fst <- featureDFFileNames[pos.fst]
+  files.rds <- featureDFFileNames[pos.rds]
+  if(length(files.fst)>=1){
+    message("Reading fst files...")
+    featureDFList.fst <- pbapply::pblapply(files.fst, function(f){fst::read.fst(f, as.data.table=T)})
+  }
+  if(length(files.rds)>=1){
+    message("Reading rds files...")
+    featureDFList.rds <- pbapply::pblapply(files.rds, function(f){readRDS(f)})
+  }
+  featureDFList <- c(featureDFList.fst, featureDFList.rds)
+  names(featureDFList) <- c(paramSet[pos.fst], paramSet[pos.rds])
   return(featureDFList)
 }
 #' @export
@@ -41,5 +43,4 @@ saveFeatureDFList <- function(featureDFList, fileNameHeader){
       }
     }
   )
-  invisible(return(NULL))
 }
