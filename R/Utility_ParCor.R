@@ -96,7 +96,7 @@ parCor <- function(mat, num_splits=parallel::detectCores(), verbose=2){
   }, cl=cl)
   parallel::stopCluster(cl)
   gc();gc()
-
+  
   ### build the output matrix block by block
   if(verbose>0|verbose) cat(" - bigcrossprod: merging the batches into", p, "x", p, "output matrix\n")
   outmat <- matrix(0, ncol = p, nrow = p)
@@ -112,7 +112,8 @@ parCor <- function(mat, num_splits=parallel::detectCores(), verbose=2){
   outmat <- cov2cor(outmat)
 
   ### output
-  file.remove(file.path(tmp.dir, mat.binfile))
+  rm(list=setdiff(ls(), c("outmat", "tmp.dir", "mat.binfile", "mat.descfile")))
   gc();gc()
+  file.remove(file.path(tmp.dir, mat.binfile))
   return(outmat)
 }
