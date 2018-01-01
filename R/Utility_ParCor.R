@@ -112,6 +112,7 @@ parCor <- function(mat, num_splits=parallel::detectCores(), verbose=2){
   outmat <- cov2cor(outmat)
 
   ### output
+  file.remove(file.path(tmp.dir, mat.binfile))
   gc();gc()
   return(outmat)
 }
