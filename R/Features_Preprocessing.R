@@ -176,6 +176,7 @@ Features_FeatureSelection <- function(preprocessedDFList, coreN=parallel::detect
 
   # Selection by filtering
   Features_SBF_Single <- function(df, seeds, coreN=NULL){
+    message("Selection by filtering.")
     dt <- data.table::as.data.table(df)
     dt <- dt[DataType=="Train", ,]
     outcomes <- dt$"Immunogenicity"
@@ -203,8 +204,10 @@ Features_FeatureSelection <- function(preprocessedDFList, coreN=parallel::detect
       )
     }
     sbfFeatureSet <- caret::predictors(sbfRes)
+    sbfFeatureSet <- c("DataType", "Peptide", "Immunogenicity", "Cluster", sbfFeatureSet)
     dt <- data.table::as.data.table(df)
-    dt <- dt[, c("DataType", "Peptide", "Immunogenicity", "Cluster", sbfFeatureSet), with=F]
+    message(length(setdiff(colnames(dt), sbfFeatureSet)), " features were removed.")
+    dt <- dt[, sbfFeatureSet, with=F]
 
     # Output
     gc();gc()
@@ -213,6 +216,7 @@ Features_FeatureSelection <- function(preprocessedDFList, coreN=parallel::detect
 
   # Recursive feature elimination
   Features_RFE_Single <- function(df, sizes=50, seeds, coreN=NULL){
+    message("Recursive feature elimination.")
     dt <- data.table::as.data.table(df)
     dt <- dt[DataType=="Train", ,]
     outcomes <- dt$"Immunogenicity"
@@ -240,8 +244,10 @@ Features_FeatureSelection <- function(preprocessedDFList, coreN=parallel::detect
       )
     }
     rfeFeatureSet <- caret::predictors(rfeRes)
+    rfeFeatureSet <- c("DataType", "Peptide", "Immunogenicity", "Cluster", rfeFeatureSet)
     dt <- data.table::as.data.table(df)
-    dt <- dt[, c("DataType", "Peptide", "Immunogenicity", "Cluster", rfeFeatureSet), with=F]
+    message(length(setdiff(colnames(dt), rfeFeatureSet)), " features were removed.")
+    dt <- dt[, rfeFeatureSet, with=F]
 
     # Output
     gc();gc()
@@ -268,14 +274,12 @@ Features_FeatureSelection <- function(preprocessedDFList, coreN=parallel::detect
       "sbfRes"=NULL,
       "rfeRes"=NULL
     )
-    message("Selection by filtering.")
     res <- modifyList(res, Features_SBF_Single(
       res$"dt",
       seeds=caretSeedsList_SBF[[i]],
       coreN=coreN
     ))
     if(ncol(res$"dt")>=55){
-      message("Recursive feature elimination.")
       res <- modifyList(res, Features_RFE_Single(
         res$"dt", sizes=50,
         seeds=caretSeedsList_RFE[[i]],
