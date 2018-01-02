@@ -160,17 +160,13 @@ Features_Preprocess <- function(splitDFList, coreN=parallel::detectCores()){
 #' @rdname Features_Preprocessing
 #' @name Features_Preprocessing
 Features_FeatureSelection <- function(preprocessedDFList, coreN=parallel::detectCores()){
-  # A set of random seeds
+  # A random seed generator
   caretSeeds <- function(seed, number){
     set.seed(seed)
     seeds <- vector(mode="list", length=number+1)
     for(i in 1:number) seeds[[i]] <- sample.int(10000, 2)
     seeds[[number+1]] <- sample.int(10000, 1)
     return(seeds)
-  }
-  caretSeedsList <- foreach::foreach(param=conbinedParamSet) %do% {
-    s <- as.numeric(as.character(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]))
-    caretSeeds(s, number=10)
   }
 
   # Selection by filtering
@@ -281,6 +277,10 @@ Features_FeatureSelection <- function(preprocessedDFList, coreN=parallel::detect
   message("Feature selection...")
   time.start <- proc.time()
   conbinedParamSet <- names(preprocessedDFList)
+  caretSeedsList <- foreach::foreach(param=conbinedParamSet) %do% {
+    s <- as.numeric(as.character(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]))
+    caretSeeds(s, number=10)
+  }
   preprocessedDTList <- foreach::foreach(i=1:length(conbinedParamSet)) %do% {
     cat(i, "/", length(conbinedParamSet), ": ", conbinedParamSet[i], "\n", sep="")
     res <- list(
