@@ -72,20 +72,21 @@ Immunogenicity <- function(
     if(!any(class(dt)=="data.table")) dt <- data.table::as.data.table(dt)
     if(is.null(dt$"DataType")){
       message("The input datatable is not valid! No 'DataType' column is detected.")
-      invisible(h2o::h2o.shutdown(F))
       return(NULL)
     }
 
     ## Define a random seed
     param <- names(preprocessedDFList)[i]
     s <- try(as.integer(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]), silent=T)
-    if(s=="try-error") s <- 123456789  ## ad hoc seed
+    if(any(class(s)=="try-error")) s <- 123456789  ## ad hoc seed
     modName <- paste0("BestH2OModel_", param)
+    modDir <- paste0(destDir, "/", param)
+    dir.create(modDir, showWarnings=F, recursive=T)
     cat("Random seed = ", s, "\n", sep="")
 
     ## Partition testing and validation subdatasets (optional)
     if(identical(levels(dt$"DataType"), c("Train", "Test", "Valid"))){
-      fst::write.fst(dt, file.path(destDir, paste0("Data_", param, ".fst")), compress=100)
+      fst::write.fst(dt, file.path(modDir, paste0("Data_", param, ".fst")), compress=100)
     }else if(identical(levels(dt$"DataType"), c("Train", "Test"))){
       cat("Test data was further devided into subdatasets... Testing:Validation=2:1", "\n", sep="")
       testID <- caret::createDataPartition(dt[DataType=="Test", Immunogenicity], p=2/3, list=F)
@@ -94,21 +95,20 @@ Immunogenicity <- function(
         dt[DataType=="Test",][testID,],
         dt[DataType=="Test",][-testID,][,DataType:="Valid"]
       ))
-      fst::write.fst(dt, file.path(destDir, paste0("Data_", param, ".fst")), compress=100)
+      fst::write.fst(dt, file.path(modDir, paste0("Data_", param, ".fst")), compress=100)
     }else{
       message("The input datatable is not valid! 'DataType' must be one of the followings: Train, Test, Valid.")
-      invisible(h2o::h2o.shutdown(F))
       return(NULL)
     }
 
     ## Model training
-    skipQ <- file.exists(file.path(destDir, modName))
+    skipQ <- file.exists(file.path(modDir, modName))
     if(skipQ==F){
       cat("Initiating H2O AutoML...\n", sep="")
       df_lb_list[[i]] <- Immunogenicity_AutoML(
         dt[DataType=="Train",], dt[DataType=="Test",], dt[DataType=="Valid",],
         featureSet=featureSet,
-        destDir=destDir, LeaderBoardName=NULL, H2OModelName=modName,
+        destDir=modDir, LeaderBoardName=NULL, H2OModelName=modName,
         seed=s, max_mem_size=max_mem_size, nthreads=nthreads
       ) %>% dplyr::mutate("Parameter"=param, "Seed"=s)
     }else{
@@ -120,25 +120,24 @@ Immunogenicity <- function(
     cat("Training data. \n", sep="")
     df_pred_train_list[[i]] <- Immunogenicity_Prediction(
       dt[DataType=="Train",],
-      destDir=destDir, H2OModelName=modName, PredictionHeader=paste0("Predictions_Train_", param),
+      destDir=modDir, H2OModelName=modName, PredictionHeader=paste0("Predictions_Train_", param),
       seed=s, max_mem_size=max_mem_size, nthreads=nthreads
     ) %>% dplyr::mutate("DataType"="Train", "Parameter"=param)
     cat("Testing data. \n", sep="")
     df_pred_test_list[[i]] <- Immunogenicity_Prediction(
       dt[DataType=="Test",],
-      destDir=destDir, H2OModelName=modName, PredictionHeader=paste0("Predictions_Test_", param),
+      destDir=modDir, H2OModelName=modName, PredictionHeader=paste0("Predictions_Test_", param),
       seed=s, max_mem_size=max_mem_size, nthreads=nthreads
     ) %>% dplyr::mutate("DataType"="Test", "Parameter"=param)
     cat("Validation data. \n", sep="")
     df_pred_valid_list[[i]] <- Immunogenicity_Prediction(
       dt[DataType=="Valid",],
-      destDir=destDir, H2OModelName=modName, PredictionHeader=paste0("Predictions_Valid_", param),
+      destDir=modDir, H2OModelName=modName, PredictionHeader=paste0("Predictions_Valid_", param),
       seed=s, max_mem_size=max_mem_size, nthreads=nthreads
     ) %>% dplyr::mutate("DataType"="Valid", "Parameter"=param)
 
     ## Closing
     invisible(h2o::h2o.shutdown(F))
-    return(NULL)
   }
 
   # Outputs
@@ -193,10 +192,11 @@ Immunogenicity_AutoML <- function(
     validation_frame=df_test,
     leaderboard_frame=df_valid,
     max_models=100,
-    stopping_metric="AUTO",
-    stopping_tolerance=0.05,
-    stopping_rounds=5,
-    seed=seed
+    stopping_metric="AUC",
+    stopping_tolerance=0.1,
+    stopping_rounds=3,
+    seed=seed,
+    project_name=H2OModelName
   )
   df_lb <- as.data.frame(aml@leaderboard)
   if(!is.null(LeaderBoardName)) readr::write_csv(df_lb, file.path(destDir, LeaderBoardName))
@@ -244,15 +244,15 @@ Immunogenicity_Prediction <- function(
     stat_summary(fun.data=mean_sdl, geom="pointrange", color="red") +
     geom_hline(yintercept=thr, color="grey50", size=1) +
     xlab(NULL) + ylab("Immunogenicity score") +
-    plotUtility::theme_Publication()
+    plotUtility::theme_Publication(base_size=14)
   plotUtility::savePDF(probPlot, outputFileName=file.path(destDir, paste0(PredictionHeader, "_ViolinPlot.pdf")), width=5, height=5)
 
   # Classifier performance plots
   rocPlot <- classifierplots::roc_plot(2-as.numeric(predDF$"Immunogenicity"), predDF$"Positive") +
-    plotUtility::theme_Publication()
+    plotUtility::theme_Publication(base_size=14)
   plotUtility::savePDF(rocPlot, outputFileName=file.path(destDir, paste0(PredictionHeader, "_ROCPlot.pdf")), width=5, height=5)
   calibPlot <- classifierplots::calibration_plot(2-as.numeric(predDF$"Immunogenicity"), predDF$"Positive") +
-    plotUtility::theme_Publication()
+    plotUtility::theme_Publication(base_size=14)
   plotUtility::savePDF(calibPlot, outputFileName=file.path(destDir, paste0(PredictionHeader, "_CalibrationPlot.pdf")), width=5, height=5)
 
   # Output
