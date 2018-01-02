@@ -161,11 +161,16 @@ Features_Preprocess <- function(splitDFList, coreN=parallel::detectCores()){
 #' @name Features_Preprocessing
 Features_FeatureSelection <- function(preprocessedDFList, coreN=parallel::detectCores()){
   # A random seed generator
-  caretSeeds <- function(seed, number){
+  caretSeeds_SBF <- function(seed, number=10, repeats=5){
     set.seed(seed)
-    seeds <- vector(mode="list", length=number+1)
-    for(i in 1:number) seeds[[i]] <- sample.int(10000, 2)
-    seeds[[number+1]] <- sample.int(10000, 1)
+    seeds <- sample.int(10000, number*repeats+1)
+    return(seeds)
+  }
+  caretSeeds_RFE <- function(seed, number=10, repeats=5){
+    set.seed(seed)
+    seeds <- vector(mode="list", length=number*repeats+1)
+    for(i in 1:(number*repeats)) seeds[[i]] <- sample.int(10000, 2)
+    seeds[[number*repeats+1]] <- sample.int(10000, 1)
     return(seeds)
   }
 
@@ -182,14 +187,19 @@ Features_FeatureSelection <- function(preprocessedDFList, coreN=parallel::detect
     )
     if(!is.null(coreN)){
       cl <- parallel::makeCluster(coreN, type='SOCK')
+      parallel::clusterExport(
+        cl,
+        list("dt", "outcomes", "sbfCtrl"),
+        envir=environment()
+      )
       doParallel::registerDoParallel(cl)
       sbfRes <- caret::sbf(
-        dt, outcomes, sbfControl=sbfCtrl
+        dt, as.numeric(outcomes), sbfControl=sbfCtrl
       )
       parallel::stopCluster(cl)
     }else{
       sbfRes <- caret::sbf(
-        dt, outcomes, sbfControl=sbfCtrl
+        dt, as.numeric(outcomes), sbfControl=sbfCtrl
       )
     }
     sbfFeatureSet <- caret::predictors(sbfRes)
@@ -201,67 +211,32 @@ Features_FeatureSelection <- function(preprocessedDFList, coreN=parallel::detect
     list("dt"=dt, "sbfRes"=sbfRes)
   }
 
-  # Simulated annealing
-  Features_safs_Single <- function(df, seeds, coreN=NULL){
-    dt <- data.table::as.data.table(df)
-    dt <- dt[DataType=="Train", ,]
-    outcomes <- dt$"Immunogenicity"
-    dt <- dt[, -c("DataType", "Peptide", "Immunogenicity", "Cluster"), with=F]
-    safsCtrl <- caret::safsControl(
-      functions=caret::caretSA,
-      method="repeatedcv", number=10, repeates=5,
-      verbose=T, seeds=seeds, allowParallel=T
-    )
-    if(!is.null(coreN)){
-      cl <- parallel::makeCluster(coreN, type='SOCK')
-      doParallel::registerDoParallel(cl)
-      safsRes <- caret::safs(
-        dt, outcomes,
-        iters=100,
-        safsControl=safsCtrl,
-        method="lm"
-      )
-      parallel::stopCluster(cl)
-    }else{
-      safsRes <- caret::safs(
-        dt, outcomes,
-        iters=100,
-        safsControl=safsCtrl,
-        method="lm"
-      )
-    }
-    safsFeatureSet <- caret::predictors(safsRes)
-    dt <- data.table::as.data.table(df)
-    dt <- dt[, c("DataType", "Peptide", "Immunogenicity", "Cluster", safsFeatureSet), with=F]
-
-    # Output
-    gc();gc()
-    list("dt"=dt, "safsRes"=safsRes)
-  }
-
   # Recursive feature elimination
-  Features_RFE_Single <- function(df, seeds, coreN=NULL){
+  Features_RFE_Single <- function(df, sizes=50, seeds, coreN=NULL){
     dt <- data.table::as.data.table(df)
     dt <- dt[DataType=="Train", ,]
     outcomes <- dt$"Immunogenicity"
     dt <- dt[, -c("DataType", "Peptide", "Immunogenicity", "Cluster"), with=F]
     rfeCtrl <- caret::rfeControl(
-      functions=caret::lmFuncs,
-      method="repeatedcv", number=10, repeates=5,
+      functions=caret::rfFuncs, rerank=F,
+      method="repeatedcv", number=10, repeats=5,
       verbose=T, seeds=seeds, allowParallel=T
     )
     if(!is.null(coreN)){
       cl <- parallel::makeCluster(coreN, type='SOCK')
+      parallel::clusterExport(
+        cl,
+        list("dt", "outcomes", "rfeCtrl"),
+        envir=environment()
+      )
       doParallel::registerDoParallel(cl)
       rfeRes <- caret::rfe(
-        dt, outcomes,
-        sizes=100, metric="Kappa", rfeControl=rfeCtrl
+        dt, outcomes, sizes=sizes, metric="Kappa", rfeControl=rfeCtrl
       )
       parallel::stopCluster(cl)
     }else{
       rfeRes <- caret::rfe(
-        dt, outcomes,
-        sizes=100, metric="Kappa", rfeControl=rfeCtrl
+        dt, outcomes, sizes=sizes, metric="Kappa", rfeControl=rfeCtrl
       )
     }
     rfeFeatureSet <- caret::predictors(rfeRes)
@@ -277,9 +252,13 @@ Features_FeatureSelection <- function(preprocessedDFList, coreN=parallel::detect
   message("Feature selection...")
   time.start <- proc.time()
   conbinedParamSet <- names(preprocessedDFList)
-  caretSeedsList <- foreach::foreach(param=conbinedParamSet) %do% {
+  caretSeedsList_SBF <- foreach::foreach(param=conbinedParamSet) %do% {
     s <- as.numeric(as.character(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]))
-    caretSeeds(s, number=10)
+    caretSeeds_SBF(s, number=10, repeats=5)
+  }
+  caretSeedsList_RFE <- foreach::foreach(param=conbinedParamSet) %do% {
+    s <- as.numeric(as.character(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]))
+    caretSeeds_RFE(s, number=10, repeats=5)
   }
   preprocessedDTList <- foreach::foreach(i=1:length(conbinedParamSet)) %do% {
     cat(i, "/", length(conbinedParamSet), ": ", conbinedParamSet[i], "\n", sep="")
@@ -292,15 +271,17 @@ Features_FeatureSelection <- function(preprocessedDFList, coreN=parallel::detect
     message("Selection by filtering.")
     res <- modifyList(res, Features_SBF_Single(
       res$"dt",
-      seeds=caretSeedsList[[i]],
+      seeds=caretSeedsList_SBF[[i]],
       coreN=coreN
     ))
-    message("Recursive feature elimination.")
-    res <- modifyList(res, Features_RFE_Single(
-      res$"dt",
-      seeds=caretSeedsList[[i]],
-      coreN=coreN
-    ))
+    if(ncol(res$"dt")>=55){
+      message("Recursive feature elimination.")
+      res <- modifyList(res, Features_RFE_Single(
+        res$"dt", sizes=50,
+        seeds=caretSeedsList_RFE[[i]],
+        coreN=coreN
+      ))
+    }
     res
   }
   names(preprocessedDTList) <- conbinedParamSet
