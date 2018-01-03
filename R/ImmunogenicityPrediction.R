@@ -11,6 +11,7 @@
 #' @param evalDF A dataframe for evaluation.
 #' @param featureSet A set of features to be used for model training. If "all", all features in the training dataframe except "DataType", "Immunogenicity", "Peptide", and "Cluster" will be used.
 #' @param destDir A directory either from importing H2O models or for exporting outputs.
+#' @param outputHeader A file/folder name header.
 #' @param LeaderBoardName The file name of the leader board to be exported. The file format must be CSV. If you want to skip exporting, set \code{NULL}.
 #' @param H2OModelName The file name of the best H2O model to be exported. No file extension is required. If you want to skip exporting, set \code{NULL}.
 #' @param PredictionHeader The file name header of the prediction results to be exported.
@@ -42,7 +43,7 @@
 #' @rdname ImmunogenicityPrediction
 #' @name ImmunogenicityPrediction
 Immunogenicity <- function(
-  preprocessedDFList, featureSet="all", destDir="./Results/", max_mem_size="6G", nthreads=6
+  preprocessedDFList, featureSet="all", destDir="./Results/", outputHeader="Output_", max_mem_size="6G", nthreads=6
 ){
   # Create directory (optional)
   dir.create(destDir, showWarnings=F, recursive=T)
@@ -80,7 +81,7 @@ Immunogenicity <- function(
     s <- try(as.integer(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]), silent=T)
     if(any(class(s)=="try-error")) s <- 123456789  ## ad hoc seed
     modName <- paste0("BestH2OModel_", param)
-    modDir <- paste0(destDir, "/", param)
+    modDir <- paste0(destDir, "/", outputHeader, param)
     dir.create(modDir, showWarnings=F, recursive=T)
     cat("Random seed = ", s, "\n", sep="")
 
@@ -142,13 +143,13 @@ Immunogenicity <- function(
 
   # Outputs
   df_lb <- data.table::rbindlist(df_lb_list)
-  readr::write_csv(df_lb, file.path(destDir, "LeaderBoard.csv"))
+  readr::write_csv(df_lb, file.path(destDir, paste0(outputHeader, "LeaderBoard.csv")))
   df_pred <- data.table::rbindlist(list(
     data.table::rbindlist(df_pred_train_list),
     data.table::rbindlist(df_pred_test_list),
     data.table::rbindlist(df_pred_valid_list)
   ))
-  readr::write_csv(df_pred, file.path(destDir, paste0("Predictions.csv")))
+  readr::write_csv(df_pred, file.path(destDir, paste0(outputHeader, "Predictions.csv")))
   gc();gc()
   return(list("LeaderBoard"=df_lb, "Predictions"=df_pred))
 }

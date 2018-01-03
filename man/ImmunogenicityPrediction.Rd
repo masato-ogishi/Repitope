@@ -10,7 +10,8 @@
 \title{Immunogenicity prediction using H2O AutoML instances}
 \usage{
 Immunogenicity(preprocessedDFList, featureSet = "all",
-  destDir = "./Results/", max_mem_size = "6G", nthreads = 6)
+  destDir = "./Results/", outputHeader = "Output_", max_mem_size = "6G",
+  nthreads = 6)
 
 Immunogenicity_AutoML(trainDF, testDF, validDF, featureSet = "all",
   destDir = "./Results/", LeaderBoardName = "LeaderBoard.csv",
@@ -27,6 +28,8 @@ Immunogenicity_Prediction(evalDF, destDir = "./Results/",
 \item{featureSet}{A set of features to be used for model training. If "all", all features in the training dataframe except "DataType", "Immunogenicity", "Peptide", and "Cluster" will be used.}
 
 \item{destDir}{A directory either from importing H2O models or for exporting outputs.}
+
+\item{outputHeader}{A file/folder name header.}
 
 \item{max_mem_size}{The upper limit of memory for H2O Java machine learning engine.}
 
