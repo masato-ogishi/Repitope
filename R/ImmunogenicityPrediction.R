@@ -22,6 +22,7 @@
 #' @importFrom dplyr select
 #' @importFrom dplyr mutate
 #' @importFrom dplyr bind_cols
+#' @importFrom readr read_csv
 #' @importFrom readr write_csv
 #' @importFrom stringr str_split
 #' @importFrom stringr fixed
@@ -43,7 +44,7 @@
 #' @rdname ImmunogenicityPrediction
 #' @name ImmunogenicityPrediction
 Immunogenicity <- function(
-  preprocessedDFList, featureSet="all", destDir="./Results/", outputHeader="Output_", max_mem_size="6G", nthreads=6
+  preprocessedDFList, featureSet="all", destDir="./Results/", outputHeader="Output", max_mem_size="6G", nthreads=6
 ){
   # Create directory (optional)
   dir.create(destDir, showWarnings=F, recursive=T)
@@ -76,18 +77,17 @@ Immunogenicity <- function(
       return(NULL)
     }
 
-    ## Define a random seed
+    ## Parameter and directory check
     param <- names(preprocessedDFList)[i]
     s <- try(as.integer(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]), silent=T)
     if(any(class(s)=="try-error")) s <- 123456789  ## ad hoc seed
-    modName <- paste0("BestH2OModel_", param)
-    modDir <- paste0(destDir, "/", outputHeader, param)
+    modDir <- paste0(destDir, "/", outputHeader, "_", param)
     dir.create(modDir, showWarnings=F, recursive=T)
     cat("Random seed = ", s, "\n", sep="")
 
-    ## Partition testing and validation subdatasets (optional)
+    ## Partitioning the testing and validation subdatasets
     if(identical(levels(dt$"DataType"), c("Train", "Test", "Valid"))){
-      fst::write.fst(dt, file.path(modDir, paste0("Data_", param, ".fst")), compress=100)
+      fst::write.fst(dt, file.path(modDir, "Data.fst"), compress=100)
     }else if(identical(levels(dt$"DataType"), c("Train", "Test"))){
       cat("Test data was further devided into subdatasets... Testing:Validation=2:1", "\n", sep="")
       testID <- caret::createDataPartition(dt[DataType=="Test", Immunogenicity], p=2/3, list=F)
@@ -96,24 +96,25 @@ Immunogenicity <- function(
         dt[DataType=="Test",][testID,],
         dt[DataType=="Test",][-testID,][,DataType:="Valid"]
       ))
-      fst::write.fst(dt, file.path(modDir, paste0("Data_", param, ".fst")), compress=100)
+      fst::write.fst(dt, file.path(modDir, "Data.fst"), compress=100)
     }else{
       message("The input datatable is not valid! 'DataType' must be one of the followings: Train, Test, Valid.")
       return(NULL)
     }
 
     ## Model training
-    skipQ <- file.exists(file.path(modDir, modName))
+    skipQ <- file.exists(file.path(modDir, "BestH2OModel"))
     if(skipQ==F){
       cat("Initiating H2O AutoML...\n", sep="")
       df_lb_list[[i]] <- Immunogenicity_AutoML(
         dt[DataType=="Train",], dt[DataType=="Test",], dt[DataType=="Valid",],
         featureSet=featureSet,
-        destDir=modDir, LeaderBoardName=NULL, H2OModelName=modName,
+        destDir=modDir, LeaderBoardName="LeaderBoard.csv", H2OModelName="BestH2OModel",
         seed=s, max_mem_size=max_mem_size, nthreads=nthreads
-      ) %>% dplyr::mutate("Parameter"=param, "Seed"=s)
+      ) %>% dplyr::mutate("Parameter"=param)
     }else{
       cat("Model training was skipped.\n")
+      df_lb_list[[i]] <- readr::read_csv(file.path(modDir, "LeaderBoard.csv"))
     }
 
     ## Prediction
@@ -121,21 +122,23 @@ Immunogenicity <- function(
     cat("Training data. \n", sep="")
     df_pred_train_list[[i]] <- Immunogenicity_Prediction(
       dt[DataType=="Train",],
-      destDir=modDir, H2OModelName=modName, PredictionHeader=paste0("Predictions_Train_", param),
+      destDir=modDir, H2OModelName="BestH2OModel", PredictionHeader=paste0("Predictions_Train"),
       seed=s, max_mem_size=max_mem_size, nthreads=nthreads
     ) %>% dplyr::mutate("DataType"="Train", "Parameter"=param)
     cat("Testing data. \n", sep="")
     df_pred_test_list[[i]] <- Immunogenicity_Prediction(
       dt[DataType=="Test",],
-      destDir=modDir, H2OModelName=modName, PredictionHeader=paste0("Predictions_Test_", param),
+      destDir=modDir, H2OModelName="BestH2OModel", PredictionHeader=paste0("Predictions_Test"),
       seed=s, max_mem_size=max_mem_size, nthreads=nthreads
     ) %>% dplyr::mutate("DataType"="Test", "Parameter"=param)
     cat("Validation data. \n", sep="")
     df_pred_valid_list[[i]] <- Immunogenicity_Prediction(
       dt[DataType=="Valid",],
-      destDir=modDir, H2OModelName=modName, PredictionHeader=paste0("Predictions_Valid_", param),
+      destDir=modDir, H2OModelName="BestH2OModel", PredictionHeader=paste0("Predictions_Valid"),
       seed=s, max_mem_size=max_mem_size, nthreads=nthreads
     ) %>% dplyr::mutate("DataType"="Valid", "Parameter"=param)
+    data.table::rbindlist(list(df_pred_train_list[[i]], df_pred_test_list[[i]], df_pred_valid_list[[i]])) %>%
+      readr::write_csv(file.path(modDir, "Predictions.csv"))
 
     ## Closing
     invisible(h2o::h2o.shutdown(F))
@@ -143,13 +146,13 @@ Immunogenicity <- function(
 
   # Outputs
   df_lb <- data.table::rbindlist(df_lb_list)
-  readr::write_csv(df_lb, file.path(destDir, paste0(outputHeader, "LeaderBoard.csv")))
+  readr::write_csv(df_lb, file.path(destDir, paste0(outputHeader, "_LeaderBoard.csv")))
   df_pred <- data.table::rbindlist(list(
     data.table::rbindlist(df_pred_train_list),
     data.table::rbindlist(df_pred_test_list),
     data.table::rbindlist(df_pred_valid_list)
   ))
-  readr::write_csv(df_pred, file.path(destDir, paste0(outputHeader, "Predictions.csv")))
+  readr::write_csv(df_pred, file.path(destDir, paste0(outputHeader, "_Predictions.csv")))
   gc();gc()
   return(list("LeaderBoard"=df_lb, "Predictions"=df_pred))
 }

@@ -10,7 +10,7 @@
 \title{Immunogenicity prediction using H2O AutoML instances}
 \usage{
 Immunogenicity(preprocessedDFList, featureSet = "all",
-  destDir = "./Results/", outputHeader = "Output_", max_mem_size = "6G",
+  destDir = "./Results/", outputHeader = "Output", max_mem_size = "6G",
   nthreads = 6)
 
 Immunogenicity_AutoML(trainDF, testDF, validDF, featureSet = "all",

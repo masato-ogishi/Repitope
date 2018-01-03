@@ -12,10 +12,8 @@
 #' df.calis1 <- dplyr::filter(EpitopeDataset, stringr::str_detect(Dataset, "Calis1"))
 #'
 #' ## Data restricted on the HLA-A2 molecule.
-#' library(tidyverse)
 #' df.long <- compressedToLongFormat(EpitopeDataset, "MHC")
 #' df.long$"MHC" <- standardizeHLAString(df.long$"MHC")
-#' df.hla.a2 <- df.long %>%
-#'   dplyr::filter(stringr::str_detect(MHC, "A02")|stringr::str_detect(MHC, "A2$")) %>%
-#'   dplyr::distinct(Peptide, .keep_all=T)
+#' df.hla.a2 <- dplyr::filter(df.long, stringr::str_detect(MHC, "A02")|stringr::str_detect(MHC, "A2$"))
+#' df.hla.a2 <- dplyr::distinct(df.hla.a2, Peptide, .keep_all=TRUE)
 "EpitopeDataset"
