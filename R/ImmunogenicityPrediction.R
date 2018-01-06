@@ -114,7 +114,8 @@ Immunogenicity <- function(
       ) %>% dplyr::mutate("Parameter"=param)
     }else{
       cat("Model training was skipped.\n")
-      df_lb_list[[i]] <- readr::read_csv(file.path(modDir, "LeaderBoard.csv"))
+      df_lb_list[[i]] <- readr::read_csv(file.path(modDir, "LeaderBoard.csv")) %>%
+        dplyr::mutate("Parameter"=param)
     }
 
     ## Prediction
