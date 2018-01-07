@@ -42,13 +42,15 @@ Features_Importance <- function(
       s <- try(as.integer(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]), silent=T)
       if(any(class(s)=="try-error")) s <- 123456789  ## ad hoc seed
       set.seed(s)
-      dt <- preprocessedDFList[[i]][["dt"]] %>% dplyr::select(-DataType, -Peptide, -Cluster)
+      dt <- data.table::as.data.table(preprocessedDFList[[i]][["dt"]])
+      dt <- dt[DataType=="Train",]
+      dt <- dt %>% dplyr::select(-DataType, -Peptide, -Cluster)
       if(nrow(dt)>maxRowN) dt <- dplyr::slice(dt, sample(1:nrow(dt), maxRowN))
-      tsk <- mlr::makeClassifTask(id=paste0("Benchmark_", param), data=as.data.frame(dt), target="Immunogenicity")
-      target <- mlr::getTaskTargets(tsk)
-      tab <- as.numeric(table(target))
-      w <- 1/tab[target]
-      tsk <- mlr::makeClassifTask(data=as.data.frame(dt), target="Immunogenicity", weights=w)
+      tsk <- mlr::makeClassifTask(data=as.data.frame(dt), target="Immunogenicity")
+      #target <- mlr::getTaskTargets(tsk)
+      #tab <- as.numeric(table(target))
+      #w <- 1/tab[target]
+      #tsk <- mlr::makeClassifTask(data=as.data.frame(dt), target="Immunogenicity", weights=w)
       return(tsk)
     })
   }
@@ -69,7 +71,6 @@ Features_Importance <- function(
     featureImportances <- pbapply::pblapply(taskSet, mlr::generateFilterValuesData, method="randomForestSRC.rfsrc")
   }
   featureImportanceDFList <- lapply(1:length(preprocessedDFList), function(i){
-    dt <- data.table::as.data.table(preprocessedDFList[[i]][["dt"]])
     param <- names(preprocessedDFList)[i]
     imp <- featureImportances[[i]][["data"]] %>%
       dplyr::transmute(FeatureID=name, Importance=scales::rescale(randomForestSRC.rfsrc, to=c(0,1)), Parameter=param) %>%
@@ -79,6 +80,7 @@ Features_Importance <- function(
     }else{
       feat <- as.character(imp[["FeatureID"]])
     }
+    dt <- data.table::as.data.table(preprocessedDFList[[i]][["dt"]])
     dt <- dt[, c("DataType", "Peptide", "Immunogenicity", "Cluster", feat), with=F]
     gc();gc()
     list("dt"=dt, "feat"=feat, "imp"=imp)
