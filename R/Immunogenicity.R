@@ -44,8 +44,10 @@ Immunogenicity <- function(
   maxJavaMemory="6G", coreN=parallel::detectCores()
 ){
   # Working environment
-  options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling library(mlr)!
   dir.create(destDir, showWarnings=F, recursive=T)
+  options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling library(mlr)!
+  require(mlr)
+  require(parallelMap)
 
   # Input check
   if(any(class(preprocessedDFList[[1]])=="data.frame")) preprocessedDFList <- lapply(preprocessedDFList, function(d){list("dt"=d)})
@@ -65,15 +67,14 @@ Immunogenicity <- function(
     ## Task
     tsk <- mlr::makeClassifTask(data=as.data.frame(data), target="Immunogenicity")
 
-    ## Class weights
-    target <- mlr::getTaskTargets(tsk)
-    tab <- as.numeric(table(target))
-    w <- 1/tab[target]
-    tsk <- mlr::makeClassifTask(data=as.data.frame(data), target="Immunogenicity", weights=w)
+    ### Class weights [Stacked classifier does not support this!]
+    #target <- mlr::getTaskTargets(tsk)
+    #tab <- as.numeric(table(target))
+    #w <- 1/tab[target]
+    #tsk <- mlr::makeClassifTask(data=as.data.frame(data), target="Immunogenicity", weights=w)
 
     ## Model training
     if(!is.null(coreN)){
-      require(parallelMap)
       parallelMap::parallelStartSocket(cpus=coreN)
       stck <- mlr::train(learner=mlr::makeStackedLearner(base.learners=lrns, predict.type="prob", method="hill.climb"), task=tsk)
       parallelMap::parallelStop()
@@ -116,7 +117,7 @@ Immunogenicity <- function(
     skipQ <- file.exists(file.path(modDir, "StackedModel.rds"))
     if(skipQ==F){
       cat("Stacked model construction was started...\n")
-      stck <- stackedML(dt_train)
+      stck <- stackedML(dt_train, featureSet=featureSet)
       saveRDS(stck, file.path(modDir, "StackedModel.rds"))
     }else{
       cat("Model training was skipped.\n")
@@ -163,8 +164,10 @@ Immunogenicity_Benchmark <- function(
   destDir="./Benchmark/", maxJavaMemory="6G", coreN=parallel::detectCores()
 ){
   # Working environment
-  options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling library(mlr)!
   dir.create(destDir, showWarnings=F, recursive=T)
+  options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling library(mlr)!
+  require(mlr)
+  require(parallelMap)
 
   # Input check
   if(any(class(preprocessedDFList[[1]])=="data.frame")) preprocessedDFList <- lapply(preprocessedDFList, function(d){list("dt"=d)})
@@ -179,10 +182,10 @@ Immunogenicity_Benchmark <- function(
       dt <- preprocessedDFList[[i]][["dt"]] %>% dplyr::select(-DataType, -Peptide, -Cluster)
       if(nrow(dt)>maxRowN) dt <- dplyr::slice(dt, sample(1:nrow(dt), maxRowN))
       tsk <- mlr::makeClassifTask(id=paste0("Benchmark_", param), data=as.data.frame(dt), target="Immunogenicity")
-      target <- mlr::getTaskTargets(tsk)
-      tab <- as.numeric(table(target))
-      w <- 1/tab[target]
-      tsk <- mlr::makeClassifTask(data=as.data.frame(dt), target="Immunogenicity", weights=w)
+      #target <- mlr::getTaskTargets(tsk)
+      #tab <- as.numeric(table(target))
+      #w <- 1/tab[target]
+      #tsk <- mlr::makeClassifTask(id=paste0("Benchmark_", param), data=as.data.frame(dt), target="Immunogenicity", weights=w)
       return(tsk)
     })
   }
@@ -217,7 +220,6 @@ Immunogenicity_Benchmark <- function(
       mlr::ber, mlr::setAggregation(mlr::ber, mlr::train.mean)
     )
     if(!is.null(coreN)){
-      require(parallelMap)
       parallelMap::parallelStartSocket(cpus=coreN)
       bmr <- mlr::benchmark(
         learners=mlr::makeLearner(learnerString, predict.type="prob"),
