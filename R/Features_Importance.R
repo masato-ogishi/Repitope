@@ -75,8 +75,7 @@ Features_Importance <- function(
       dplyr::transmute(FeatureID=name, Importance=scales::rescale(randomForestSRC.rfsrc, to=c(0,1)), Parameter=param) %>%
       DescTools::Sort(ord="Importance", decreasing=T)
     if(!is.null(featureN)){
-      imp <- dplyr::slice(imp, seq(1, min(nrow(imp), featureN)))
-      feat <- as.character(imp[["FeatureID"]])
+      feat <- as.character(dplyr::slice(imp, seq(1, min(nrow(imp), featureN)))[["FeatureID"]])
     }else{
       feat <- as.character(imp[["FeatureID"]])
     }
