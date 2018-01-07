@@ -2,9 +2,17 @@
 % Please edit documentation in R/Features.R
 \name{Features}
 \alias{Features}
+\alias{Features_PeptideDescriptor}
+\alias{Features_rTPCP}
 \title{Generate peptide features for immunogenicity prediction.}
 \usage{
 Features(peptideSet, TCRSet, fragLenSet = 3:8, aaIndexIDSet = "all",
+  alignTypeSet = "global-local", TCRFragDepthSet = 10000, seedSet = 1:5,
+  coreN = parallel::detectCores())
+
+Features_PeptideDescriptor(peptideSet, fragLenSet = 3:8)
+
+Features_rTPCP(peptideSet, TCRSet, fragLenSet = 3:8, aaIndexIDSet = "all",
   alignTypeSet = "global-local", TCRFragDepthSet = 10000, seedSet = 1:5,
   coreN = parallel::detectCores())
 }
@@ -26,7 +34,7 @@ Features(peptideSet, TCRSet, fragLenSet = 3:8, aaIndexIDSet = "all",
 \item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.}
 }
 \description{
+\code{Features} is a wrapper function, generating a list of dataframes of peptide features calculated with different parameter sets.
 \code{Features_PeptideDescriptor} calculates descriptive statistics using peptide descriptors.\cr
 \code{Features_rTPCP} calculates descriptive statistics of repertoire-wide TCR-peptide pairwise contact potentials.\cr
-\code{Features} is a wrapper function, generating a list of dataframes of peptide features calculated with different parameter sets.
 }
