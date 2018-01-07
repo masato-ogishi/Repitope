@@ -249,6 +249,7 @@ Immunogenicity_Benchmark <- function(
   for(l in learnerSet){ try(bm_wrapper(l, taskSet)) }
   message("Integrating benchmark results...\n")
   bmfiles <- list.files(pattern="^BenchmarkResult.+csv$", path=destDir, full.names=T)
+  bmfiles <- setdiff(bmfiles, file.path(destDir, "BenchmarkResult_Combined.csv"))
   bmr <- dplyr::bind_rows(lapply(bmfiles, readr::read_csv))
   bmr.ord <- bmr %>%
     dplyr::group_by(learner.id) %>% dplyr::summarise(auc=mean(auc)) %>%
