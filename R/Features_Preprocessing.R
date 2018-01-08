@@ -16,6 +16,7 @@
 #' @importFrom dplyr select
 #' @importFrom tidyr drop_na
 #' @importFrom data.table as.data.table
+#' @importFrom data.table copy
 #' @importFrom data.table :=
 #' @importFrom data.table setcolorder
 #' @importFrom data.table setorder
@@ -72,6 +73,7 @@ Features_Preprocess <- function(featureDFList, metadataDFList){
     dataTypes <- rep("Test", nrow(dt))
     dataTypes[caret::createDataPartition(dt$"Immunogenicity", p=7/10, list=F)] <- "Train"
     dataTypes <- factor(dataTypes, levels=c("Train", "Test"))
+    dt <- data.table::copy(dt)
     dt[, DataType:=dataTypes]
     data.table::setcolorder(dt, unique(c("DataType", colnames(dt))))
 
@@ -111,25 +113,23 @@ Features_CorFilter <- function(preprocessedDFList, corThreshold=0.75, coreN=para
   Features_CorFilter_Single <- function(df, corThreshold=0.75, coreN=NULL){
     # Correlation-based feature elimination using the training subdataset
     dt <- data.table::as.data.table(df)
-    dt <- dt[DataType=="Train", ]
-    metadataSet <- c("DataType", "Peptide", "Immunogenicity", "Cluster")
-    dt.meta <- dt[, c("DataType", "Peptide", "Immunogenicity", "Cluster"), with=F]
-    dt <- dt[, -c("DataType", "Peptide", "Immunogenicity", "Cluster"), with=F]
+    dt_train <- data.table::copy(dt)
+    dt_train <- dt_train[DataType=="Train", ]
+    dt_train <- dt_train[, -c("DataType", "Peptide", "Immunogenicity", "Cluster"), with=F]
     message("Calculating correlation matrix...")
     if(!is.null(coreN)){
-      corMat <- parCor(dt, num_splits=coreN, verbose=2)
+      corMat <- parCor(dt_train, num_splits=coreN, verbose=2)
     }else{
-      corMat <- parCor(dt, num_splits=1, verbose=2)
+      corMat <- parCor(dt_train, num_splits=1, verbose=2)
     }
     removedFeatureSet <- caret::findCorrelation(corMat, cutoff=corThreshold, verbose=F, names=T)
     if(length(removedFeatureSet)>0) dt <- dt[, -removedFeatureSet, with=F]
     message(length(removedFeatureSet), " features were removed based on their correlations.")
-    dt <- data.table::rbindlist(list(dt.meta, dt))
 
     # Output
-    rm(list=setdiff(ls(), "dt"))
+    rm(list=setdiff(ls(), c("dt", "corMat")))
     gc();gc()
-    return(list("dt"=dt))
+    return(list("dt"=dt, "corMat"=corMat))
   }
   message("Correlation-based feature elimination.")
   time.start <- proc.time()

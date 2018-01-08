@@ -39,8 +39,10 @@ saveFeatureDFList <- function(featureDFList, fileNameHeader){
     1:length(featureDFList),
     function(i){
       if(is.data.frame(featureDFList[[i]])){
+        message("Saving fst files...")
         fst::write.fst(featureDFList[[i]], paste0(fileNameHeader, names(featureDFList)[i], ".fst"))
       }else{
+        message("Saving rds files...")
         saveRDS(featureDFList[[i]], paste0(fileNameHeader, names(featureDFList)[i], ".rds"))
       }
     }
