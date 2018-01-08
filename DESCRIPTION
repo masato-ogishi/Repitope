@@ -1,7 +1,7 @@
 Package: Repitope
 Type: Package
 Title: Epitope prediction from TCR-peptide contact profiles
-Version: 0.3.6.2
+Version: 0.4.0
 Author: Masato Ogishi
 Maintainer: Masato Ogishi <oogishi-tky@umin.ac.jp>
 Description: In sillico prediction of peptide immunogenicity is a critical component of precision immunotherapy.
@@ -22,6 +22,7 @@ Imports:
     doParallel (>= 1.0.11),
     dplyr (>= 0.7.3),
     e1071 (>= 1.6-8),
+    ff (>= 2.2-13),
     foreach (>= 1.4.4),
     fst (>= 0.8.2),
     ggplot2 (>= 2.2.1),
