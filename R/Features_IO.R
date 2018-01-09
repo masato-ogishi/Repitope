@@ -35,16 +35,16 @@ readFeatureDFList <- function(featureDFFileNames){
 #' @rdname Features_IO
 #' @name Features_IO
 saveFeatureDFList <- function(featureDFList, fileNameHeader){
-  pbapply::pblapply(
-    1:length(featureDFList),
-    function(i){
-      if(is.data.frame(featureDFList[[i]])){
-        message("Saving fst files...")
-        fst::write.fst(featureDFList[[i]], paste0(fileNameHeader, names(featureDFList)[i], ".fst"))
-      }else{
-        message("Saving rds files...")
-        saveRDS(featureDFList[[i]], paste0(fileNameHeader, names(featureDFList)[i], ".rds"))
-      }
-    }
-  )
+  dataFrameQ <- sapply(featureDFList, is.data.frame)
+  if(any(dataFrameQ==F)){
+    message("Saving rds files...")
+    pbapply::pblapply(1:length(featureDFList),
+      function(i){saveRDS(featureDFList[[i]], paste0(fileNameHeader, names(featureDFList)[i], ".rds"))}
+    )
+  }else{
+    message("Saving fst files...")
+    pbapply::pblapply(1:length(featureDFList),
+      function(i){fst::write.fst(featureDFList[[i]], paste0(fileNameHeader, names(featureDFList)[i], ".fst"))}
+    )
+  }
 }
