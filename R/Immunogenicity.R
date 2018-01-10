@@ -134,21 +134,21 @@ Immunogenicity <- function(
       data.frame("Param"=param, "DataType"="Train", as.data.frame(pred_train)),
       data.frame("Param"=param, "DataType"="Test", as.data.frame(pred_test))
     ))
-    measuresDFList[[i]] <- data.table::rbindlist(list(
+    measureDFList[[i]] <- data.table::rbindlist(list(
       as.data.frame(c(list("Param"=param, "DataType"="Train"), as.list(mlr::performance(pred_train, measures=list(mlr::timeboth, mlr::auc, mlr::kappa), task=tsk_train, model=stck)), mlr::calculateROCMeasures(pred_train)$"measures")),
       as.data.frame(c(list("Param"=param, "DataType"="Test"), as.list(mlr::performance(pred_train, measures=list(mlr::timeboth, mlr::auc, mlr::kappa), task=tsk_train, model=stck)), mlr::calculateROCMeasures(pred_test)$"measures"))
     ))
     readr::write_csv(predDFList[[i]], file.path(modDir, "Predictions.csv"))
-    readr::write_csv(measuresDFList[[i]], file.path(modDir, "PerformanceMeasures.csv"))
+    readr::write_csv(measureDFList[[i]], file.path(modDir, "PerformanceMeasures.csv"))
 
     ## Closing
-    rm(list=setdiff(ls(), c("predDFList", "measuresDFList")))
+    rm(list=setdiff(ls(), c("predDFList", "measureDFList")))
     gc();gc()
   }
 
   # Outputs
   predDF <- data.table::rbindlist(predDFList)
-  measureDF <- data.table::rbindlist(measuresDFList)
+  measureDF <- data.table::rbindlist(measureDFList)
   readr::write_csv(predDF, file.path(destDir, paste0(outputHeader, "_Predictions.csv")))
   readr::write_csv(measureDF, file.path(destDir, paste0(outputHeader, "_PerformanceMeasures.csv")))
   rm(list=setdiff(ls(), c("predDF", "measuresDF")))

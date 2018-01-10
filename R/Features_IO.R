@@ -38,12 +38,14 @@ saveFeatureDFList <- function(featureDFList, fileNameHeader){
   dataFrameQ <- sapply(featureDFList, is.data.frame)
   if(any(dataFrameQ==F)){
     message("Saving rds files...")
-    pbapply::pblapply(1:length(featureDFList),
+    pbapply::pblapply(
+      1:length(featureDFList),
       function(i){saveRDS(featureDFList[[i]], paste0(fileNameHeader, names(featureDFList)[i], ".rds"))}
     )
   }else{
     message("Saving fst files...")
-    pbapply::pblapply(1:length(featureDFList),
+    pbapply::pblapply(
+      1:length(featureDFList),
       function(i){fst::write.fst(featureDFList[[i]], paste0(fileNameHeader, names(featureDFList)[i], ".fst"))}
     )
   }
