@@ -105,13 +105,18 @@ Immunogenicity <- function(
 
     ## Input data check
     dt <- preprocessedDFList[[i]]$"dt"
-    if(!any(class(dt)=="data.table")) dt <- data.table::as.data.table(dt)
     if(is.null(dt$"DataType")){
       message("The input datatable is not valid! No 'DataType' column is detected.")
       return(NULL)
     }
-    dt_train <- dt[DataType=="Train",] %>% dplyr::select(-DataType, -Peptide, -Cluster)
-    dt_test <- dt[DataType=="Test",] %>% dplyr::select(-DataType, -Peptide, -Cluster)
+    dt_train <- dt %>%
+      dplyr::filter(DataType=="Train") %>%
+      dplyr::select(-DataType, -Peptide, -Cluster) %>%
+      as.data.frame()
+    dt_test <- dt %>%
+      dplyr::filter(DataType=="Test") %>%
+      dplyr::select(-DataType, -Peptide, -Cluster) %>%
+      as.data.frame()
 
     ## Model training
     skipQ <- file.exists(file.path(modDir, "StackedModel.rds"))
@@ -151,7 +156,7 @@ Immunogenicity <- function(
   measureDF <- data.table::rbindlist(measureDFList)
   readr::write_csv(predDF, file.path(destDir, paste0(outputHeader, "_Predictions.csv")))
   readr::write_csv(measureDF, file.path(destDir, paste0(outputHeader, "_PerformanceMeasures.csv")))
-  rm(list=setdiff(ls(), c("predDF", "measuresDF")))
+  rm(list=setdiff(ls(), c("predDF", "measureDF")))
   gc();gc()
   return(list("predDF"=predDF, "measureDF"=measureDF))
 }
