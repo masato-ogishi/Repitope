@@ -46,58 +46,25 @@ Immunogenicity <- function(
   # Working environment
   dir.create(destDir, showWarnings=F, recursive=T)
   options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling library(mlr)!
-  require(mlr)
-  require(parallelMap)
 
   # Input check
   if(any(class(preprocessedDFList[[1]])=="data.frame")) preprocessedDFList <- lapply(preprocessedDFList, function(d){list("dt"=d)})
-
-  # Stacked machine learning optimized from preliminary experiments
-  stackedML <- function(data, featureSet="all"){
-    ## Learners
-    lrns <- lapply(c("classif.extraTrees", "classif.randomForestSRC", "classif.rda", "classif.svm", "classif.qda", "classif.lqa"),
-                   function(learner){mlr::makeLearner(learner, predict.type="prob")})
-
-    ## Features
-    if(identical(featureSet, "all")) featureSet <- colnames(data)
-    metadataSet <- c("DataType", "Peptide", "Cluster")
-    featureSet <- setdiff(colnames(data), metadataSet)
-    data <- dplyr::select(data, featureSet)
-
-    ## Task
-    tsk <- mlr::makeClassifTask(data=as.data.frame(data), target="Immunogenicity")
-
-    ### Class weights [Stacked classifier does not support this!]
-    #target <- mlr::getTaskTargets(tsk)
-    #tab <- as.numeric(table(target))
-    #w <- 1/tab[target]
-    #tsk <- mlr::makeClassifTask(data=as.data.frame(data), target="Immunogenicity", weights=w)
-
-    ## Model training
-    if(!is.null(coreN)){
-      parallelMap::parallelStartSocket(cpus=coreN)
-      stck <- mlr::train(learner=mlr::makeStackedLearner(base.learners=lrns, predict.type="prob", method="hill.climb"), task=tsk)
-      parallelMap::parallelStop()
-    }else{
-      stck <- mlr::train(learner=mlr::makeStackedLearner(base.learners=lrns, predict.type="prob", method="hill.climb"), task=tsk)
-    }
-    gc();gc()
-    return(stck)
-  }
 
   # Batch machine learning
   leng <- length(preprocessedDFList)
   predDFList <- as.list(rep(NA, leng))
   measureDFList <- as.list(rep(NA, leng))
   cat("Number of datasets = ", leng, "\n", sep="")
+  stackML <- function(preprocessedDFList, i){
+    library(mlr)
+    library(parallelMap)
 
-  for(i in 1:leng){
     ## Parameter check
     param <- names(preprocessedDFList)[i]
     s <- try(as.integer(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]), silent=T)
     if(any(class(s)=="try-error")) s <- 123456789  ## ad hoc seed
     set.seed(s)
-    cat("Random seed = ", s, "\n", sep="")
+    cat(i, "/", leng, "| Parameter set: ", param, "\n", sep="")
 
     ## Destination directory
     modDir <- paste0(destDir, "/", outputHeader, "_", param)
@@ -119,37 +86,67 @@ Immunogenicity <- function(
       as.data.frame()
 
     ## Model training
-    skipQ <- file.exists(file.path(modDir, "StackedModel.rds"))
+    if(!is.null(coreN)) parallelMap::parallelStartSocket(cpus=coreN)
+    skipQ <- file.exists(file.path(modDir, "Predictions.csv"))&file.exists(file.path(modDir, "PerformanceMeasures.csv"))
     if(skipQ==F){
-      cat("Stacked model construction was started...\n")
-      stck <- stackedML(dt_train, featureSet=featureSet)
+      ### Learners
+      lrns <- list(
+        mlr::makeLearner("classif.extraTrees", predict.type="prob"),
+        mlr::makeLearner("classif.randomForestSRC", predict.type="prob"),
+        mlr::makeLearner("classif.svm", predict.type="prob", par.vals=list(cost=0.0133, gamma=0.02)),
+        mlr::makeLearner("classif.xgboost", predict.type="prob", par.vals=list(booster="gbtree", eta=0.1))
+      )
+
+      ### Features
+      if(identical(featureSet, "all")) featureSet <- colnames(dt_train)
+      featureSet <- setdiff(featureSet, c("DataType", "Peptide", "Cluster"))
+      dt_mod <- dplyr::select(dt_train, featureSet)
+
+      ### Task
+      tsk <- mlr::makeClassifTask(data=as.data.frame(dt_mod), target="Immunogenicity")
+
+      ### Class weights [Stacked classifier does not support this!]
+      #target <- mlr::getTaskTargets(tsk)
+      #tab <- as.numeric(table(target))
+      #w <- 1/tab[target]
+      #tsk <- mlr::makeClassifTask(data=as.data.frame(data), target="Immunogenicity", weights=w)
+
+      ### Model training
+      cat("Constructing stacked model...\n")
+      stk.lrn <- mlr::makeStackedLearner(base.learners=lrns, super.learner="classif.extraTrees", predict.type="prob", method="stack.cv")
+      stck <- mlr::train(learner=stk.lrn, task=tsk)
       saveRDS(stck, file.path(modDir, "StackedModel.rds"))
+
+      ### Prediction
+      cat("Immunogenicity predictions...\n", sep="")
+      tsk_train <- mlr::makeClassifTask(data=dt_train, target="Immunogenicity")
+      tsk_test <- mlr::makeClassifTask(data=dt_test, target="Immunogenicity")
+      pred_train <- predict(stck, tsk_train)
+      pred_test <- predict(stck, tsk_test)
+      predDFList[[i]] <- data.table::rbindlist(list(
+        data.frame("Param"=param, "DataType"="Train", as.data.frame(pred_train)),
+        data.frame("Param"=param, "DataType"="Test", as.data.frame(pred_test))
+      ))
+      measureDFList[[i]] <- data.table::rbindlist(list(
+        as.data.frame(c(list("Param"=param, "DataType"="Train"), as.list(mlr::performance(pred_train, measures=list(mlr::timeboth, mlr::auc, mlr::kappa), task=tsk_train, model=stck)), mlr::calculateROCMeasures(pred_train)$"measures")),
+        as.data.frame(c(list("Param"=param, "DataType"="Test"), as.list(mlr::performance(pred_test, measures=list(mlr::timeboth, mlr::auc, mlr::kappa), task=tsk_train, model=stck)), mlr::calculateROCMeasures(pred_test)$"measures"))
+      ))
+      print(measureDFList[[i]])
+      readr::write_csv(predDFList[[i]], file.path(modDir, "Predictions.csv"))
+      readr::write_csv(measureDFList[[i]], file.path(modDir, "PerformanceMeasures.csv"))
     }else{
       cat("Model training was skipped.\n")
-      stck <- readRDS(file.path(modDir, "StackedModel.rds"))
+      predDFList[[i]] <- readr::read_csv(file.path(modDir, "Predictions.csv"))
+      measureDFList[[i]] <- readr::read_csv(file.path(modDir, "PerformanceMeasures.csv"))
     }
 
-    ## Prediction
-    cat("Immunogenicity predictions...\n", sep="")
-    tsk_train <- mlr::makeClassifTask(data=dt_train, target="Immunogenicity")
-    tsk_test <- mlr::makeClassifTask(data=dt_test, target="Immunogenicity")
-    pred_train <- predict(stck, tsk_train)
-    pred_test <- predict(stck, tsk_test)
-    predDFList[[i]] <- data.table::rbindlist(list(
-      data.frame("Param"=param, "DataType"="Train", as.data.frame(pred_train)),
-      data.frame("Param"=param, "DataType"="Test", as.data.frame(pred_test))
-    ))
-    measureDFList[[i]] <- data.table::rbindlist(list(
-      as.data.frame(c(list("Param"=param, "DataType"="Train"), as.list(mlr::performance(pred_train, measures=list(mlr::timeboth, mlr::auc, mlr::kappa), task=tsk_train, model=stck)), mlr::calculateROCMeasures(pred_train)$"measures")),
-      as.data.frame(c(list("Param"=param, "DataType"="Test"), as.list(mlr::performance(pred_train, measures=list(mlr::timeboth, mlr::auc, mlr::kappa), task=tsk_train, model=stck)), mlr::calculateROCMeasures(pred_test)$"measures"))
-    ))
-    readr::write_csv(predDFList[[i]], file.path(modDir, "Predictions.csv"))
-    readr::write_csv(measureDFList[[i]], file.path(modDir, "PerformanceMeasures.csv"))
-
     ## Closing
+    if(!is.null(coreN)) parallelMap::parallelStop()
+    try(pacman::p_unload("all"), silent=T)
     rm(list=setdiff(ls(), c("predDFList", "measureDFList")))
     gc();gc()
   }
+  for(i in 1:leng){ try(stackML(preprocessedDFList, i)) }
 
   # Outputs
   predDF <- data.table::rbindlist(predDFList)
@@ -171,8 +168,6 @@ Immunogenicity_Benchmark <- function(
   # Working environment
   dir.create(destDir, showWarnings=F, recursive=T)
   options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling library(mlr)!
-  require(mlr)
-  require(parallelMap)
 
   # Input check
   if(any(class(preprocessedDFList[[1]])=="data.frame")) preprocessedDFList <- lapply(preprocessedDFList, function(d){list("dt"=d)})
@@ -194,12 +189,12 @@ Immunogenicity_Benchmark <- function(
       return(tsk)
     })
   }
-  message("Converting preprocessed dataframes into a list of tasks...\n")
+  message("Converting preprocessed dataframes into a list of tasks...")
   taskSet <- preprocessedDFList_to_taskList(preprocessedDFList, maxRowN=10000)
   gc();gc()
 
   # Learners
-  message("Preparing required packages...\n")
+  message("Preparing required packages...")
   lrns.df <- suppressWarnings(mlr::listLearners("classif", properties=c("twoclass", "prob")))
   if(is.null(learnerSet)) learnerSet <- lrns.df$"class"
   if(is.null(omitLearnerSet)) omitLearnerSet <- c()
@@ -212,10 +207,12 @@ Immunogenicity_Benchmark <- function(
   gc();gc()
 
   # Benchmarking
-  message("Starting benchmark experiments...\n")
+  message("Starting benchmark experiments...")
   bm_wrapper <- function(learnerString, tasks){
+    library(mlr)
+    library(parallelMap)
     set.seed(12345)
-    message(learnerString, "\n")
+    message(learnerString)
     msrs <- list(
       mlr::timeboth, mlr::setAggregation(mlr::timeboth, mlr::train.mean),
       mlr::auc, mlr::setAggregation(mlr::auc, mlr::train.mean),
@@ -247,7 +244,7 @@ Immunogenicity_Benchmark <- function(
     saveRDS(bmr, file.path(destDir, paste0("BenchmarkResult_", learnerString, ".rds")))
     bmr.df <- as.data.frame(bmr)
     readr::write_csv(bmr.df, file.path(destDir, paste0("BenchmarkResult_", learnerString, ".csv")))
-    pacman::p_unload("all")
+    try(pacman::p_unload("all"), silent=T)
     rm(list=ls())
     gc();gc()
   }
