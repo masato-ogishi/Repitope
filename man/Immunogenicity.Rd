@@ -31,6 +31,6 @@ Immunogenicity_Benchmark(preprocessedDFList, learnerSet = NULL,
 \item{omitLearnerSet}{(Optional) A set of learner strings to be omitted from model benchmarking. Set \code{NULL} to ignore.}
 }
 \description{
-\code{Immunogenicity} is a wrapper function for training and evaluating a stacked classifier.\cr
+\code{Immunogenicity} is a wrapper function for training and evaluating an extraTrees classifier.\cr
 \code{Immunogenicity_Benchmark} is a wrapper function for benchmarking classifiers implemented in the \code{mlr} package.\cr
 }
