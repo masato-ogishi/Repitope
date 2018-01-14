@@ -52,13 +52,8 @@ Immunogenicity <- function(
 
   # Batch machine learning
   leng <- length(preprocessedDFList)
-  predDFList <- as.list(rep(NA, leng))
-  measureDFList <- as.list(rep(NA, leng))
   cat("Number of datasets = ", leng, "\n", sep="")
   mlr_wrapper <- function(preprocessedDFList, i){
-    library(mlr)
-    library(parallelMap)
-
     ## Parameter check
     param <- names(preprocessedDFList)[i]
     s <- try(as.integer(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]), silent=T)
@@ -86,9 +81,15 @@ Immunogenicity <- function(
       as.data.frame()
 
     ## Model training
-    if(!is.null(coreN)) parallelMap::parallelStartSocket(cpus=coreN)
     skipQ <- file.exists(file.path(modDir, "Predictions.csv"))&file.exists(file.path(modDir, "PerformanceMeasures.csv"))
-    if(skipQ==F){
+    if(skipQ){
+      cat("Model training was skipped.\n")
+    }else{
+      ### Parallelization
+      library(mlr)
+      library(parallelMap)
+      if(!is.null(coreN)) parallelMap::parallelStartSocket(cpus=coreN)
+
       ### Features
       if(identical(featureSet, "all")) featureSet <- colnames(dt_train)
       featureSet <- setdiff(featureSet, c("DataType", "Peptide", "Cluster"))
@@ -117,32 +118,30 @@ Immunogenicity <- function(
       tsk_test <- mlr::makeClassifTask(data=dt_test, target="Immunogenicity")
       pred_train <- predict(mod, task=tsk_train)
       pred_test <- predict(mod, task=tsk_test)
-      predDFList[[i]] <- data.table::rbindlist(list(
+      predDF <- data.table::rbindlist(list(
         data.frame("Param"=param, "DataType"="Train", as.data.frame(pred_train)),
         data.frame("Param"=param, "DataType"="Test", as.data.frame(pred_test))
       ))
-      measureDFList[[i]] <- data.table::rbindlist(list(
+      measureDF <- data.table::rbindlist(list(
         as.data.frame(c(list("Param"=param, "DataType"="Train"), as.list(mlr::performance(pred_train, measures=list(mlr::timeboth, mlr::auc, mlr::kappa), task=tsk_train, model=mod)), mlr::calculateROCMeasures(pred_train)$"measures")),
         as.data.frame(c(list("Param"=param, "DataType"="Test"), as.list(mlr::performance(pred_test, measures=list(mlr::timeboth, mlr::auc, mlr::kappa), task=tsk_train, model=mod)), mlr::calculateROCMeasures(pred_test)$"measures"))
       ))
-      print(measureDFList[[i]])
-      readr::write_csv(predDFList[[i]], file.path(modDir, "Predictions.csv"))
-      readr::write_csv(measureDFList[[i]], file.path(modDir, "PerformanceMeasures.csv"))
-    }else{
-      cat("Model training was skipped.\n")
-      predDFList[[i]] <- readr::read_csv(file.path(modDir, "Predictions.csv"))
-      measureDFList[[i]] <- readr::read_csv(file.path(modDir, "PerformanceMeasures.csv"))
-    }
+      print(measureDF)
+      readr::write_csv(predDF, file.path(modDir, "Predictions.csv"))
+      readr::write_csv(measureDF, file.path(modDir, "PerformanceMeasures.csv"))
 
-    ## Closing
-    if(!is.null(coreN)) parallelMap::parallelStop()
-    try(pacman::p_unload("all"), silent=T)
-    rm(list=setdiff(ls(), c("predDFList", "measureDFList")))
-    gc();gc()
+      ## Closing
+      if(!is.null(coreN)) parallelMap::parallelStop()
+      try(pacman::p_unload("all"), silent=T)
+      gc();gc()
+    }
   }
   for(i in 1:leng){ try(mlr_wrapper(preprocessedDFList, i)) }
 
   # Outputs
+  cat("Concatenating results...\n")
+  predDFList <- pbapply::pblapply(list.files(pattern="^Predictions.csv$", path=destDir, recursive=T, full.names=T), function(f){suppressMessages(readr::read_csv(f, col_types='ccicddc_'))})
+  measureDFList <- pbapply::pblapply(list.files(pattern="^PerformanceMeasures.csv$", path=destDir, recursive=T, full.names=T), function(f){suppressMessages(readr::read_csv(f))})
   predDF <- data.table::rbindlist(predDFList)
   measureDF <- data.table::rbindlist(measureDFList)
   readr::write_csv(predDF, file.path(destDir, paste0(outputHeader, "_Predictions.csv")))
