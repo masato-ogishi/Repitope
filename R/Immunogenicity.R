@@ -39,21 +39,12 @@
 #' @rdname Immunogenicity
 #' @name Immunogenicity
 Immunogenicity <- function(
-  preprocessedDFList, featureSet="all",
+  preprocessedDFList=NULL, featureSet="all",
   destDir="./Immunogenicity/", outputHeader="Output",
   maxJavaMemory="6G", coreN=parallel::detectCores()
 ){
-  # Working environment
-  dir.create(destDir, showWarnings=F, recursive=T)
-  options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling library(mlr)!
-
-  # Input check
-  if(any(class(preprocessedDFList[[1]])=="data.frame")) preprocessedDFList <- lapply(preprocessedDFList, function(d){list("dt"=d)})
-
-  # Batch machine learning
-  leng <- length(preprocessedDFList)
-  cat("Number of datasets = ", leng, "\n", sep="")
-  mlr_wrapper <- function(preprocessedDFList, i){
+  # Internally used functions
+  machine_learning <- function(preprocessedDFList, i){
     ## Parameter check
     param <- names(preprocessedDFList)[i]
     s <- try(as.integer(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]), silent=T)
@@ -61,94 +52,118 @@ Immunogenicity <- function(
     set.seed(s)
     cat(i, "/", leng, "| Parameter set: ", param, "\n", sep="")
 
-    ## Destination directory
+    ## Destination directory check
     modDir <- paste0(destDir, "/", outputHeader, "_", param)
     dir.create(modDir, showWarnings=F, recursive=T)
+    skipQ <- file.exists(file.path(modDir, "Predictions.csv")) & file.exists(file.path(modDir, "PerformanceMeasures.csv"))
+    if(skipQ){
+      cat("Machine learning was skipped.\n")
+      return(NULL)
+    }
 
     ## Input data check
     dt <- preprocessedDFList[[i]]$"dt"
     if(is.null(dt$"DataType")){
-      message("The input datatable is not valid! No 'DataType' column is detected.")
+      message("The input datatable is not valid! 'DataType' column is required.")
       return(NULL)
     }
+    if(identical(featureSet, "all")) featureSet <- colnames(dt)
+    featureSet <- unique(c("Immunogenicity", setdiff(featureSet, c("DataType", "Peptide", "Cluster"))))
     dt_train <- dt %>%
       dplyr::filter(DataType=="Train") %>%
-      dplyr::select(-DataType, -Peptide, -Cluster) %>%
+      dplyr::select(featureSet) %>%
       as.data.frame()
     dt_test <- dt %>%
       dplyr::filter(DataType=="Test") %>%
-      dplyr::select(-DataType, -Peptide, -Cluster) %>%
+      dplyr::select(featureSet) %>%
       as.data.frame()
 
+    ## Parallelization
+    library(mlr)
+    library(parallelMap)
+    if(!is.null(coreN)) parallelMap::parallelStartSocket(cpus=coreN)
+
+    ## Learner
+    lrn <- mlr::makeLearner("classif.extraTrees", predict.type="prob", mtry=35, numRandomCuts=2)  ## optimized from preliminary experiments
+
+    ## Task
+    tsk <- mlr::makeClassifTask(data=as.data.frame(dt_train), target="Immunogenicity")
+
+    ## Class weights [Stacked classifier does not support this!]
+    target <- mlr::getTaskTargets(tsk)
+    tab <- as.numeric(table(target))
+    w <- 1/tab[target]
+    tsk <- mlr::makeClassifTask(data=as.data.frame(dt_train), target="Immunogenicity", weights=w)
+
     ## Model training
-    skipQ <- file.exists(file.path(modDir, "Predictions.csv"))&file.exists(file.path(modDir, "PerformanceMeasures.csv"))
-    if(skipQ){
-      cat("Model training was skipped.\n")
-    }else{
-      ### Parallelization
-      library(mlr)
-      library(parallelMap)
-      if(!is.null(coreN)) parallelMap::parallelStartSocket(cpus=coreN)
+    cat("Constructing model...\n")
+    mod <- mlr::train(learner=lrn, task=tsk)
+    saveRDS(mod, file.path(modDir, "Model.rds"))
 
-      ### Features
-      if(identical(featureSet, "all")) featureSet <- colnames(dt_train)
-      featureSet <- setdiff(featureSet, c("DataType", "Peptide", "Cluster"))
-      dt_mod <- dplyr::select(dt_train, featureSet)
+    ## Prediction
+    cat("Predicting immunogenicity...\n", sep="")
+    tsk_train <- mlr::makeClassifTask(data=dt_train, target="Immunogenicity")
+    tsk_test <- mlr::makeClassifTask(data=dt_test, target="Immunogenicity")
+    pred_train <- predict(mod, task=tsk_train)
+    pred_test <- predict(mod, task=tsk_test)
+    predDF <- data.table::rbindlist(list(
+      data.frame("Param"=param, "DataType"="Train", as.data.frame(pred_train)),
+      data.frame("Param"=param, "DataType"="Test", as.data.frame(pred_test))
+    ))
+    measureDF <- data.table::rbindlist(list(
+      as.data.frame(c(list("Param"=param, "DataType"="Train"), as.list(mlr::performance(pred_train, measures=list(mlr::timeboth, mlr::auc, mlr::kappa), task=tsk_train, model=mod)), mlr::calculateROCMeasures(pred_train)$"measures")),
+      as.data.frame(c(list("Param"=param, "DataType"="Test"), as.list(mlr::performance(pred_test, measures=list(mlr::timeboth, mlr::auc, mlr::kappa), task=tsk_train, model=mod)), mlr::calculateROCMeasures(pred_test)$"measures"))
+    ))
+    print(measureDF)
+    readr::write_csv(predDF, file.path(modDir, "Predictions.csv"))
+    readr::write_csv(measureDF, file.path(modDir, "PerformanceMeasures.csv"))
 
-      ### Learner
-      lrn <- mlr::makeLearner("classif.extraTrees", predict.type="prob", mtry=35, numRandomCuts=2)  ## optimized from preliminary experiments
-
-      ### Task
-      tsk <- mlr::makeClassifTask(data=as.data.frame(dt_mod), target="Immunogenicity")
-
-      ### Class weights [Stacked classifier does not support this!]
-      target <- mlr::getTaskTargets(tsk)
-      tab <- as.numeric(table(target))
-      w <- 1/tab[target]
-      tsk <- mlr::makeClassifTask(data=as.data.frame(dt_mod), target="Immunogenicity", weights=w)
-
-      ### Model training
-      cat("Constructing model...\n")
-      mod <- mlr::train(learner=lrn, task=tsk)
-      saveRDS(mod, file.path(modDir, "Model.rds"))
-
-      ### Prediction
-      cat("Immunogenicity predictions...\n", sep="")
-      tsk_train <- mlr::makeClassifTask(data=dt_train, target="Immunogenicity")
-      tsk_test <- mlr::makeClassifTask(data=dt_test, target="Immunogenicity")
-      pred_train <- predict(mod, task=tsk_train)
-      pred_test <- predict(mod, task=tsk_test)
-      predDF <- data.table::rbindlist(list(
-        data.frame("Param"=param, "DataType"="Train", as.data.frame(pred_train)),
-        data.frame("Param"=param, "DataType"="Test", as.data.frame(pred_test))
-      ))
-      measureDF <- data.table::rbindlist(list(
-        as.data.frame(c(list("Param"=param, "DataType"="Train"), as.list(mlr::performance(pred_train, measures=list(mlr::timeboth, mlr::auc, mlr::kappa), task=tsk_train, model=mod)), mlr::calculateROCMeasures(pred_train)$"measures")),
-        as.data.frame(c(list("Param"=param, "DataType"="Test"), as.list(mlr::performance(pred_test, measures=list(mlr::timeboth, mlr::auc, mlr::kappa), task=tsk_train, model=mod)), mlr::calculateROCMeasures(pred_test)$"measures"))
-      ))
-      print(measureDF)
-      readr::write_csv(predDF, file.path(modDir, "Predictions.csv"))
-      readr::write_csv(measureDF, file.path(modDir, "PerformanceMeasures.csv"))
-
-      ## Closing
-      if(!is.null(coreN)) parallelMap::parallelStop()
-      try(pacman::p_unload("all"), silent=T)
-      gc();gc()
-    }
+    ## Closing
+    if(!is.null(coreN)) parallelMap::parallelStop()
+    try(pacman::p_unload("all"), silent=T)
+    gc();gc()
+    return(NULL)
   }
-  for(i in 1:leng){ try(mlr_wrapper(preprocessedDFList, i)) }
+  concatenate_results <- function(destDir){
+    cat("Concatenating results...\n")
+    predDFList <- pbapply::pblapply(list.files(pattern="^Predictions.csv$", path=destDir, recursive=T, full.names=T), function(f){suppressMessages(readr::read_csv(f, col_types='ccicddc_'))})
+    measureDFList <- pbapply::pblapply(list.files(pattern="^PerformanceMeasures.csv$", path=destDir, recursive=T, full.names=T), function(f){suppressMessages(readr::read_csv(f))})
+    predDF <- data.table::rbindlist(predDFList)
+    measureDF <- data.table::rbindlist(measureDFList)
+    readr::write_csv(predDF, file.path(destDir, paste0(outputHeader, "_Predictions.csv")))
+    readr::write_csv(measureDF, file.path(destDir, paste0(outputHeader, "_PerformanceMeasures.csv")))
+    return(list("predDF"=predDF, "measureDF"=measureDF))
+  }
+
+  # Working environment
+  dir.create(destDir, showWarnings=F, recursive=T)
+  options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling library(mlr)!
+
+  # Just concatenating previous CSV files
+  if(is.null(preprocessedDFList)){
+    res <- concatenate_results(destDir)
+    rm(list=setdiff(ls(), c("res")))
+    gc();gc()
+    return(res)
+  }
+
+  # Input formatting
+  if(any(sapply(preprocessedDFList, is.data.frame))){
+    preprocessedDFList <- lapply(preprocessedDFList, function(d){list("dt"=d)})
+  }
+
+  # Batch machine learning
+  leng <- length(preprocessedDFList)
+  cat("Number of datasets = ", leng, "\n", sep="")
+  for(i in 1:leng){
+    try(machine_learning(preprocessedDFList, i))
+  }
 
   # Outputs
-  cat("Concatenating results...\n")
-  predDFList <- pbapply::pblapply(list.files(pattern="^Predictions.csv$", path=destDir, recursive=T, full.names=T), function(f){suppressMessages(readr::read_csv(f, col_types='ccicddc_'))})
-  measureDFList <- pbapply::pblapply(list.files(pattern="^PerformanceMeasures.csv$", path=destDir, recursive=T, full.names=T), function(f){suppressMessages(readr::read_csv(f))})
-  predDF <- data.table::rbindlist(predDFList)
-  measureDF <- data.table::rbindlist(measureDFList)
-  readr::write_csv(predDF, file.path(destDir, paste0(outputHeader, "_Predictions.csv")))
-  readr::write_csv(measureDF, file.path(destDir, paste0(outputHeader, "_PerformanceMeasures.csv")))
-  rm(list=setdiff(ls(), c("predDF", "measureDF")))
+  res <- concatenate_results(destDir)
+  rm(list=setdiff(ls(), c("res")))
   gc();gc()
-  return(list("predDF"=predDF, "measureDF"=measureDF))
+  return(res)
 }
 
 #' @export

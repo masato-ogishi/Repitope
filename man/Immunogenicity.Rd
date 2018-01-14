@@ -5,7 +5,7 @@
 \alias{Immunogenicity_Benchmark}
 \title{Immunogenicity prediction.}
 \usage{
-Immunogenicity(preprocessedDFList, featureSet = "all",
+Immunogenicity(preprocessedDFList = NULL, featureSet = "all",
   destDir = "./Immunogenicity/", outputHeader = "Output",
   maxJavaMemory = "6G", coreN = parallel::detectCores())
 
