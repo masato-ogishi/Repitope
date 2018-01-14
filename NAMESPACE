@@ -2,10 +2,10 @@
 
 export(Features)
 export(Features_CorFilter)
-export(Features_DecodeParameters)
 export(Features_ErrorCorrect)
 export(Features_FeatureSelect)
 export(Features_Importance)
+export(Features_MinimumParameters)
 export(Features_Mock)
 export(Features_PeptideDescriptor)
 export(Features_Preprocess)

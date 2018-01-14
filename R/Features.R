@@ -163,14 +163,17 @@ Features_rTPCP <- function(
   coreN=parallel::detectCores()
 ){
   time.start <- proc.time()
+  tmp.timestamp <- format(Sys.time(), "%Y.%b.%d.%H.%M.%OS3")
+  tmp.dir <- tempdir()
 
-  # AAIndex-derived pairwise matching matrices
+  # Pairwise contact potential matrices derived from AAIndex scales
   aaIndexMatrixFormat <- function(aaIndexID, pairMatInverse=T){
     pairMat <- dplyr::filter(AACPMatrix, AAIndexID==aaIndexID)$data[[1]]
     pairMat <- as.matrix(pairMat)
     rownames(pairMat) <- colnames(pairMat)
     if(pairMatInverse){ pairMat <- -pairMat }
-    return(scales::rescale(pairMat))
+    pairMat <- scales::rescale(pairMat)
+    return(pairMat)
   }
   if(identical(aaIndexIDSet, "all")) aaIndexIDSet <- AACPMatrix$AAIndexID
   pairMatSet <- c(lapply(aaIndexIDSet, function(a){aaIndexMatrixFormat(a, pairMatInverse=F)}),
@@ -214,38 +217,53 @@ Features_rTPCP <- function(
   }
   names(TCRSet) <- seedSet
 
-  ## TCR fragment dictionary matrix
+  ## TCR fragment dictionary
   TCRFragDict_ParameterGrid <- expand.grid(fragLenSet, TCRFragDepthSet, seedSet, stringsAsFactors=F) %>%
-    magrittr::set_colnames(c("FragLen","Depth","Seed"))
-  TCRFragDict_Mat <- pbapply::pbapply(
-    TCRFragDict_ParameterGrid, 1,
-    function(v){TCRFragDictSet(TCRSet[[as.character(v[3])]], as.numeric(v[1]), as.numeric(v[2]), as.numeric(v[3]))}
-  )
+    magrittr::set_colnames(c("FragLen","Depth","Seed")) %>%
+    data.table::as.data.table() %>%
+    split(by="Depth")
   TCRFragDict_ParameterSet <- apply(
     expand.grid(fragLenSet, TCRFragDepthSet, seedSet, stringsAsFactors=F), 1,
     function(v){paste0("TCRParam_", v[1], "_", v[2], "_", v[3])}
   )
-  colnames(TCRFragDict_Mat) <- TCRFragDict_ParameterSet
+  TCRFragDict_MatList <- lapply(TCRFragDict_ParameterGrid, function(param){
+    cat("TCR repertoire depth = ", unique(param$"Depth"), "\n", sep="")
+    mat <- pbapply::pbapply(
+      param, 1,
+      function(v){TCRFragDictSet(TCRSet[[as.character(v[3])]], as.numeric(v[1]), as.numeric(v[2]), as.numeric(v[3]))}
+    )
+    param <- apply(
+      param, 1,
+      function(v){paste0("TCRParam_", v[1], "_", v[2], "_", v[3])}
+    )
+    colnames(mat) <- param
+    return(mat)
+  })
 
   ## Convert to ffdf
-  tmp.timestamp <- format(Sys.time(), "%Y.%b.%d.%H.%M.%OS3")
-  tmp.dir <- tempdir()
-  TCRFragDict_Mat <- ff::as.ffdf(as.data.frame(TCRFragDict_Mat))
-  invisible(ff::ffsave(TCRFragDict_Mat, file=file.path(tmp.dir, paste0("TCRFragMat.", tmp.timestamp))))
+  for(i in 1:length(TCRFragDepthSet)){
+    assign(x=paste0("TCRFragDict.", TCRFragDepthSet[i]), ff::as.ffdf(as.data.frame(TCRFragDict_MatList[[i]])))
+  }
+  invisible(ff::ffsave(list=paste0("TCRFragDict.", TCRFragDepthSet), file=file.path(tmp.dir, paste0("TCRFragDict.", tmp.timestamp))))
   message("Preparation of TCR fragment dictionary was finished.")
 
   # Fragment matching analysis
 
   ## Working function
   fragmentMatchingStats <- function(paramRow){
+    ### Restore parameters
     peptide <- as.character(paramRow[[1]])
     AAIndexID <- as.character(paramRow[[2]])
     alignType <- as.character(paramRow[[3]])
     TCRParameterString <- as.character(paramRow[[4]])
     depth <- as.numeric(unlist(strsplit(TCRParameterString, "_"))[3])
-    suppressWarnings(ff::ffload(file=file.path(tmp.dir, paste0("TCRFragMat.", tmp.timestamp)))) ## loading TCRFragDict_Mat
-    TCRSet.FR <- as.character(TCRFragDict_Mat[[TCRParameterString]][1:depth])
-    TCRSet.Mock <- as.character(TCRFragDict_Mat[[TCRParameterString]][(depth+1):(depth*2)])
+
+    ### Load and restore TCR fragment dictionaries
+    suppressWarnings(ff::ffload(list=paste0("TCRFragDict.", depth), file=file.path(tmp.dir, paste0("TCRFragDict.", tmp.timestamp))))
+    TCRSet.FR <- as.character(get(paste0("TCRFragDict.", depth))[[TCRParameterString]][1:depth])
+    TCRSet.Mock <- as.character(get(paste0("TCRFragDict.", depth))[[TCRParameterString]][(depth+1):(depth*2)])
+
+    ### Calculate statistics from the pairwise alignment scores
     statSet <- c("mean","sd","median","trimmed","mad","skew","kurtosis","se","IQR","Q0.1","Q0.9")
     scoreSet.FR <- try(psych::describe(
       Biostrings::pairwiseAlignment(pattern=TCRSet.FR, subject=peptide,
