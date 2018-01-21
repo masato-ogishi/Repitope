@@ -332,22 +332,25 @@ Features_rTPCP <- function(
     }
     return(as.numeric(c(scoreSet.FR, scoreSet.FR-scoreSet.Mock))) ## A numeric vector of length 22
   }
-  fragmentMatchingStats <- function(peptideSet, AAIndexID, alignType, TCRParameterString, coreN=coreN){
-    statSet <- c("mean","sd","median","trimmed","mad","skew","kurtosis","se","IQR","Q0.1","Q0.9")
-    statNameSet <- c("Mean","SD","Median","TrimmedMean10","MedAbsDev","Skew","Kurtosis","SE","IQR","Q10","Q90") %>%
-      expand.grid(c("FR", "Diff")) %>%
-      apply(1, function(v){paste0(v[1], "_", v[2])}) ## A character vector of length 22
-    if(is.null(coreN)) coreN <- 1
-    cl <- parallel::makeCluster(coreN, type="SOCK")
-    parallel::clusterExport(
-      cl,
-      list("AAIndexID", "alignType", "TCRParameterString",
-           "tmpDir", "aaIndexMatrix_descfile", "aaIndexIDSet",
-           "TCRFragDict_descfile", "TCRFragDict_ParameterSet", "TCRFragDict_Levels",
-           "load_AAIndexMatrix", "load_TCRSet",
-           "calculate_stats_single", "statSet"),
-      envir=environment()
-    )
+
+  ## Parallelized fragment matching analysis
+  statSet <- c("mean","sd","median","trimmed","mad","skew","kurtosis","se","IQR","Q0.1","Q0.9")
+  statNameSet <- c("Mean","SD","Median","TrimmedMean10","MedAbsDev","Skew","Kurtosis","SE","IQR","Q10","Q90") %>%
+    expand.grid(c("FR", "Diff")) %>%
+    apply(1, function(v){paste0(v[1], "_", v[2])}) ## A character vector of length 22
+  if(is.null(coreN)) coreN <- 1
+  cl <- parallel::makeCluster(coreN, type="SOCK")
+  parallel::clusterExport(
+    cl,
+    list("AAIndexID", "alignType", "TCRParameterString",
+         "tmpDir", "aaIndexMatrix_descfile", "aaIndexIDSet",
+         "TCRFragDict_descfile", "TCRFragDict_ParameterSet", "TCRFragDict_Levels",
+         "load_AAIndexMatrix", "load_TCRSet",
+         "calculate_stats_single", "statSet"),
+    envir=environment()
+  )
+
+  fragmentMatchingStats <- function(peptideSet, AAIndexID, alignType, TCRParameterString, cl=cl){
     dt <- snow::parLapply(cl=cl,
       peptideSet, function(pept){
         aaIndexMatrix_Tmp <- load_AAIndexMatrix(AAIndexID)
@@ -355,7 +358,6 @@ Features_rTPCP <- function(
         calculate_stats_single(pept, TCRSet_Tmp, aaIndexMatrix_Tmp, alignType, statSet)
       }
     )
-    parallel::stopCluster(cl)
     dt <- data.table::transpose(data.table::as.data.table(as.data.frame(dt, fix.empty.names=F)))
     colnames(dt) <- statNameSet
     dt[,"Peptide":=peptideSet][,"AAIndexID":=AAIndexID][,"AlignType":=alignType][,"TCRParam":=TCRParameterString]
@@ -363,28 +365,24 @@ Features_rTPCP <- function(
     return(dt)
   }
 
-  ## Combinations of parameters
   parameterGrid <- expand.grid(aaIndexIDSet, alignTypeSet, TCRFragDict_ParameterSet, stringsAsFactors=F) %>%
     magrittr::set_colnames(c("AAIndexID","AlignType","TCRParam"))
   paramCombN <- nrow(parameterGrid)
   message("Number of parameter combinations = ", paramCombN)
-  gc();gc()
-
-  ## Parallelized fragment matching
   message("Fragment matching was started. (Memory occupied = ", memory.size(), "[Mb])")
-  if(is.null(coreN)) coreN <- 1
   dt_feature <- pbapply::pblapply(
     1:paramCombN,
     function(i){
       out <- file.path(tmpDir, paste0("dt_feature_rTPCP_", i, ".fst"))
       if(!file.exists(out)){
-        dt <- fragmentMatchingStats(peptideSet, parameterGrid[i,1], parameterGrid[i,2], parameterGrid[i,3], coreN=coreN)
+        dt <- fragmentMatchingStats(peptideSet, parameterGrid[i,1], parameterGrid[i,2], parameterGrid[i,3], cl=cl)
         rownames(dt) <- 1:nrow(dt)
         fst::write.fst(dt, out)
       }
     }
   )
   message("Fragment matching was finished. (Memory occupied = ", memory.size(), "[Mb])")
+  parallel::stopCluster(cl)
   gc();gc()
 
   ## Final formatting
