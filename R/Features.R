@@ -200,12 +200,14 @@ Features_rTPCP <- function(
   aaIndexMatrix[["AAIndexID"]] <- as.numeric(factor(aaIndexMatrix[["AAIndexID"]], levels=aaIndexIDSet))
   aaIndexMatrix_binfile <- paste0("AAIndexMatrix.bin")
   aaIndexMatrix_descfile <- paste0("AAIndexMatrix.desc")
-  aaIndexMatrix <- bigmemory::as.big.matrix(
-    as.matrix(aaIndexMatrix), type = "double", separated = F,
-    backingpath = tmpDir,
-    backingfile = aaIndexMatrix_binfile,
-    descriptorfile = aaIndexMatrix_descfile
-  )
+  if(!file.exists(file.path(tmpDir, aaIndexMatrix_descfile))){
+    aaIndexMatrix <- bigmemory::as.big.matrix(
+      as.matrix(aaIndexMatrix), type = "double", separated = F,
+      backingpath = tmpDir,
+      backingfile = aaIndexMatrix_binfile,
+      descriptorfile = aaIndexMatrix_descfile
+    )
+  }
   message("Preparation of AAIndex-derived pairwise contact potential matrices was finished.")
 
   # TCR fragment dictionary
@@ -284,12 +286,14 @@ Features_rTPCP <- function(
   TCRFragDict$TCRFrag <- as.numeric(factor(TCRFragDict$TCRFrag, levels=TCRFragDict_Levels))
   TCRFragDict_binfile <- paste0("TCRFragDict.bin")
   TCRFragDict_descfile <- paste0("TCRFragDict.desc")
-  TCRFragDict <- bigmemory::as.big.matrix(
-    as.matrix(TCRFragDict), type = "double", separated = F,
-    backingpath = tmpDir,
-    backingfile = TCRFragDict_binfile,
-    descriptorfile = TCRFragDict_descfile
-  )
+  if(!file.exists(file.path(tmpDir, TCRFragDict_descfile))){
+    TCRFragDict <- bigmemory::as.big.matrix(
+      as.matrix(TCRFragDict), type = "double", separated = F,
+      backingpath = tmpDir,
+      backingfile = TCRFragDict_binfile,
+      descriptorfile = TCRFragDict_descfile
+    )
+  }
   message("Preparation of TCR fragment dictionary was finished.")
 
   # Fragment matching analysis
