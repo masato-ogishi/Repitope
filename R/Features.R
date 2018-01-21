@@ -179,7 +179,6 @@ Features_rTPCP <- function(
 ){
   # Start calculation
   time.start <- proc.time()
-  tmpTimeStamp <- format(Sys.time(), "%Y.%b.%d.%H.%M.%OS3")
 
   # Pairwise contact potential matrices derived from AAIndex scales
   message("Preparation of AAIndex-derived pairwise contact potential matrices was started.")
@@ -199,8 +198,8 @@ Features_rTPCP <- function(
   aaIndexMatrix <- data.table::rbindlist(lapply(aaIndexMatrix, as.data.frame))
   aaIndexMatrix[["AAIndexID"]] <- unlist(lapply(aaIndexIDSet, function(id){rep(id, length(Biostrings::AA_STANDARD))}))
   aaIndexMatrix[["AAIndexID"]] <- as.numeric(factor(aaIndexMatrix[["AAIndexID"]], levels=aaIndexIDSet))
-  aaIndexMatrix_binfile <- paste0("AAIndexMatrix.", tmpTimeStamp, ".bin")
-  aaIndexMatrix_descfile <- paste0("AAIndexMatrix.", tmpTimeStamp, ".desc")
+  aaIndexMatrix_binfile <- paste0("AAIndexMatrix.bin")
+  aaIndexMatrix_descfile <- paste0("AAIndexMatrix.desc")
   aaIndexMatrix <- bigmemory::as.big.matrix(
     as.matrix(aaIndexMatrix), type = "double", separated = F,
     backingpath = tmpDir,
@@ -283,8 +282,8 @@ Features_rTPCP <- function(
   TCRFragDict_Levels <- sort(unique(TCRFragDict$TCRFrag))
   TCRFragDict$TCRParam <- as.numeric(factor(TCRFragDict$TCRParam, levels=TCRFragDict_ParameterSet))
   TCRFragDict$TCRFrag <- as.numeric(factor(TCRFragDict$TCRFrag, levels=TCRFragDict_Levels))
-  TCRFragDict_binfile <- paste0("TCRFragDict.", tmpTimeStamp, ".bin")
-  TCRFragDict_descfile <- paste0("TCRFragDict.", tmpTimeStamp, ".desc")
+  TCRFragDict_binfile <- paste0("TCRFragDict.bin")
+  TCRFragDict_descfile <- paste0("TCRFragDict.desc")
   TCRFragDict <- bigmemory::as.big.matrix(
     as.matrix(TCRFragDict), type = "double", separated = F,
     backingpath = tmpDir,
