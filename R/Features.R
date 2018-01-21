@@ -257,8 +257,8 @@ Features_rTPCP <- function(
   TCRFragDict_skipQ <- file.exists(TCRFragDict_out)
   if(TCRFragDict_skipQ){
     TCRFragDict <- try(readRDS(TCRFragDict_out), silent=T)
+    if(any(class(TCRFragDict), "try-error")) TCRFragDict_skipQ <- F
   }
-  if(any(class(TCRFragDict), "try-error")) TCRFragDict_skipQ <- F
   if(TCRFragDict_skipQ==F){
     if(length(TCRFragDepthSet)==1){
       TCRFragDict <- pbapply::pbapply(
