@@ -12,6 +12,7 @@
 #' @param TCRFragDepthSet A set of the numbers of TCR fragments to be matched. This should be kept constant for comparison.
 #' @param seedSet A set of random seeds.
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.
+#' @param tmpDir Destination directory to save intermediate files
 #' @importFrom dplyr %>%
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
@@ -30,6 +31,8 @@
 #' @importFrom data.table transpose
 #' @importFrom data.table rbindlist
 #' @importFrom tibble as_tibble
+#' @importFrom fst read.fst
+#' @importFrom fst write.fst
 #' @importFrom Kmisc str_rev
 #' @importFrom Biostrings pairwiseAlignment
 #' @importFrom Biostrings AA_STANDARD
@@ -60,17 +63,18 @@ Features <- function(
   fragLenSet=3:8, aaIndexIDSet="all",
   alignTypeSet="global-local", TCRFragDepthSet=10000,
   seedSet=1:5,
-  coreN=parallel::detectCores()
+  coreN=parallel::detectCores(),
+  tmpDir=tempdir()
 ){
-  # Feature calculation
   message("Peptide descriptor analysis.")
-  df_feature_peptDesc <- Features_PeptideDescriptor(peptideSet, fragLenSet) ## A single dataframe
-  gc();gc()
-  message("rTPCP analysis.")
-  dt_feature_rTPCP <- Features_rTPCP(peptideSet, TCRSet, fragLenSet, aaIndexIDSet, alignTypeSet, TCRFragDepthSet, seedSet, coreN) ## A list of datatables
+  df_feature_peptDesc <- Features_PeptideDescriptor(peptideSet, fragLenSet, tmpDir) ## A single dataframe
   gc();gc()
 
-  # Output
+  message("rTPCP analysis.")
+  dt_feature_rTPCP <- Features_rTPCP(peptideSet, TCRSet, fragLenSet, aaIndexIDSet, alignTypeSet, TCRFragDepthSet, seedSet, coreN, tmpDir) ## A list of datatables
+  gc();gc()
+
+  message("Combining the results.")
   df_feature_list <- lapply(dt_feature_rTPCP, function(dt){tibble::as_tibble(cbind(df_feature_peptDesc, dt[,"Peptide":=NULL]))})
   return(df_feature_list)
 }
@@ -79,7 +83,14 @@ Features <- function(
 #' @export
 #' @rdname Features
 #' @name Features_PeptideDescriptor
-Features_PeptideDescriptor <- function(peptideSet, fragLenSet=3:8){
+Features_PeptideDescriptor <- function(peptideSet, fragLenSet=3:8, tmpDir=tempdir()){
+  # Temp directory check
+  out <- file.path(tmpDir, "df_feature_peptDesc.fst")
+  if(file.exists(out)){
+    return(fst::read.fst(out))
+  }
+
+  # Start calculation
   time.start <- proc.time()
 
   # Working functions
@@ -148,6 +159,7 @@ Features_PeptideDescriptor <- function(peptideSet, fragLenSet=3:8){
   df_feature <- suppressWarnings(dplyr::left_join(df_basic, df_feature, by="Peptide"))
 
   # Output
+  fst::write.fst(df_feature, out)
   time.end <- proc.time()
   message("Overall time required = ", format((time.end-time.start)[3], nsmall=2), "[sec]")
   return(df_feature)
@@ -161,13 +173,15 @@ Features_rTPCP <- function(
   fragLenSet=3:8, aaIndexIDSet="all",
   alignTypeSet="global-local", TCRFragDepthSet=10000,
   seedSet=1:5,
-  coreN=parallel::detectCores()
+  coreN=parallel::detectCores(),
+  tmpDir=tempdir()
 ){
+  # Start calculation
   time.start <- proc.time()
-  tmp.timestamp <- format(Sys.time(), "%Y.%b.%d.%H.%M.%OS3")
-  tmp.dir <- tempdir()
+  tmpTimeStamp <- format(Sys.time(), "%Y.%b.%d.%H.%M.%OS3")
 
   # Pairwise contact potential matrices derived from AAIndex scales
+  message("Preparation of AAIndex-derived pairwise contact potential matrices was started.")
   aaIndexMatrixFormat <- function(aaIndexID, pairMatInverse=T){
     pairMat <- dplyr::filter(AACPMatrix, AAIndexID==aaIndexID)$data[[1]]
     pairMat <- as.matrix(pairMat)
@@ -184,17 +198,18 @@ Features_rTPCP <- function(
   aaIndexMatrix <- data.table::rbindlist(lapply(aaIndexMatrix, as.data.frame))
   aaIndexMatrix[["AAIndexID"]] <- unlist(lapply(aaIndexIDSet, function(id){rep(id, length(Biostrings::AA_STANDARD))}))
   aaIndexMatrix[["AAIndexID"]] <- as.numeric(factor(aaIndexMatrix[["AAIndexID"]], levels=aaIndexIDSet))
-  aaIndexMatrix_binfile <- paste0("AAIndexMatrix.", tmp.timestamp, ".bin")
-  aaIndexMatrix_descfile <- paste0("AAIndexMatrix.", tmp.timestamp, ".desc")
+  aaIndexMatrix_binfile <- paste0("AAIndexMatrix.", tmpTimeStamp, ".bin")
+  aaIndexMatrix_descfile <- paste0("AAIndexMatrix.", tmpTimeStamp, ".desc")
   aaIndexMatrix <- bigmemory::as.big.matrix(
     as.matrix(aaIndexMatrix), type = "double", separated = F,
-    backingpath = tmp.dir,
+    backingpath = tmpDir,
     backingfile = aaIndexMatrix_binfile,
     descriptorfile = aaIndexMatrix_descfile
   )
   message("Preparation of AAIndex-derived pairwise contact potential matrices was finished.")
 
   # TCR fragment dictionary
+  message("Preparation of TCR fragment dictionary was started.")
 
   ## Working function
   ## Note: parallelization is avoided because this process uses random seeds...
@@ -217,7 +232,6 @@ Features_rTPCP <- function(
   }
 
   ## Input check
-  message("Preparation of TCR fragment dictionary was started.")
   if(is.character(TCRSet)){
     TCRSet <- lapply(seedSet, function(s){set.seed(s); sample(TCRSet, length(TCRSet))})
   }else if(is.list(TCRSet)){
@@ -238,32 +252,41 @@ Features_rTPCP <- function(
   TCRFragDict_ParameterGrid <- expand.grid(fragLenSet, TCRFragDepthSet, seedSet, stringsAsFactors=F) %>%
     magrittr::set_colnames(c("FragLen","Depth","Seed")) %>%
     data.table::as.data.table()
-  if(length(TCRFragDepthSet)==1){
-    TCRFragDict <- pbapply::pbapply(
-      TCRFragDict_ParameterGrid, 1,
-      function(v){TCRFragDictSet(TCRSet[[as.character(v[3])]], as.numeric(v[1]), as.numeric(v[2]), as.numeric(v[3]))}
-    ) %>%
-      magrittr::set_colnames(TCRFragDict_ParameterSet) %>%
-      as.data.frame() %>%
-      dplyr::mutate("TCRFragDictType"=c(rep(1, TCRFragDepthSet), rep(0, TCRFragDepthSet))) %>%
-      tidyr::gather(TCRParam, TCRFrag, -TCRFragDictType)
-  }else{
-    TCRFragDict <- pbapply::pbapply(
-      TCRFragDict_ParameterGrid, 1,
-      function(v){TCRFragDictSet(TCRSet[[as.character(v[3])]], as.numeric(v[1]), as.numeric(v[2]), as.numeric(v[3]))}
-    )
-    TCRFragDict <- mapply(function(x, y){data.frame("TCRParam"=y, "TCRFrag"=x, "TCRFragDictType"=c(rep(1, length(x)/2), rep(0, length(x)/2)), stringsAsFactors=F)},
-                          TCRFragDict, TCRFragDict_ParameterSet, SIMPLIFY=F)
-    TCRFragDict <- data.table::rbindlist(TCRFragDict)
+  TCRFragDict_out <- file.path(tmpDir, "TCRFragDict.rds")
+  TCRFragDict_skipQ <- file.exists(TCRFragDict_out)
+  if(TCRFragDict_skipQ){
+    TCRFragDict <- try(readRDS(TCRFragDict_out), silent=T)
+  }
+  if(any(class(TCRFragDict), "try-error")) TCRFragDict_skipQ <- F
+  if(TCRFragDict_skipQ==F){
+    if(length(TCRFragDepthSet)==1){
+      TCRFragDict <- pbapply::pbapply(
+        TCRFragDict_ParameterGrid, 1,
+        function(v){TCRFragDictSet(TCRSet[[as.character(v[3])]], as.numeric(v[1]), as.numeric(v[2]), as.numeric(v[3]))}
+      ) %>%
+        magrittr::set_colnames(TCRFragDict_ParameterSet) %>%
+        as.data.frame() %>%
+        dplyr::mutate("TCRFragDictType"=c(rep(1, TCRFragDepthSet), rep(0, TCRFragDepthSet))) %>%
+        tidyr::gather(TCRParam, TCRFrag, -TCRFragDictType)
+    }else{
+      TCRFragDict <- pbapply::pbapply(
+        TCRFragDict_ParameterGrid, 1,
+        function(v){TCRFragDictSet(TCRSet[[as.character(v[3])]], as.numeric(v[1]), as.numeric(v[2]), as.numeric(v[3]))}
+      )
+      TCRFragDict <- mapply(function(x, y){data.frame("TCRParam"=y, "TCRFrag"=x, "TCRFragDictType"=c(rep(1, length(x)/2), rep(0, length(x)/2)), stringsAsFactors=F)},
+                            TCRFragDict, TCRFragDict_ParameterSet, SIMPLIFY=F)
+      TCRFragDict <- data.table::rbindlist(TCRFragDict)
+    }
+    saveRDS(TCRFragDict, TCRFragDict_out)
   }
   TCRFragDict_Levels <- sort(unique(TCRFragDict$TCRFrag))
   TCRFragDict$TCRParam <- as.numeric(factor(TCRFragDict$TCRParam, levels=TCRFragDict_ParameterSet))
   TCRFragDict$TCRFrag <- as.numeric(factor(TCRFragDict$TCRFrag, levels=TCRFragDict_Levels))
-  TCRFragDict_binfile <- paste0("TCRFragDict.", tmp.timestamp, ".bin")
-  TCRFragDict_descfile <- paste0("TCRFragDict.", tmp.timestamp, ".desc")
+  TCRFragDict_binfile <- paste0("TCRFragDict.", tmpTimeStamp, ".bin")
+  TCRFragDict_descfile <- paste0("TCRFragDict.", tmpTimeStamp, ".desc")
   TCRFragDict <- bigmemory::as.big.matrix(
     as.matrix(TCRFragDict), type = "double", separated = F,
-    backingpath = tmp.dir,
+    backingpath = tmpDir,
     backingfile = TCRFragDict_binfile,
     descriptorfile = TCRFragDict_descfile
   )
@@ -273,14 +296,14 @@ Features_rTPCP <- function(
 
   ## Working functions
   load_AAIndexMatrix <- function(AAIndexID){
-    aaIndexMatrix_Tmp <- bigmemory::attach.big.matrix(obj=aaIndexMatrix_descfile, path=tmp.dir)
+    aaIndexMatrix_Tmp <- bigmemory::attach.big.matrix(obj=aaIndexMatrix_descfile, path=tmpDir)
     aaIndexMatrix_Tmp <- aaIndexMatrix_Tmp[aaIndexMatrix_Tmp[,"AAIndexID"]==grep(AAIndexID, aaIndexIDSet),]
     aaIndexMatrix_Tmp <- aaIndexMatrix_Tmp[, Biostrings::AA_STANDARD]
     rownames(aaIndexMatrix_Tmp) <- Biostrings::AA_STANDARD
     return(aaIndexMatrix_Tmp)
   }
   load_TCRSet <- function(TCRParameterString){
-    TCRFragDict_Tmp <- bigmemory::attach.big.matrix(obj=TCRFragDict_descfile, path=tmp.dir)
+    TCRFragDict_Tmp <- bigmemory::attach.big.matrix(obj=TCRFragDict_descfile, path=tmpDir)
     TCRFragDict_Tmp <- TCRFragDict_Tmp[TCRFragDict_Tmp[,"TCRParam"]==grep(TCRParameterString, TCRFragDict_ParameterSet),]
     TCRSet.FR <- TCRFragDict_Levels[TCRFragDict_Tmp[TCRFragDict_Tmp[,"TCRFragDictType"]==1,"TCRFrag"]]
     TCRSet.Mock <- TCRFragDict_Levels[TCRFragDict_Tmp[TCRFragDict_Tmp[,"TCRFragDictType"]==0,"TCRFrag"]]
@@ -319,7 +342,7 @@ Features_rTPCP <- function(
     parallel::clusterExport(
       cl,
       list("AAIndexID", "alignType", "TCRParameterString",
-           "tmp.dir", "aaIndexMatrix_descfile", "aaIndexIDSet",
+           "tmpDir", "aaIndexMatrix_descfile", "aaIndexIDSet",
            "TCRFragDict_descfile", "TCRFragDict_ParameterSet", "TCRFragDict_Levels",
            "load_AAIndexMatrix", "load_TCRSet",
            "calculate_stats_single", "statSet"),
@@ -353,20 +376,27 @@ Features_rTPCP <- function(
   dt_feature <- pbapply::pblapply(
     1:paramCombN,
     function(i){
-      fragmentMatchingStats(peptideSet, parameterGrid[i,1], parameterGrid[i,2], parameterGrid[i,3], coreN=coreN)
+      out <- file.path(tmpDir, paste0("dt_feature_rTPCP_", i, ".fst"))
+      if(!file.exists(out)){
+        dt <- fragmentMatchingStats(peptideSet, parameterGrid[i,1], parameterGrid[i,2], parameterGrid[i,3], coreN=coreN)
+        fst::write.fst(dt, out)
+      }
     }
-  ) %>% data.table::rbindlist() %>% data.table::as.data.table()
+  )
   message("Fragment matching was finished. (Memory occupied = ", memory.size(), "[Mb])")
   gc();gc()
 
   ## Final formatting
   message("Data formatting...")
+  dt_feature <- pbapply::pblapply(
+    list.files(pattern="^dt_feature_rTPCP.+fst$", path=tmpDir, full.names=T), fst::read.fst
+  ) %>% data.table::rbindlist() %>% data.table::as.data.table()
   dt_feature <- cbind(
     dt_feature,
     data.table::as.data.table(stringr::str_split(gsub("TCRParam_", "", dt_feature$"TCRParam"), "_", simplify=T)) %>%
       magrittr::set_colnames(c("FragLen","Depth","Seed"))
   )
-  dt_feature <- dt_feature[,"TCRParam":=NULL]
+  dt_feature[,"TCRParam":=NULL]
   data.table::setcolorder(dt_feature, unique(c("Peptide", "AAIndexID", "AlignType", "FragLen","Depth","Seed", colnames(dt_feature))))
   dt_feature_list <- dt_feature %>% split(by=c("AAIndexID", "FragLen"), sorted=T)
   dt_feature_list <- mapply(

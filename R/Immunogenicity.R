@@ -50,13 +50,13 @@ Immunogenicity <- function(
 ){
   # Working environment
   dir.create(destDir, showWarnings=F, recursive=T)
-  options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling library(mlr)!
+  options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling requireNamespace(mlr)!
 
   # Internally used functions
   machine_learning <- function(preprocessedDFList, i){
     ## Initialization
-    library(mlr)
-    library(parallelMap)
+    requireNamespace(mlr)
+    requireNamespace(parallelMap)
     if(!is.null(coreN)) parallelMap::parallelStartSocket(cpus=coreN)
 
     ## Parameter check
@@ -177,9 +177,7 @@ Immunogenicity <- function(
   # Batch machine learning
   leng <- length(preprocessedDFList)
   cat("Number of datasets = ", leng, "\n", sep="")
-  for(i in 1:leng){
-    try(machine_learning(preprocessedDFList, i))
-  }
+  res <- lapply(i:leng, function(i){ try(machine_learning(preprocessedDFList, i), silent=T) })
 
   # Outputs
   res <- concatenate_results(destDir)
@@ -197,7 +195,7 @@ Immunogenicity_Benchmark <- function(
 ){
   # Working environment
   dir.create(destDir, showWarnings=F, recursive=T)
-  options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling library(mlr)!
+  options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling requireNamespace(mlr)!
 
   # Input check
   if(any(class(preprocessedDFList[[1]])=="data.frame")) preprocessedDFList <- lapply(preprocessedDFList, function(d){list("dt"=d)})
@@ -239,8 +237,8 @@ Immunogenicity_Benchmark <- function(
   # Benchmarking
   message("Starting benchmark experiments...")
   bm_wrapper <- function(learnerString, tasks){
-    library(mlr)
-    library(parallelMap)
+    requireNamespace(mlr)
+    requireNamespace(parallelMap)
     set.seed(12345)
     message(learnerString)
     msrs <- list(

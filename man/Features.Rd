@@ -8,13 +8,13 @@
 \usage{
 Features(peptideSet, TCRSet, fragLenSet = 3:8, aaIndexIDSet = "all",
   alignTypeSet = "global-local", TCRFragDepthSet = 10000, seedSet = 1:5,
-  coreN = parallel::detectCores())
+  coreN = parallel::detectCores(), tmpDir = tempdir())
 
-Features_PeptideDescriptor(peptideSet, fragLenSet = 3:8)
+Features_PeptideDescriptor(peptideSet, fragLenSet = 3:8, tmpDir = tempdir())
 
 Features_rTPCP(peptideSet, TCRSet, fragLenSet = 3:8, aaIndexIDSet = "all",
   alignTypeSet = "global-local", TCRFragDepthSet = 10000, seedSet = 1:5,
-  coreN = parallel::detectCores())
+  coreN = parallel::detectCores(), tmpDir = tempdir())
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}
@@ -32,6 +32,8 @@ Features_rTPCP(peptideSet, TCRSet, fragLenSet = 3:8, aaIndexIDSet = "all",
 \item{seedSet}{A set of random seeds.}
 
 \item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.}
+
+\item{tmpDir}{Destination directory to save intermediate files}
 }
 \description{
 \code{Features} is a wrapper function, generating a list of dataframes of peptide features calculated with different parameter sets.

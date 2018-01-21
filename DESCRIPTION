@@ -13,6 +13,7 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
 Imports:
+    assertthat (>= 0.2.0),
     bigmemory (>= 4.5.31),
     Biostrings (>= 2.44.2),
     caret (>= 6.0-78),
@@ -23,7 +24,6 @@ Imports:
     dplyr (>= 0.7.3),
     e1071 (>= 1.6-8),
     extraTrees (>= 1.0.5),
-    ff (>= 2.2-13),
     foreach (>= 1.4.4),
     fst (>= 0.8.2),
     ggplot2 (>= 2.2.1),
