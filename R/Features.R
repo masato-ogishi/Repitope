@@ -12,7 +12,7 @@
 #' @param TCRFragDepthSet A set of the numbers of TCR fragments to be matched. This should be kept constant for comparison.
 #' @param seedSet A set of random seeds.
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.
-#' @param tmpDir Destination directory to save intermediate files
+#' @param tmpDir Destination directory to save intermediate files.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
@@ -133,7 +133,7 @@ Features_PeptideDescriptor <- function(peptideSet, fragLenSet=3:8, tmpDir=tempdi
     library(matrixStats)
   }))
   parameterGrid <- expand.grid(peptideSet, fragLenSet, stringsAsFactors=F)
-  message("Parallelized fragment descriptor calculation was started. (Memory occupied = ", memory.size(), "[Mb])")
+  message("Parallelized fragment descriptor calculation was started.")
   parallel::clusterExport(
     cl=cl,
     list("parameterGrid", "peptideDescriptor.FragStat.Single", "peptideDescriptor.Batch", "peptideDescriptor.NameSet"),
@@ -145,7 +145,7 @@ Features_PeptideDescriptor <- function(peptideSet, fragLenSet=3:8, tmpDir=tempdi
     cl=cl
   )
   parallel::stopCluster(cl)
-  message("Parallelized fragment descriptor calculation was finished. (Memory occupied = ", memory.size(), "[Mb])")
+  message("Parallelized fragment descriptor calculation was finished.")
   gc();gc();
   df_feature <- data.table::rbindlist(df_feature) %>%
     tidyr::gather(Stat, Value, -Peptide, -FragLen, -AADescriptor) %>%
@@ -380,7 +380,7 @@ Features_rTPCP <- function(
     magrittr::set_colnames(c("AAIndexID","AlignType","TCRParam"))
   paramCombN <- nrow(parameterGrid)
   message("Number of parameter combinations = ", paramCombN)
-  message("Fragment matching was started. (Memory occupied = ", memory.size(), "[Mb])")
+  message("Fragment matching was started.")
   dt_feature <- pbapply::pblapply(
     1:paramCombN,
     function(i){
@@ -392,7 +392,7 @@ Features_rTPCP <- function(
       }
     }
   )
-  message("Fragment matching was finished. (Memory occupied = ", memory.size(), "[Mb])")
+  message("Fragment matching was finished.")
   parallel::stopCluster(cl)
   gc();gc()
 
