@@ -134,8 +134,11 @@ Features_PeptideDescriptor <- function(peptideSet, fragLenSet=3:8, tmpDir=tempdi
   }))
   parameterGrid <- expand.grid(peptideSet, fragLenSet, stringsAsFactors=F)
   message("Parallelized fragment descriptor calculation was started. (Memory occupied = ", memory.size(), "[Mb])")
-  parallel::clusterExport(cl, list("parameterGrid", "peptideDescriptor.FragStat.Single", "peptideDescriptor.Batch", "peptideDescriptor.NameSet"),
-                          envir=environment())
+  parallel::clusterExport(
+    cl=cl,
+    list("parameterGrid", "peptideDescriptor.FragStat.Single", "peptideDescriptor.Batch", "peptideDescriptor.NameSet"),
+    envir=environment()
+  )
   df_feature <- pbapply::pbapply(
     parameterGrid, 1,
     function(v){peptideDescriptor.FragStat.Single(v[1], as.numeric(v[2]))},
@@ -345,9 +348,8 @@ Features_rTPCP <- function(
   if(is.null(coreN)) coreN <- 1
   cl <- parallel::makeCluster(coreN, type="SOCK")
   parallel::clusterExport(
-    cl,
-    list("AAIndexID", "alignType", "TCRParameterString",
-         "tmpDir", "aaIndexMatrix_descfile", "aaIndexIDSet",
+    cl=cl,
+    list("tmpDir", "aaIndexMatrix_descfile", "aaIndexIDSet",
          "TCRFragDict_descfile", "TCRFragDict_ParameterSet", "TCRFragDict_Levels",
          "load_AAIndexMatrix", "load_TCRSet",
          "calculate_stats_single", "statSet"),
@@ -355,6 +357,11 @@ Features_rTPCP <- function(
   )
 
   fragmentMatchingStats <- function(peptideSet, AAIndexID, alignType, TCRParameterString, cl=cl){
+    parallel::clusterExport(
+      cl=cl,
+      list("AAIndexID", "alignType", "TCRParameterString"),
+      envir=environment()
+    )
     dt <- snow::parLapply(cl=cl,
       peptideSet, function(pept){
         aaIndexMatrix_Tmp <- load_AAIndexMatrix(AAIndexID)
