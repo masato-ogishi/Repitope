@@ -34,6 +34,11 @@
 #' @importFrom parallelMap parallelStartSocket
 #' @importFrom parallelMap parallelStop
 #' @importFrom pbapply pblapply
+#' @importFrom extraTrees extraTrees
+#' @importFrom extraTrees prepareForSave
+#' @importFrom caret confusionMatrix
+#' @importFrom pROC roc
+#' @importFrom pROC auc
 #' @import mlr
 #' @export
 #' @rdname Immunogenicity
@@ -43,8 +48,17 @@ Immunogenicity <- function(
   destDir="./Immunogenicity/", outputHeader="Output",
   maxJavaMemory="6G", coreN=parallel::detectCores()
 ){
+  # Working environment
+  dir.create(destDir, showWarnings=F, recursive=T)
+  options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling library(mlr)!
+
   # Internally used functions
   machine_learning <- function(preprocessedDFList, i){
+    ## Initialization
+    library(mlr)
+    library(parallelMap)
+    if(!is.null(coreN)) parallelMap::parallelStartSocket(cpus=coreN)
+
     ## Parameter check
     param <- names(preprocessedDFList)[i]
     s <- try(as.integer(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]), silent=T)
@@ -52,10 +66,9 @@ Immunogenicity <- function(
     set.seed(s)
     cat(i, "/", leng, "| Parameter set: ", param, "\n", sep="")
 
-    ## Destination directory check
-    modDir <- paste0(destDir, "/", outputHeader, "_", param)
-    dir.create(modDir, showWarnings=F, recursive=T)
-    skipQ <- file.exists(file.path(modDir, "Predictions.csv")) & file.exists(file.path(modDir, "PerformanceMeasures.csv"))
+    ## Skipping
+    out <- paste0(destDir, "/", outputHeader, "_", param, "_")
+    skipQ <- file.exists(paste0(out, "Predictions.csv")) & file.exists(paste0(out, "PerformanceMeasures.csv"))
     if(skipQ){
       cat("Machine learning was skipped.\n")
       return(NULL)
@@ -78,66 +91,75 @@ Immunogenicity <- function(
       dplyr::select(featureSet) %>%
       as.data.frame()
 
-    ## Parallelization
-    library(mlr)
-    library(parallelMap)
-    if(!is.null(coreN)) parallelMap::parallelStartSocket(cpus=coreN)
-
-    ## Learner
-    lrn <- mlr::makeLearner("classif.extraTrees", predict.type="prob", mtry=35, numRandomCuts=2)  ## optimized from preliminary experiments
-
-    ## Task
-    tsk <- mlr::makeClassifTask(data=as.data.frame(dt_train), target="Immunogenicity")
-
     ## Class weights [Stacked classifier does not support this!]
-    target <- mlr::getTaskTargets(tsk)
-    tab <- as.numeric(table(target))
-    w <- 1/tab[target]
+    tsk <- mlr::makeClassifTask(data=as.data.frame(dt_train), target="Immunogenicity")
+    trgt <- mlr::getTaskTargets(tsk)
+    tab <- as.numeric(table(trgt))
+    w <- 1/tab[trgt]
     tsk <- mlr::makeClassifTask(data=as.data.frame(dt_train), target="Immunogenicity", weights=w)
 
     ## Model training
     cat("Constructing model...\n")
-    mod <- mlr::train(learner=lrn, task=tsk)
-    saveRDS(mod, file.path(modDir, "Model.rds"))
+    extraTrees_train_wrapper <- function(orig, featSet=featureSet){
+      dat <- as.matrix(dplyr::select(orig, setdiff(featSet, "Immunogenicity")))
+      mod <- extraTrees::extraTrees(
+        x=dat, y=orig$"Immunogenicity",
+        mtry=35, numRandomCuts=2, weights=w,
+        numThreads=ifelse(is.null(coreN), 1, coreN)
+      )
+      return(mod)
+    }
+    mod <- extraTrees_train_wrapper(dt_train)
 
     ## Prediction
     cat("Predicting immunogenicity...\n", sep="")
-    tsk_train <- mlr::makeClassifTask(data=dt_train, target="Immunogenicity")
-    tsk_test <- mlr::makeClassifTask(data=dt_test, target="Immunogenicity")
-    pred_train <- predict(mod, task=tsk_train)
-    pred_test <- predict(mod, task=tsk_test)
+    extraTrees_predict_wrapper <- function(et, newdata, featSet=featureSet){
+      dat <- as.matrix(dplyr::select(newdata, setdiff(featSet, "Immunogenicity")))
+      pred <- cbind(
+        data.frame("PredictedImmunogenicity"=predict(et, dat, probability=F)),
+        as.data.frame(predict(et, dat, probability=T))
+      )
+      return(pred)
+    }
+    extraTrees_performance_wrapper <- function(pred, orig){
+      measure.auc <- as.numeric(pROC::auc(pROC::roc(orig$"Immunogenicity", pred$"Positive")))
+      measure.cm <- caret::confusionMatrix(pred$"PredictedImmunogenicity", orig$"Immunogenicity")
+      measures <- c(measure.auc, measure.cm$overall[c("Accuracy", "Kappa")], measure.cm$byClass)
+      names(measures) <- c("AUC", "Accuracy", "Kappa", "Sensitivity", "Specificity", "PPV", "NPV", "Precision", "Recall", "F1", "Prevalence", "DetectionRate", "DetectionPrevalence", "BalancedAccuracy")
+      measures <- as.list(measures)
+      return(measures)
+    }
+    pred_train <- extraTrees_predict_wrapper(mod, newdata=dt_train)
+    pred_test <- extraTrees_predict_wrapper(mod, newdata=dt_test)
+    measureDF <- data.table::rbindlist(list(
+      data.frame("Param"=param, "DataType"="Train", as.data.frame(extraTrees_performance_wrapper(pred_train, dt_train))),
+      data.frame("Param"=param, "DataType"="Test", as.data.frame(extraTrees_performance_wrapper(pred_test, dt_test)))
+    ))
     predDF <- data.table::rbindlist(list(
       data.frame("Param"=param, "DataType"="Train", as.data.frame(pred_train)),
       data.frame("Param"=param, "DataType"="Test", as.data.frame(pred_test))
     ))
-    measureDF <- data.table::rbindlist(list(
-      as.data.frame(c(list("Param"=param, "DataType"="Train"), as.list(mlr::performance(pred_train, measures=list(mlr::timeboth, mlr::auc, mlr::kappa), task=tsk_train, model=mod)), mlr::calculateROCMeasures(pred_train)$"measures")),
-      as.data.frame(c(list("Param"=param, "DataType"="Test"), as.list(mlr::performance(pred_test, measures=list(mlr::timeboth, mlr::auc, mlr::kappa), task=tsk_train, model=mod)), mlr::calculateROCMeasures(pred_test)$"measures"))
-    ))
     print(measureDF)
-    readr::write_csv(predDF, file.path(modDir, "Predictions.csv"))
-    readr::write_csv(measureDF, file.path(modDir, "PerformanceMeasures.csv"))
+    readr::write_csv(predDF, paste0(out, "Predictions.csv"))
+    readr::write_csv(measureDF, paste0(out, "PerformanceMeasures.csv"))
 
     ## Closing
     if(!is.null(coreN)) parallelMap::parallelStop()
     try(pacman::p_unload("all"), silent=T)
+    rm(list=ls())
     gc();gc()
     return(NULL)
   }
   concatenate_results <- function(destDir){
     cat("Concatenating results...\n")
-    predDFList <- pbapply::pblapply(list.files(pattern="^Predictions.csv$", path=destDir, recursive=T, full.names=T), function(f){suppressMessages(readr::read_csv(f, col_types='ccicddc_'))})
-    measureDFList <- pbapply::pblapply(list.files(pattern="^PerformanceMeasures.csv$", path=destDir, recursive=T, full.names=T), function(f){suppressMessages(readr::read_csv(f))})
+    predDFList <- pbapply::pblapply(list.files(pattern="Predictions.csv$", path=destDir, full.names=T), function(f){suppressMessages(readr::read_csv(f, col_types='cc_dd'))})
+    measureDFList <- pbapply::pblapply(list.files(pattern="PerformanceMeasures.csv$", path=destDir, full.names=T), function(f){suppressMessages(readr::read_csv(f))})
     predDF <- data.table::rbindlist(predDFList)
     measureDF <- data.table::rbindlist(measureDFList)
-    readr::write_csv(predDF, file.path(destDir, paste0(outputHeader, "_Predictions.csv")))
-    readr::write_csv(measureDF, file.path(destDir, paste0(outputHeader, "_PerformanceMeasures.csv")))
+    readr::write_csv(predDF, file.path(destDir, paste0(outputHeader, "_Predictions_Combined.csv")))
+    readr::write_csv(measureDF, file.path(destDir, paste0(outputHeader, "_PerformanceMeasures_Combined.csv")))
     return(list("predDF"=predDF, "measureDF"=measureDF))
   }
-
-  # Working environment
-  dir.create(destDir, showWarnings=F, recursive=T)
-  options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling library(mlr)!
 
   # Just concatenating previous CSV files
   if(is.null(preprocessedDFList)){
@@ -190,9 +212,9 @@ Immunogenicity_Benchmark <- function(
       dt <- preprocessedDFList[[i]][["dt"]] %>% dplyr::select(-DataType, -Peptide, -Cluster)
       if(nrow(dt)>maxRowN) dt <- dplyr::slice(dt, sample(1:nrow(dt), maxRowN))
       tsk <- mlr::makeClassifTask(id=paste0("Benchmark_", param), data=as.data.frame(dt), target="Immunogenicity")
-      #target <- mlr::getTaskTargets(tsk)
-      #tab <- as.numeric(table(target))
-      #w <- 1/tab[target]
+      #trgt <- mlr::getTaskTargets(tsk)
+      #tab <- as.numeric(table(trgt))
+      #w <- 1/tab[trgt]
       #tsk <- mlr::makeClassifTask(id=paste0("Benchmark_", param), data=as.data.frame(dt), target="Immunogenicity", weights=w)
       return(tsk)
     })
