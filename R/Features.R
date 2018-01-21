@@ -157,6 +157,7 @@ Features_PeptideDescriptor <- function(peptideSet, fragLenSet=3:8, tmpDir=tempdi
     df_basic[[paste0("Peptide_Contain", aa)]] <- as.numeric(stringr::str_detect(peptideSet, aa))
   }
   df_feature <- suppressWarnings(dplyr::left_join(df_basic, df_feature, by="Peptide"))
+  rownames(df_feature) <- 1:nrow(df_feature)
 
   # Output
   fst::write.fst(df_feature, out)
@@ -379,6 +380,7 @@ Features_rTPCP <- function(
       out <- file.path(tmpDir, paste0("dt_feature_rTPCP_", i, ".fst"))
       if(!file.exists(out)){
         dt <- fragmentMatchingStats(peptideSet, parameterGrid[i,1], parameterGrid[i,2], parameterGrid[i,3], coreN=coreN)
+        rownames(dt) <- 1:nrow(dt)
         fst::write.fst(dt, out)
       }
     }
