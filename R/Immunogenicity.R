@@ -236,8 +236,8 @@ Immunogenicity_Benchmark <- function(
   # Benchmarking
   message("Starting benchmark experiments...")
   bm_wrapper <- function(learnerString, tasks){
-    requireNamespace("mlr")
-    requireNamespace("parallelMap")
+    require("mlr")
+    require("parallelMap")
     set.seed(12345)
     message(learnerString)
     msrs <- list(

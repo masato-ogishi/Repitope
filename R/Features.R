@@ -390,6 +390,7 @@ Features_rTPCP <- function(
         rownames(dt) <- 1:nrow(dt)
         fst::write.fst(dt, out)
       }
+      gc();gc()
     }
   )
   message("Fragment matching was finished.")
