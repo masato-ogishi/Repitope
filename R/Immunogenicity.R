@@ -260,7 +260,6 @@ Immunogenicity_Benchmark <- function(
     )
     parallelMap::parallelStop()
     print(bmr)
-    saveRDS(bmr, file.path(destDir, paste0("BenchmarkResult_", learnerString, ".rds")))
     bmr.df <- as.data.frame(bmr)
     readr::write_csv(bmr.df, file.path(destDir, paste0("BenchmarkResult_", learnerString, ".csv")))
     try(pacman::p_unload("all"), silent=T)
