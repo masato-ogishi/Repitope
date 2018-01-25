@@ -66,8 +66,8 @@ Features_Importance <- function(
   # Importances
   message("Calculating feature importances...")
   if(is.null(coreN)) coreN <- 1
-  requireNamespace(mlr)
-  requireNamespace(parallelMap)
+  requireNamespace("mlr")
+  requireNamespace("parallelMap")
   parallelMap::parallelStartSocket(cpus=coreN)
   featureImportances <- pbapply::pblapply(taskSet, mlr::generateFilterValuesData, method="randomForestSRC.rfsrc")
   parallelMap::parallelStop()

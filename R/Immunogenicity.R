@@ -228,6 +228,7 @@ Immunogenicity_Benchmark <- function(
   learnerSet <- setdiff(learnerSet, omitLearnerSet)
   lrns.df <- dplyr::filter(lrns.df, class %in% learnerSet)
   lrns.pkg <- lrns.df$package
+  lrns.pkg <- unique(unlist(stringr::str_split(lrns.pkg, stringr::fixed(","))))
   lrns.pkg <- setdiff(lrns.pkg, as.character(as.data.frame(installed.packages())$"Package"))
   if(length(lrns.pkg)>=1) pacman::p_install(lrns.pkg, character.only=T)
   gc();gc()
@@ -235,8 +236,8 @@ Immunogenicity_Benchmark <- function(
   # Benchmarking
   message("Starting benchmark experiments...")
   bm_wrapper <- function(learnerString, tasks){
-    requireNamespace(mlr)
-    requireNamespace(parallelMap)
+    requireNamespace("mlr")
+    requireNamespace("parallelMap")
     set.seed(12345)
     message(learnerString)
     msrs <- list(
