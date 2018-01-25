@@ -9,7 +9,7 @@
 #' @param omitLearnerSet (Optional) A set of learner strings to be omitted from model benchmarking. Set \code{NULL} to ignore.
 #' @param destDir A directory for loading & exporting data.
 #' @param outputHeader A file/folder name header.
-#' @param maxJavaMemory The upper limit of memory for Java virtual machine.
+#' @param maxJavaMemory The upper limit of memory for Java virtual machine in megabytes.
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr select
@@ -31,40 +31,47 @@
 #' @importFrom data.table as.data.table
 #' @importFrom data.table rbindlist
 #' @importFrom parallel detectCores
-#' @importFrom parallelMap parallelStartSocket
-#' @importFrom parallelMap parallelStop
 #' @importFrom pbapply pblapply
 #' @importFrom extraTrees extraTrees
-#' @importFrom extraTrees prepareForSave
+#' @importFrom extraTrees setJavaMemory
 #' @importFrom caret confusionMatrix
 #' @importFrom pROC roc
 #' @importFrom pROC auc
-#' @import mlr
+#' @importFrom mlr makeClassifTask
+#' @importFrom mlr getTaskTargets
+#' @importFrom mlr listLearners
+#' @importFrom mlr timeboth
+#' @importFrom mlr setAggregation
+#' @importFrom mlr train.mean
+#' @importFrom mlr auc
+#' @importFrom mlr logloss
+#' @importFrom mlr acc
+#' @importFrom mlr kappa
+#' @importFrom mlr ber
+#' @importFrom mlr benchmark
+#' @importFrom mlr makeLearner
+#' @importFrom mlr makeResampleDesc
+#' @importFrom parallelMap parallelStartSocket
+#' @importFrom parallelMap parallelStop
 #' @export
 #' @rdname Immunogenicity
 #' @name Immunogenicity
 Immunogenicity <- function(
   preprocessedDFList=NULL, featureSet="all",
   destDir="./Immunogenicity/", outputHeader="Output",
-  maxJavaMemory="6G", coreN=parallel::detectCores()
+  maxJavaMemory=6000, coreN=parallel::detectCores()
 ){
   # Working environment
   dir.create(destDir, showWarnings=F, recursive=T)
-  options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling requireNamespace(mlr)!
+  extraTrees::setJavaMemory(maxJavaMemory)
 
   # Internally used functions
   machine_learning <- function(preprocessedDFList, i){
-    ## Initialization
-    requireNamespace(mlr)
-    requireNamespace(parallelMap)
-    if(!is.null(coreN)) parallelMap::parallelStartSocket(cpus=coreN)
-
     ## Parameter check
     param <- names(preprocessedDFList)[i]
     s <- try(as.integer(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]), silent=T)
     if(any(class(s)=="try-error")) s <- 123456789  ## ad hoc seed
     set.seed(s)
-    cat(i, "/", leng, "| Parameter set: ", param, "\n", sep="")
 
     ## Skipping
     out <- paste0(destDir, "/", outputHeader, "_", param, "_")
@@ -91,16 +98,12 @@ Immunogenicity <- function(
       dplyr::select(featureSet) %>%
       as.data.frame()
 
-    ## Class weights [Stacked classifier does not support this!]
-    tsk <- mlr::makeClassifTask(data=as.data.frame(dt_train), target="Immunogenicity")
-    trgt <- mlr::getTaskTargets(tsk)
-    tab <- as.numeric(table(trgt))
-    w <- 1/tab[trgt]
-    tsk <- mlr::makeClassifTask(data=as.data.frame(dt_train), target="Immunogenicity", weights=w)
-
     ## Model training
     cat("Constructing model...\n")
     extraTrees_train_wrapper <- function(orig, featSet=featureSet){
+      trgt <- orig$"Immunogenicity"
+      tab <- as.numeric(table(trgt))
+      w <- 1/tab[trgt]
       dat <- as.matrix(dplyr::select(orig, setdiff(featSet, "Immunogenicity")))
       mod <- extraTrees::extraTrees(
         x=dat, y=orig$"Immunogenicity",
@@ -112,7 +115,7 @@ Immunogenicity <- function(
     mod <- extraTrees_train_wrapper(dt_train)
 
     ## Prediction
-    cat("Predicting immunogenicity...\n", sep="")
+    cat("Predicting immunogenicity...\n")
     extraTrees_predict_wrapper <- function(et, newdata, featSet=featureSet){
       dat <- as.matrix(dplyr::select(newdata, setdiff(featSet, "Immunogenicity")))
       pred <- cbind(
@@ -144,8 +147,6 @@ Immunogenicity <- function(
     readr::write_csv(measureDF, paste0(out, "PerformanceMeasures.csv"))
 
     ## Closing
-    if(!is.null(coreN)) parallelMap::parallelStop()
-    try(pacman::p_unload("all"), silent=T)
     rm(list=ls())
     gc();gc()
     return(NULL)
@@ -161,23 +162,20 @@ Immunogenicity <- function(
     return(list("predDF"=predDF, "measureDF"=measureDF))
   }
 
-  # Just concatenating previous CSV files
-  if(is.null(preprocessedDFList)){
-    res <- concatenate_results(destDir)
-    rm(list=setdiff(ls(), c("res")))
-    gc();gc()
-    return(res)
+  # Main analysis workflow
+  if(!is.null(preprocessedDFList)){
+    # Input formatting
+    if(any(sapply(preprocessedDFList, is.data.frame))){
+      preprocessedDFList <- lapply(preprocessedDFList, function(d){list("dt"=d)})
+    }
+    # Batch machine learning
+    leng <- length(preprocessedDFList)
+    cat("Number of datasets = ", leng, "\n", sep="")
+    res <- lapply(i:leng, function(i){
+      cat(i, "/", leng, "| Parameter set: ", param, "\n", sep="")
+      try(machine_learning(preprocessedDFList, i), silent=T)
+    })
   }
-
-  # Input formatting
-  if(any(sapply(preprocessedDFList, is.data.frame))){
-    preprocessedDFList <- lapply(preprocessedDFList, function(d){list("dt"=d)})
-  }
-
-  # Batch machine learning
-  leng <- length(preprocessedDFList)
-  cat("Number of datasets = ", leng, "\n", sep="")
-  res <- lapply(i:leng, function(i){ try(machine_learning(preprocessedDFList, i), silent=T) })
 
   # Outputs
   res <- concatenate_results(destDir)
@@ -191,34 +189,34 @@ Immunogenicity <- function(
 #' @name Immunogenicity_Benchmark
 Immunogenicity_Benchmark <- function(
   preprocessedDFList, learnerSet=NULL, omitLearnerSet=NULL,
-  destDir="./Benchmark/", maxJavaMemory="6G", coreN=parallel::detectCores()
+  destDir="./Benchmark/", maxJavaMemory=6000, coreN=parallel::detectCores()
 ){
   # Working environment
   dir.create(destDir, showWarnings=F, recursive=T)
-  options(java.parameters=gsub("-Xmx-Xmx", "-Xmx", paste0("-Xmx", maxJavaMemory))) ## Before calling requireNamespace(mlr)!
+  extraTrees::setJavaMemory(maxJavaMemory)
 
   # Input check
   if(any(class(preprocessedDFList[[1]])=="data.frame")) preprocessedDFList <- lapply(preprocessedDFList, function(d){list("dt"=d)})
 
   # Tasks
-  preprocessedDFList_to_taskList <- function(preprocessedDFList, maxRowN=10000){
+  preprocessedDFList_to_taskList <- function(preprocessedDFList, maxRowN=Inf){
     pbapply::pblapply(1:length(preprocessedDFList), function(i){
       param <- names(preprocessedDFList)[i]
       s <- try(as.integer(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]), silent=T)
       if(any(class(s)=="try-error")) s <- 123456789  ## ad hoc seed
       set.seed(s)
-      dt <- preprocessedDFList[[i]][["dt"]] %>% dplyr::select(-DataType, -Peptide, -Cluster)
+      dt <- preprocessedDFList[[i]][["dt"]] %>% dplyr::select(-DataType, -Peptide, -Cluster) %>% as.data.frame()
       if(nrow(dt)>maxRowN) dt <- dplyr::slice(dt, sample(1:nrow(dt), maxRowN))
-      tsk <- mlr::makeClassifTask(id=paste0("Benchmark_", param), data=as.data.frame(dt), target="Immunogenicity")
-      #trgt <- mlr::getTaskTargets(tsk)
-      #tab <- as.numeric(table(trgt))
-      #w <- 1/tab[trgt]
-      #tsk <- mlr::makeClassifTask(id=paste0("Benchmark_", param), data=as.data.frame(dt), target="Immunogenicity", weights=w)
+      tsk <- mlr::makeClassifTask(id=paste0("Benchmark_", param), data=dt, target="Immunogenicity")
+      trgt <- mlr::getTaskTargets(tsk)
+      tab <- as.numeric(table(trgt))
+      w <- 1/tab[trgt]
+      tsk <- mlr::makeClassifTask(id=paste0("Benchmark_", param), data=dt, target="Immunogenicity", weights=w)
       return(tsk)
     })
   }
   message("Converting preprocessed dataframes into a list of tasks...")
-  taskSet <- preprocessedDFList_to_taskList(preprocessedDFList, maxRowN=10000)
+  taskSet <- preprocessedDFList_to_taskList(preprocessedDFList, maxRowN=Inf)
   gc();gc()
 
   # Learners
@@ -249,25 +247,16 @@ Immunogenicity_Benchmark <- function(
       mlr::kappa, mlr::setAggregation(mlr::kappa, mlr::train.mean),
       mlr::ber, mlr::setAggregation(mlr::ber, mlr::train.mean)
     )
-    if(!is.null(coreN)){
-      parallelMap::parallelStartSocket(cpus=coreN)
-      bmr <- mlr::benchmark(
-        learners=mlr::makeLearner(learnerString, predict.type="prob"),
-        tasks=tasks,
-        measures=msrs,
-        resamplings=mlr::makeResampleDesc(method="CV", iters=3, predict="both"),
-        show.info=T
-      )
-      parallelMap::parallelStop()
-    }else{
-      bmr <- mlr::benchmark(
-        learners=mlr::makeLearner(learnerString, predict.type="prob"),
-        tasks=tasks,
-        measures=msrs,
-        resamplings=mlr::makeResampleDesc(method="CV", iters=3, predict="both"),
-        show.info=T
-      )
-    }
+    if(is.null(coreN)) coreN <- 1
+    parallelMap::parallelStartSocket(cpus=coreN)
+    bmr <- mlr::benchmark(
+      learners=mlr::makeLearner(learnerString, predict.type="prob"),
+      tasks=tasks,
+      measures=msrs,
+      resamplings=mlr::makeResampleDesc(method="CV", iters=3, predict="both"),
+      show.info=T
+    )
+    parallelMap::parallelStop()
     print(bmr)
     saveRDS(bmr, file.path(destDir, paste0("BenchmarkResult_", learnerString, ".rds")))
     bmr.df <- as.data.frame(bmr)
@@ -277,7 +266,7 @@ Immunogenicity_Benchmark <- function(
     gc();gc()
   }
   for(l in learnerSet){ try(bm_wrapper(l, taskSet)) }
-  message("Integrating benchmark results...\n")
+  message("Integrating benchmark results...")
   bmfiles <- list.files(pattern="^BenchmarkResult.+csv$", path=destDir, full.names=T)
   bmfiles <- setdiff(bmfiles, file.path(destDir, "BenchmarkResult_Combined.csv"))
   bmr <- dplyr::bind_rows(lapply(bmfiles, readr::read_csv))

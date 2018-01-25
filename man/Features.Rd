@@ -33,7 +33,7 @@ Features_rTPCP(peptideSet, TCRSet, fragLenSet = 3:8, aaIndexIDSet = "all",
 
 \item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.}
 
-\item{tmpDir}{Destination directory to save intermediate files}
+\item{tmpDir}{Destination directory to save intermediate files.}
 }
 \description{
 \code{Features} is a wrapper function, generating a list of dataframes of peptide features calculated with different parameter sets.

@@ -7,10 +7,10 @@
 \usage{
 Immunogenicity(preprocessedDFList = NULL, featureSet = "all",
   destDir = "./Immunogenicity/", outputHeader = "Output",
-  maxJavaMemory = "6G", coreN = parallel::detectCores())
+  maxJavaMemory = 6000, coreN = parallel::detectCores())
 
 Immunogenicity_Benchmark(preprocessedDFList, learnerSet = NULL,
-  omitLearnerSet = NULL, destDir = "./Benchmark/", maxJavaMemory = "6G",
+  omitLearnerSet = NULL, destDir = "./Benchmark/", maxJavaMemory = 6000,
   coreN = parallel::detectCores())
 }
 \arguments{
@@ -22,7 +22,7 @@ Immunogenicity_Benchmark(preprocessedDFList, learnerSet = NULL,
 
 \item{outputHeader}{A file/folder name header.}
 
-\item{maxJavaMemory}{The upper limit of memory for Java virtual machine.}
+\item{maxJavaMemory}{The upper limit of memory for Java virtual machine in megabytes.}
 
 \item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.}
 
