@@ -51,6 +51,7 @@
 #' @importFrom mlr benchmark
 #' @importFrom mlr makeLearner
 #' @importFrom mlr makeResampleDesc
+#' @importFrom mlr checkLearnerBeforeTrain
 #' @importFrom parallelMap parallelStartSocket
 #' @importFrom parallelMap parallelStop
 #' @export
@@ -221,7 +222,7 @@ Immunogenicity_Benchmark <- function(
 
   # Learners
   message("Preparing required packages...")
-  lrns.df <- suppressWarnings(mlr::listLearners("classif", properties=c("twoclass", "prob")))
+  lrns.df <- suppressWarnings(mlr::listLearners("classif", properties=c("twoclass", "prob", "weights")))
   if(is.null(learnerSet)) learnerSet <- lrns.df$"class"
   if(is.null(omitLearnerSet)) omitLearnerSet <- c()
   omitLearnerSet <- c(omitLearnerSet, gsub(".rds", "", gsub("BenchmarkResult_", "", basename(list.files(pattern="^BenchmarkResult.+rds$", path=destDir, full.names=T))), fixed=T))
