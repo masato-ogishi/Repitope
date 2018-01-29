@@ -22,8 +22,8 @@
 #' @importFrom scales rescale
 #' @importFrom data.table as.data.table
 #' @importFrom parallel detectCores
-#' @importFrom parallelMap parallelStartSocket
-#' @importFrom parallelMap parallelStop
+#' @importFrom parallel makeCluster
+#' @importFrom parallel stopCluster
 #' @importFrom pbapply pblapply
 #' @importFrom mlr makeClassifTask
 #' @importFrom mlr getTaskTargets
@@ -66,11 +66,10 @@ Features_Importance <- function(
   # Importances
   message("Calculating feature importances...")
   if(is.null(coreN)) coreN <- 1
-  requireNamespace("mlr")
-  requireNamespace("parallelMap")
-  parallelMap::parallelStartSocket(cpus=coreN)
-  featureImportances <- pbapply::pblapply(taskSet, mlr::generateFilterValuesData, method="randomForestSRC.rfsrc")
-  parallelMap::parallelStop()
+  cl <- parallel::makeCluster(coreN, type="SOCK")
+  featureImportances <- pbapply::pblapply(taskSet, mlr::generateFilterValuesData, method="randomForestSRC.rfsrc", cl=cl)
+  parallel::stopCluster(cl)
+  gc();gc()
   featureImportanceDFList <- lapply(1:length(preprocessedDFList), function(i){
     param <- names(preprocessedDFList)[i]
     imp <- featureImportances[[i]][["data"]] %>%
