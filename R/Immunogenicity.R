@@ -225,7 +225,7 @@ Immunogenicity_Benchmark <- function(
   lrns.df <- suppressWarnings(mlr::listLearners("classif", properties=c("twoclass", "prob", "weights")))
   if(is.null(learnerSet)) learnerSet <- lrns.df$"class"
   if(is.null(omitLearnerSet)) omitLearnerSet <- c()
-  omitLearnerSet <- c(omitLearnerSet, gsub(".rds", "", gsub("BenchmarkResult_", "", basename(list.files(pattern="^BenchmarkResult.+rds$", path=destDir, full.names=T))), fixed=T))
+  omitLearnerSet <- c(omitLearnerSet, gsub(".csv", "", gsub("BenchmarkResult_", "", basename(list.files(pattern="^BenchmarkResult_.+csv$", path=destDir, full.names=T))), fixed=T))
   learnerSet <- setdiff(learnerSet, omitLearnerSet)
   lrns.df <- dplyr::filter(lrns.df, class %in% learnerSet)
   lrns.pkg <- lrns.df$package
