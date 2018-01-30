@@ -7,10 +7,10 @@
 \usage{
 Immunogenicity(preprocessedDFList = NULL, featureSet = "all",
   destDir = "./Immunogenicity/", outputHeader = "Output",
-  maxJavaMemory = 6000, coreN = parallel::detectCores())
+  maxJavaMemory = "6G", coreN = parallel::detectCores())
 
 Immunogenicity_Benchmark(preprocessedDFList, learnerSet = NULL,
-  omitLearnerSet = NULL, destDir = "./Benchmark/", maxJavaMemory = 6000,
+  omitLearnerSet = NULL, destDir = "./Benchmark/", maxJavaMemory = "6G",
   coreN = parallel::detectCores())
 }
 \arguments{

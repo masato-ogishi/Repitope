@@ -7,6 +7,7 @@
 #' @importFrom stringr str_split
 #' @importFrom stringr fixed
 #' @importFrom dplyr select
+#' @importFrom VennDiagram venn.plot
 #' @export
 #' @rdname Features_MinimumParameters
 #' @name Features_MinimumParameters
@@ -22,6 +23,26 @@ Features_MinimumParameters <- function(preprocessedDFList_reference, criteria="i
   message("Alignment types: ", paste0(alignTypeSet, collapse=", "))
   message("TCR fragment library depths: ", paste0(TCRFragDepthSet, collapse=", "))
   message("Random seeds: ", paste0(seedSet, collapse=", "))
+
+  # Visualize feature overlaps [currently, enabled only in cases where five preprocessed dataframes were provided as references]
+  if(length(preprocessedDFList)==5){
+    featureSet <- lapply(preprocessedDFList, function(l){setdiff(colnames(l$"dt"), c("DataType", "Peptide", "Immunogenicity", "Cluster"))})
+    venn.plot <- VennDiagram::venn.diagram(
+      featureSet,
+      filename=NULL,
+      category.names=rep("", 5),
+      col="black",
+      fill=c("dodgerblue", "goldenrod1", "darkorange1", "seagreen3", "orchid3"),
+      alpha=0.50,
+      cex=c(1.5, 1.5, 1.5, 1.5, 1.5, 1, 0.8, 1, 0.8, 1, 0.8, 1, 0.8,
+            1, 0.8, 1, 0.55, 1, 0.55, 1, 0.55, 1, 0.55, 1, 0.55, 1, 1, 1, 1, 1, 1.5),
+      cat.col=c("dodgerblue", "goldenrod1", "darkorange1", "seagreen3", "orchid3"),
+      cat.cex=1.5,
+      cat.fontface="bold",
+      margin=0.05
+    )
+    grid::grid.draw(venn.plot)
+  }
 
   # Decode additional parameter sets from the minimally selected features
   featureSet <- setdiff(Reduce(criteria, lapply(preprocessedDFList, function(l){colnames(l$"dt")})), c("DataType", "Peptide", "Immunogenicity", "Cluster"))

@@ -33,7 +33,6 @@
 #' @importFrom parallel detectCores
 #' @importFrom pbapply pblapply
 #' @importFrom extraTrees extraTrees
-#' @importFrom extraTrees setJavaMemory
 #' @importFrom caret confusionMatrix
 #' @importFrom pROC roc
 #' @importFrom pROC auc
@@ -51,7 +50,6 @@
 #' @importFrom mlr benchmark
 #' @importFrom mlr makeLearner
 #' @importFrom mlr makeResampleDesc
-#' @importFrom mlr checkLearnerBeforeTrain
 #' @importFrom parallelMap parallelStartSocket
 #' @importFrom parallelMap parallelStop
 #' @export
@@ -60,11 +58,11 @@
 Immunogenicity <- function(
   preprocessedDFList=NULL, featureSet="all",
   destDir="./Immunogenicity/", outputHeader="Output",
-  maxJavaMemory=6000, coreN=parallel::detectCores()
+  maxJavaMemory="6G", coreN=parallel::detectCores()
 ){
   # Working environment
   dir.create(destDir, showWarnings=F, recursive=T)
-  extraTrees::setJavaMemory(maxJavaMemory)
+  options(java.parameters=paste0("-Xmx", maxJavaMemory))
 
   # Internally used functions
   machine_learning <- function(preprocessedDFList, i){
@@ -190,11 +188,11 @@ Immunogenicity <- function(
 #' @name Immunogenicity_Benchmark
 Immunogenicity_Benchmark <- function(
   preprocessedDFList, learnerSet=NULL, omitLearnerSet=NULL,
-  destDir="./Benchmark/", maxJavaMemory=6000, coreN=parallel::detectCores()
+  destDir="./Benchmark/", maxJavaMemory="6G", coreN=parallel::detectCores()
 ){
   # Working environment
   dir.create(destDir, showWarnings=F, recursive=T)
-  extraTrees::setJavaMemory(maxJavaMemory)
+  options(java.parameters=paste0("-Xmx", maxJavaMemory))
 
   # Input check
   if(any(class(preprocessedDFList[[1]])=="data.frame")) preprocessedDFList <- lapply(preprocessedDFList, function(d){list("dt"=d)})
