@@ -7,7 +7,7 @@
 #' @importFrom stringr str_split
 #' @importFrom stringr fixed
 #' @importFrom dplyr select
-#' @importFrom VennDiagram venn.plot
+#' @importFrom VennDiagram venn.diagram
 #' @export
 #' @rdname Features_MinimumParameters
 #' @name Features_MinimumParameters
