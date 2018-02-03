@@ -17,13 +17,13 @@ singleAASimilarityNetwork(aaStringSet, numSet = NULL, directed = T,
   weighted = T, forceMutType = F)
 }
 \arguments{
-\item{aaStringSet}{A set of XCR clonotype sequences (converted as an AAStringSet object).}
+\item{aaStringSet}{A set of sequences. Simple character strings will be internally converted to an AAStringSet object.}
 
-\item{longerAAStringSet}{A set of XCR clonotype sequences. Should be one amino acid longer than \code{shorterAAStringSet}.}
+\item{longerAAStringSet}{A set of sequences. Should be one amino acid longer than \code{shorterAAStringSet}.}
 
-\item{shorterAAStringSet}{A set of XCR clonotype sequences. Should be one amino acid shorter than \code{longerAAStringSet}.}
+\item{shorterAAStringSet}{A set of sequences. Should be one amino acid shorter than \code{longerAAStringSet}.}
 
-\item{numSet}{An attribute for the verteces.}
+\item{numSet}{An attribute for the vertices.}
 
 \item{directed}{Should the network be converted from undirected to directed? Directions are determined by the \code{numSet} provided.}
 

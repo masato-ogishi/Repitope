@@ -19,7 +19,7 @@ Features_rTPCP(peptideSet, TCRSet, fragLenSet = 3:8, aaIndexIDSet = "all",
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}
 
-\item{TCRSet}{Either a set of TCR sequences (as a character vector) or a list of sets of TCR sequences. If provided as a list, it must be the same length with the seedSet.}
+\item{TCRSet}{Either a set of TCR sequences (as a character vector) or a list of sets of TCR sequences. If provided as a list, it must be the same length with the seedSet. Note: the maximum size is limited to 100000 sequences.}
 
 \item{fragLenSet}{A set of the lengths of TCR sequence fragments to be matched against the peptide set.}
 

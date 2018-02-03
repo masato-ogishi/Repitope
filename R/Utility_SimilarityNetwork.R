@@ -1,9 +1,9 @@
 #' Similarity network analysis.
 #'
-#' @param aaStringSet A set of XCR clonotype sequences (converted as an AAStringSet object).
-#' @param longerAAStringSet A set of XCR clonotype sequences. Should be one amino acid longer than \code{shorterAAStringSet}.
-#' @param shorterAAStringSet A set of XCR clonotype sequences. Should be one amino acid shorter than \code{longerAAStringSet}.
-#' @param numSet An attribute for the verteces.
+#' @param aaStringSet A set of sequences. Simple character strings will be internally converted to an AAStringSet object.
+#' @param longerAAStringSet A set of sequences. Should be one amino acid longer than \code{shorterAAStringSet}.
+#' @param shorterAAStringSet A set of sequences. Should be one amino acid shorter than \code{longerAAStringSet}.
+#' @param numSet An attribute for the vertices.
 #' @param directed Should the network be converted from undirected to directed? Directions are determined by the \code{numSet} provided.
 #' @param weighted Should the network be converted to weihted? Edge weights are determined by the \code{numSet} provided.
 #' @param forceMutType Should mutational types be annotated? A little bit time-consuming.
@@ -16,6 +16,7 @@
 #' @importFrom dplyr inner_join
 #' @importFrom DescTools Sort
 #' @importFrom stringr str_sub
+#' @importFrom stringr str_split
 #' @importFrom S4Vectors nchar
 #' @importFrom Biostrings AAStringSet
 #' @importFrom Biostrings pairwiseAlignment
@@ -23,17 +24,13 @@
 #' @importFrom stringdist stringdist
 #' @importFrom Matrix sparseMatrix
 #' @importFrom Matrix t
+#' @importFrom igraph V
+#' @importFrom igraph E
 #' @importFrom igraph set_vertex_attr
 #' @importFrom igraph graph_from_adjacency_matrix
 #' @importFrom igraph graph_from_data_frame
 #' @importFrom igraph simplify
 #' @importFrom igraph as_edgelist
-#' @importFrom igraph decompose
-#' @importFrom igraph V
-#' @importFrom igraph E
-#' @importFrom igraph write_graph
-#' @importFrom igraph degree
-#' @importFrom igraph subgraph
 #' @importFrom pbapply timerProgressBar
 #' @importFrom pbapply setTimerProgressBar
 #' @importFrom pbapply pblapply
@@ -49,7 +46,7 @@ distMat_Auto <- function(aaStringSet){
     message("Input sequences must be of the same length!")
     return(NULL)
   }
-  
+
   sequenceSet <- as.character(aaStringSet)
   DistMat.auto <- Matrix::sparseMatrix(c(), c(), x=F, dims=c(length(aaStringSet), length(aaStringSet)))
   pbQ <- length(aaStringSet)>1000
@@ -99,7 +96,7 @@ distMat_Juxtaposed <- function(longerAAStringSet, shorterAAStringSet){
     message("The length difference between longer and shorter sequences must be one amino acid!")
     return(NULL)
   }
-  
+
   longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
   longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
   DistMat.juxt <- Matrix::sparseMatrix(c(), c(), x=F, dims=c(length(shorterAAStringSet), length(longerAAStringSet)))
@@ -133,7 +130,7 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
       message("Duplicates are removed from the input sequences.")
       aaStringSet <- unique(aaStringSet)
     }
-    
+
     ## Serialized adjacency matrix calculation
     aaStringSetList <- split(aaStringSet, S4Vectors::nchar(aaStringSet))
     if(length(names(aaStringSetList))>=2){
@@ -147,14 +144,14 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
     sequenceLengthPairGrid <- sequenceLengthPairGrid %>%
       dplyr::filter((as.numeric(V1)-as.numeric(V2)) %in% c(0, 1)) ## V1>=V2
     sequenceLengthPairN <- nrow(sequenceLengthPairGrid)
-    
+
     ends <- as.numeric(cumsum(table(S4Vectors::nchar(aaStringSet))))
     starts <- (c(0, ends)+1)[1:length(ends)]
     positionGrid <- as.data.frame(t(data.frame(starts, ends)))
     colnames(positionGrid) <- names(aaStringSetList)
-    
+
     DistMat <- Matrix::sparseMatrix(c(), c(), x=F, dims=rep(length(aaStringSet), 2))
-    
+
     message(paste0("Number of sequence length pairs = ", sequenceLengthPairN))
     for(i in which(sequenceLengthPairGrid$"Type"=="Auto")){
       message(paste0("Pair ", i, "/", sequenceLengthPairN, " | Auto: sequence length = ", sequenceLengthPairGrid[i,1]))
@@ -174,7 +171,7 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
       DistMat[p1, p2] <- distMat_Juxtaposed(s1, s2)
     }
     DistMat <- DistMat|Matrix::t(DistMat) ## Symmetricalization
-    
+
     ## Similarity network
     simNet <- DistMat %>%
       igraph::graph_from_adjacency_matrix(mode="undirected", weighted=NULL, diag=F) %>%
@@ -189,13 +186,13 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
     df[["AASeq1"]] <- igraph::V(simpleSimNet)$label[df$"Node1"]
     df[["AASeq2"]] <- igraph::V(simpleSimNet)$label[df$"Node2"]
     df <- dplyr::select(df, -Node1, -Node2)
-    
+
     ## Annotate mutational types and patterns
     mutType <- function(pept1, pept2){
       if(nchar(pept1)==nchar(pept2)){
         pwal <- Biostrings::pairwiseAlignment(pattern=pept1, subject=pept2, type="global")
         sbst <- Biostrings::mismatchTable(pwal)
-        sbst <- paste0(sbst$PatternSubstring, sbst$PatternStart, sbst$SubjectSubstring, collapse="")
+        sbst <- paste0(sbst$PatternSubstring, sbst$PatternStart, sbst$SubjectSubstring, collapse="_")
         return(sbst)
       }
       if(nchar(pept1)<nchar(pept2)){
@@ -205,7 +202,7 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
         longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
         longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
         del.pos <- which(longerSeq.degenerate==shorterseq)
-        sbst <- sapply(del.pos, function(p){paste0("-", p, substr(pept2, p, p), collapse="")})
+        sbst <- sapply(del.pos, function(p){paste0("-", p, substr(pept2, p, p), collapse="_")})
         sbst <- paste0(sbst, collapse="|")
         return(sbst)
       }
@@ -216,7 +213,7 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
         longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
         longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
         del.pos <- which(longerSeq.degenerate==shorterseq)
-        sbst <- sapply(del.pos, function(p){paste0(substr(pept2, p, p), p, "-", collapse="")})
+        sbst <- sapply(del.pos, function(p){paste0(substr(pept2, p, p), p, "-", collapse="_")})
         sbst <- paste0(sbst, collapse="|")
         return(sbst)
       }
@@ -226,18 +223,18 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
       df[["MutType"]] <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutType(df$"AASeq1"[i], df$"AASeq2"[i])}))
     } ## a bit slow...
     df[["MutPattern"]] <- dplyr::if_else(nchar(df$"AASeq1")==nchar(df$"AASeq2"), "Substitution", "Indel")
-    
+
     ## Output
     return(df)
   }
-  
+
   # A basic, non-directional, non-weighted network
   simNet <- net_main(aaStringSet)
   simNet_PairsDF <- net_pairs_DF(simNet, forceMutType=forceMutType)
   if(is.null(numSet)){
     return(list("SimilarityNetwork"=simNet, "PairsDF"=simNet_PairsDF))
   }
-  
+
   # A directional, weighted network
   df_num <- data.frame("Peptide"=as.character(aaStringSet), "Score"=numSet, stringsAsFactors=F)
   simNet_PairsDF_Directional <- simNet_PairsDF %>%
@@ -246,7 +243,9 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
     dplyr::transmute(AASeq1, AASeq2, Score1=Score.x, Score2=Score.y, MutType, MutPattern)
   simNet_PairsDF_Directional <- dplyr::bind_rows(
     simNet_PairsDF_Directional,
-    dplyr::transmute(simNet_PairsDF_Directional, AASeq1=AASeq2, AASeq2=AASeq1, Score1=Score2, Score2=Score1, MutType, MutPattern)
+    simNet_PairsDF_Directional %>%
+      dplyr::rename(AASeq1=AASeq2, AASeq2=AASeq1, Score1=Score2, Score2=Score1) %>%
+      dplyr::mutate(MutType=unlist(lapply(lapply(stringr::str_split(MutType, "_"), rev), paste0, collapse="_")))
   ) %>% dplyr::filter(Score1>=Score2) %>%
     dplyr::transmute(AASeq1, AASeq2, Score1, Score2, DeltaScore=Score1-Score2, MutType, MutPattern)
   simNet_Directional <- simNet_PairsDF_Directional %>%

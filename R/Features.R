@@ -5,7 +5,7 @@
 #' \code{Features_rTPCP} calculates descriptive statistics of repertoire-wide TCR-peptide pairwise contact potentials.\cr
 #'
 #' @param peptideSet A set of peptide sequences.
-#' @param TCRSet Either a set of TCR sequences (as a character vector) or a list of sets of TCR sequences. If provided as a list, it must be the same length with the seedSet.
+#' @param TCRSet Either a set of TCR sequences (as a character vector) or a list of sets of TCR sequences. If provided as a list, it must be the same length with the seedSet. Note: the maximum size is limited to 100000 sequences.
 #' @param fragLenSet A set of the lengths of TCR sequence fragments to be matched against the peptide set.
 #' @param aaIndexIDSet A set of AAIndexIDs indicating the pairwise matching score matrix to be used. A set of AAIndex-derived matrices can be retrieved by \code{AACPMatrix}. Set "all" to select all AAIndexIDs.
 #' @param alignTypeSet A set of alignment-type strings directly passed to the \code{type} argument of the \code{pairwiseAlignment} function in the \code{Biostrings} package.
@@ -238,15 +238,15 @@ Features_rTPCP <- function(
     c(TCRSet.FR, TCRSet.mock)  ## A character vector of length=depth*2
   }
 
-  ## Input check
+  ## Input formatting [Note: the upper limit of the starting repertoire is fixed to 100000]
   if(is.character(TCRSet)){
-    TCRSet <- lapply(seedSet, function(s){set.seed(s); sample(TCRSet, length(TCRSet))})
+    TCRSet <- lapply(seedSet, function(s){set.seed(s); sample(TCRSet, min(length(TCRSet), 100000))})
   }else if(is.list(TCRSet)){
     if(length(TCRSet)!=length(seedSet)){
       print("The length of TCRSet (list) and that of seedSet are not matched!")
       return(NULL)
     }else{
-      TCRSet <- mapply(function(tcr, s){set.seed(s); sample(tcr, length(tcr))}, TCRSet, seedSet, SIMPLIFY=F)
+      TCRSet <- mapply(function(tcr, s){set.seed(s); sample(tcr, min(length(tcr), 100000))}, TCRSet, seedSet, SIMPLIFY=F)
     }
   }
   names(TCRSet) <- seedSet
