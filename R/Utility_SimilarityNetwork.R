@@ -192,7 +192,7 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
       if(nchar(pept1)==nchar(pept2)){
         pwal <- Biostrings::pairwiseAlignment(pattern=pept1, subject=pept2, type="global")
         sbst <- Biostrings::mismatchTable(pwal)
-        sbst <- paste0(c(sbst$PatternSubstring, sbst$PatternStart, sbst$SubjectSubstring), collapse="_")
+        sbst <- paste0(c(as.character(sbst$PatternSubstring), sbst$PatternStart, as.character(sbst$SubjectSubstring)), collapse="_")
         return(sbst)
       }
       if(nchar(pept1)<nchar(pept2)){
