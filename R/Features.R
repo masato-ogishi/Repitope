@@ -85,6 +85,7 @@ Features <- function(
 #' @name Features_PeptideDescriptor
 Features_PeptideDescriptor <- function(peptideSet, fragLenSet=3:8, tmpDir=tempdir()){
   # Temp directory check
+  dir.create(tmpDir, showWarnings=F, recursive=T)
   out <- file.path(tmpDir, "df_feature_peptDesc.fst")
   if(file.exists(out)){
     return(fst::read.fst(out))
@@ -181,6 +182,7 @@ Features_rTPCP <- function(
   tmpDir=tempdir()
 ){
   # Start calculation
+  dir.create(tmpDir, showWarnings=F, recursive=T)
   time.start <- proc.time()
 
   # Pairwise contact potential matrices derived from AAIndex scales
