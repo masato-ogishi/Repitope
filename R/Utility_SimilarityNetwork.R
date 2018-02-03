@@ -192,7 +192,7 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
       if(nchar(pept1)==nchar(pept2)){
         pwal <- Biostrings::pairwiseAlignment(pattern=pept1, subject=pept2, type="global")
         sbst <- Biostrings::mismatchTable(pwal)
-        sbst <- paste0(sbst$PatternSubstring, sbst$PatternStart, sbst$SubjectSubstring, collapse="_")
+        sbst <- paste0(c(sbst$PatternSubstring, sbst$PatternStart, sbst$SubjectSubstring), collapse="_")
         return(sbst)
       }
       if(nchar(pept1)<nchar(pept2)){
@@ -202,7 +202,7 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
         longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
         longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
         del.pos <- which(longerSeq.degenerate==shorterseq)
-        sbst <- sapply(del.pos, function(p){paste0("-", p, substr(pept2, p, p), collapse="_")})
+        sbst <- sapply(del.pos, function(p){paste0(c("-", p, substr(pept2, p, p)), collapse="_")})
         sbst <- paste0(sbst, collapse="|")
         return(sbst)
       }
@@ -213,7 +213,7 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
         longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
         longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
         del.pos <- which(longerSeq.degenerate==shorterseq)
-        sbst <- sapply(del.pos, function(p){paste0(substr(pept2, p, p), p, "-", collapse="_")})
+        sbst <- sapply(del.pos, function(p){paste0(c(substr(pept2, p, p), p, "-"), collapse="_")})
         sbst <- paste0(sbst, collapse="|")
         return(sbst)
       }
