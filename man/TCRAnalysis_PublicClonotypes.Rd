@@ -2,40 +2,13 @@
 % Please edit documentation in R/TCRAnalysis_PublicClonotypes.R
 \name{TCRAnalysis_PublicClonotypes}
 \alias{TCRAnalysis_PublicClonotypes}
-\alias{distMat_Auto}
-\alias{TCRAnalysis_PublicClonotypes}
-\alias{distMat_Juxtaposed}
-\alias{TCRAnalysis_PublicClonotypes}
-\alias{singleAASimilarityNetwork}
-\alias{TCRAnalysis_PublicClonotypes}
 \alias{publicClonotypeAnalysis}
 \title{Public XCR clonotypes in the similarity network}
 \usage{
-distMat_Auto(aaStringSet)
-
-distMat_Juxtaposed(longerAAStringSet, shorterAAStringSet)
-
-singleAASimilarityNetwork(aaStringSet, numSet = NULL, directed = T,
-  weighted = T, forceMutType = F)
-
 publicClonotypeAnalysis(simNet, sizeThresholdSet = 10000,
   outputFileHeader = "./Graph/Graph_")
 }
 \arguments{
-\item{aaStringSet}{A set of XCR clonotype sequences (converted as an AAStringSet object).}
-
-\item{longerAAStringSet}{A set of XCR clonotype sequences. Should be one amino acid longer than \code{shorterAAStringSet}.}
-
-\item{shorterAAStringSet}{A set of XCR clonotype sequences. Should be one amino acid shorter than \code{longerAAStringSet}.}
-
-\item{numSet}{An attribute for the verteces.}
-
-\item{directed}{Should the network be converted from undirected to directed? Directions are determined by the \code{numSet} provided.}
-
-\item{weighted}{Should the network be converted to weihted? Edge weights are determined by the \code{numSet} provided.}
-
-\item{forceMutType}{Should mutational types be annotated? A little bit time-consuming.}
-
 \item{simNet}{A similarity network object.}
 
 \item{sizeThresholdSet}{A set of integers specifying the maximum numbers of clonotypes retained as public clonotypes. Based on the degree distribution, appropriate degree threshold will be internally calculated.}
