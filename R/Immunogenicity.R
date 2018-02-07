@@ -170,7 +170,7 @@ Immunogenicity <- function(
     # Batch machine learning
     leng <- length(preprocessedDFList)
     cat("Number of datasets = ", leng, "\n", sep="")
-    res <- lapply(i:leng, function(i){
+    res <- lapply(1:leng, function(i){
       cat(i, "/", leng, "| Parameter set: ", param, "\n", sep="")
       try(machine_learning(preprocessedDFList, i), silent=T)
     })
