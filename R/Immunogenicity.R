@@ -71,6 +71,7 @@ Immunogenicity <- function(
     s <- try(as.integer(rev(unlist(stringr::str_split(param, stringr::fixed("."))))[1]), silent=T)
     if(any(class(s)=="try-error")) s <- 123456789  ## ad hoc seed
     set.seed(s)
+    cat("Parameter set ", i, ": ", param, "\n", sep="")
 
     ## Skipping
     out <- paste0(destDir, "/", outputHeader, "_", param, "_")
@@ -171,7 +172,6 @@ Immunogenicity <- function(
     leng <- length(preprocessedDFList)
     cat("Number of datasets = ", leng, "\n", sep="")
     res <- lapply(1:leng, function(i){
-      cat(i, "/", leng, "| Parameter set: ", param, "\n", sep="")
       try(machine_learning(preprocessedDFList, i), silent=T)
     })
   }
