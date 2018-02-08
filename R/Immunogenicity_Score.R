@@ -25,27 +25,27 @@
 #' @rdname Immunogenicity_Score
 #' @name Immunogenicity_Score
 Immunogenicity_Score <- function(
-  featureDFFileNames_train, 
-  featureDFFileNames_predict=NULL, 
+  featureDFFileNames_train,
+  featureDFFileNames_predict=NULL,
   metadata_train,
   featureSet="all",
   seedSet=1:10,
-  maxJavaMemory="6G", 
+  maxJavaMemory="6G",
   coreN=parallel::detectCores()
 ){
   # Working function
   Immunogenicity_Score_Single <- function(
-    featureDFFileNames_train, 
-    featureDFFileNames_predict=NULL, 
+    featureDFFileNames_train,
+    featureDFFileNames_predict=NULL,
     metadata_train,
     featureSet="all",
     seed=12345,
-    maxJavaMemory="6G", 
+    maxJavaMemory="6G",
     coreN=parallel::detectCores()
   ){
     set.seed(seed)
     options(java.parameters=paste0("-Xmx", maxJavaMemory))
-    
+
     # Data for model training
     leng <- length(featureDFFileNames_train)
     dt_train_list <- lapply(featureDFFileNames_train, fst::read_fst, as.data.table=T)
@@ -55,7 +55,7 @@ Immunogenicity_Score <- function(
       )))
     }
     dt_train_list <- lapply(dt_train_list, function(dt){dplyr::select(dt, c("Peptide", featureSet))})
-    
+
     # Data for predicting immunogenicity
     if(is.null(featureDFFileNames_predict)){
       peptideSet <- sort(unique(unlist(
@@ -80,17 +80,17 @@ Immunogenicity_Score <- function(
         return(dt)
       }))
     }
-    
+
     predDTList <- pbapply::pblapply(
       1:leng,
       function(i){
         set.seed(i)
-        
+
         ## Preprocessing
         dt_train <- dt_train_list[[i]]
         pp_train <- caret::preProcess(dplyr::select(dt_train, -Peptide), method=c("center", "scale"))
         dt_train <- predict(pp_train, dt_train)
-        
+
         ## Model training
         trgt <- merge(dt_train, metadata_train, by="Peptide", sort=F)$"Immunogenicity"
         tab <- as.numeric(table(trgt))
@@ -101,23 +101,23 @@ Immunogenicity_Score <- function(
           mtry=35, numRandomCuts=2, weights=w,
           numThreads=ifelse(is.null(coreN), 1, coreN)
         )
-        
+
         ## Prediction
         if(is.null(featureDFFileNames_predict)) dt_pred <- dt_pred_list[[i]]
         mat <- as.matrix(predict(pp_train, dplyr::select(dt_pred, -Peptide, -DataSource)))
         pred <- cbind(
           dplyr::select(dt_pred, Peptide, DataSource),
-          data.frame(PredictedImmunogenicity=predict(et, mat, probability=F)), 
+          data.frame(PredictedImmunogenicity=predict(et, mat, probability=F)),
           as.data.frame(predict(et, mat, probability=T))
         )
         pred <- data.table::as.data.table(pred)
-        
+
         ## Output
         gc();gc()
         return(pred)
       }
     )
-    
+
     set.seed(seed)
     predDT <- data.table::rbindlist(predDTList)
     if(is.null(featureDFFileNames_predict)){
@@ -126,17 +126,18 @@ Immunogenicity_Score <- function(
     predDT[,Seed:=seed]
     return(predDT)
   }
-  
+
   # Batch workflow
-  dt <- data.table::rbindlist(lapply(seedSet, function(s){
-    cat("Seed = ", s, "/", length(seedSet), "\n", sep="")
+  dt <- data.table::rbindlist(lapply(1:length(seedSet), function(i){
+    s <- seedSet[i]
+    cat(i, "/", length(seedSet), " | Seed = ", s, "\n", sep="")
     dt <- Immunogenicity_Score_Single(
-      featureDFFileNames_train, 
-      featureDFFileNames_predict, 
+      featureDFFileNames_train,
+      featureDFFileNames_predict,
       metadata_train,
-      featureSet, 
+      featureSet,
       seed=s,
-      maxJavaMemory, 
+      maxJavaMemory,
       coreN
     )
     gc();gc()
