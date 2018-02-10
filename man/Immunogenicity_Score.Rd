@@ -22,28 +22,6 @@ Immunogenicity_Score(featureDFFileNames_train,
 \item{maxJavaMemory}{The upper limit of memory for Java virtual machine in megabytes.}
 
 \item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.}
-
-\item{dplyr}{select}
-
-\item{data.table}{:=}
-
-\item{data.table}{rbindlist}
-
-\item{data.table}{as.data.table}
-
-\item{data.table}{setcolorder}
-
-\item{parallel}{detectCores}
-
-\item{pbapply}{pblapply}
-
-\item{caret}{preProcess}
-
-\item{extraTrees}{extraTrees}
-
-\item{fst}{read_fst}
-
-\item{BBmisc}{chunk}
 }
 \description{
 \code{Immunogenicity_Score} calculates immunogenicity scores.

@@ -33,7 +33,7 @@
 #' @importFrom tibble as_tibble
 #' @importFrom fst read.fst
 #' @importFrom fst write.fst
-#' @importFrom Kmisc str_rev
+#' @importFrom Biostrings reverse
 #' @importFrom Biostrings pairwiseAlignment
 #' @importFrom Biostrings AA_STANDARD
 #' @importFrom psych describe
@@ -223,7 +223,7 @@ Features_rTPCP <- function(
   TCRFragDictSet <- function(TCRSet, fragLen, depth, seed){
     fragDict <- function(sequenceSet, fragLen, depth, seed){
       set.seed(seed)
-      s <- c(sequenceSet, Kmisc::str_rev(sequenceSet))
+      s <- c(sequenceSet, Biostrings::reverse(sequenceSet))
       f <- sapply(1:(max(nchar(s), na.rm=T)-fragLen+1), function(i){stringr::str_sub(s, i, i+fragLen-1)})
       f <- f[nchar(f)==fragLen]
       l <- length(f)

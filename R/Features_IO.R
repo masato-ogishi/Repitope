@@ -49,5 +49,5 @@ saveFeatureDFList <- function(featureDFList, fileNameHeader){
       function(i){fst::write.fst(featureDFList[[i]], paste0(fileNameHeader, names(featureDFList)[i], ".fst"))}
     )
   }
-  return(NULL)
+  invisible(NULL)
 }

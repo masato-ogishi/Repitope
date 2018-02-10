@@ -10,17 +10,17 @@
 #' @param maxJavaMemory The upper limit of memory for Java virtual machine in megabytes.
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.
 #' @importFrom dplyr %>%
-#' @param dplyr select
-#' @param data.table :=
-#' @param data.table rbindlist
-#' @param data.table as.data.table
-#' @param data.table setcolorder
-#' @param parallel detectCores
-#' @param pbapply pblapply
-#' @param caret preProcess
-#' @param extraTrees extraTrees
-#' @param fst read_fst
-#' @param BBmisc chunk
+#' @importFrom dplyr select
+#' @importFrom data.table :=
+#' @importFrom data.table rbindlist
+#' @importFrom data.table as.data.table
+#' @importFrom data.table setcolorder
+#' @importFrom parallel detectCores
+#' @importFrom pbapply pblapply
+#' @importFrom caret preProcess
+#' @importFrom extraTrees extraTrees
+#' @importFrom fst read_fst
+#' @importFrom BBmisc chunk
 #' @export
 #' @rdname Immunogenicity_Score
 #' @name Immunogenicity_Score
@@ -63,9 +63,8 @@ Immunogenicity_Score <- function(
       )))
       peptideSetList <- BBmisc::chunk(peptideSet, n.chunks=leng, shuffle=T)
       dt_pred_list <- lapply(1:leng, function(i){
-        dt <- dt_train_list[[i]]
-        dt <- dt[Peptide %in% peptideSetList[[i]],,]
-        dt <- dt[,DataSource:=featureDFFileNames_train[i]]
+        dt <- dt_train_list[[i]][Peptide %in% peptideSetList[[i]],]
+        dt[,DataSource:=featureDFFileNames_train[i]]
         return(dt)
       })
       dt_train_list <- lapply(1:leng, function(i){
@@ -74,9 +73,8 @@ Immunogenicity_Score <- function(
       })
     }else{
       dt_pred <- data.table::rbindlist(lapply(featureDFFileNames_predict, function(f){
-        dt <- fst::read_fst(f, as.data.table=T)
-        dt <- dplyr::select(dt, c("Peptide", featureSet))
-        dt <- dt[,DataSource:=f]
+        dt <- dplyr::select(fst::read_fst(f, as.data.table=T), c("Peptide", featureSet))
+        dt[,DataSource:=f]
         return(dt)
       }))
     }
