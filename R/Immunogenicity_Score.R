@@ -3,10 +3,10 @@
 #' \code{Immunogenicity_Score} calculates immunogenicity scores.
 #'
 #' @param featureDFFileNames_train A character vector of the fst file names of feature dataframes for model training.
-#' @param featureDFFileNames_predict A character vector of the fst file names of feature dataframes for predicting immunogenicity scores. If \code{NULL}, model training data was splitted into training and prediction subdatasets.
+#' @param featureDFFileNames_predict A character vector of the fst file names of feature dataframes for predicting immunogenicity scores. If the length equals to that of \code{featureDFFileNames_train}, each dataframe will be subject to the prediction by the classifier trained from the corresponding training dataframe. Otherwise, they will be subject to the prediction in an all-by-all manner. If \code{NULL}, model training dataframe will be splitted into training and prediction dataframes.
 #' @param metadata_train A dataframe containig "Peptide" and "Immunogenicity" columns for model training.
 #' @param featureSet A set of features for model training.
-#' @param seedSet A set of random seeds for bootstrapping.
+#' @param seedSet A set of random seeds for bootstrapping. Can be a single value when \code{featureDFFileNames_predict} is provided.
 #' @param maxJavaMemory The upper limit of memory for Java virtual machine in megabytes.
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.
 #' @importFrom dplyr %>%
@@ -33,18 +33,15 @@ Immunogenicity_Score <- function(
   maxJavaMemory="6G",
   coreN=parallel::detectCores()
 ){
-  # Working function
-  Immunogenicity_Score_Single <- function(
+  options(java.parameters=paste0("-Xmx", maxJavaMemory))
+
+  dt_lists <- function(
     featureDFFileNames_train,
     featureDFFileNames_predict=NULL,
-    metadata_train,
     featureSet="all",
-    seed=12345,
-    maxJavaMemory="6G",
-    coreN=parallel::detectCores()
+    seed=12345
   ){
     set.seed(seed)
-    options(java.parameters=paste0("-Xmx", maxJavaMemory))
 
     # Data for model training
     leng <- length(featureDFFileNames_train)
@@ -54,97 +51,121 @@ Immunogenicity_Score <- function(
         lapply(dt_train_list, function(dt){setdiff(colnames(dt), "Peptide")})
       )))
     }
-    dt_train_list <- lapply(dt_train_list, function(dt){dplyr::select(dt, c("Peptide", featureSet))})
+    dt_train_list <- lapply(1:leng, function(i){
+      dt_train_list[[i]] %>%
+        dplyr::select(c("Peptide", featureSet)) %>%
+        dplyr::mutate(DataSource_Train=featureDFFileNames_train[i],
+                      Seed=NA)
+    })
 
     # Data for predicting immunogenicity
     if(is.null(featureDFFileNames_predict)){
       peptideSet <- sort(unique(unlist(
         lapply(dt_train_list, function(dt){dt$"Peptide"})
       )))
-      peptideSetList <- BBmisc::chunk(peptideSet, n.chunks=leng, shuffle=T)
+      peptideSetList <- BBmisc::chunk(peptideSet, n.chunks=leng, shuffle=T)  ## requires a random seed
       dt_pred_list <- lapply(1:leng, function(i){
-        dt <- dt_train_list[[i]][Peptide %in% peptideSetList[[i]],]
-        dt[,DataSource:=featureDFFileNames_train[i]]
-        return(dt)
+        dt_train_list[[i]] %>%
+          dplyr::filter(Peptide %in% peptideSetList[[i]]) %>%
+          dplyr::mutate(DataSource_Pred=featureDFFileNames_train[i],
+                        Seed=seed) %>%
+          data.table::as.data.table()
       })
       dt_train_list <- lapply(1:leng, function(i){
-        dt <- dt_train_list[[i]]
-        dt[!Peptide %in% peptideSetList[[i]],,]
+        dt_train_list[[i]] %>%
+          dplyr::filter(!Peptide %in% peptideSetList[[i]]) %>%
+          dplyr::mutate(DataSource_Train=featureDFFileNames_train[i],
+                        Seed=seed) %>%
+          data.table::as.data.table()
       })
     }else{
-      dt_pred <- data.table::rbindlist(lapply(featureDFFileNames_predict, function(f){
-        dt <- dplyr::select(fst::read_fst(f, as.data.table=T), c("Peptide", featureSet))
-        dt[,DataSource:=f]
-        return(dt)
-      }))
+      dt_pred_list <- lapply(featureDFFileNames_predict, function(f){
+        fst::read_fst(f) %>%
+          dplyr::select(c("Peptide", featureSet)) %>%
+          dplyr::mutate(DataSource_Pred=f,
+                        Seed=NA) %>%
+          data.table::as.data.table()
+      })
     }
+    gc();gc()
+    list(dt_train_list, dt_pred_list)
+  }
 
-    predDTList <- pbapply::pblapply(
-      1:leng,
-      function(i){
-        set.seed(i)
+  immscore <- function(dt_train, dt_pred){
+    ## Preprocessing
+    pp_train <- caret::preProcess(dplyr::select(dt_train, -Peptide, -DataSource_Train, -Seed), method=c("center", "scale"))
+    dt_train <- predict(pp_train, dt_train)
 
-        ## Preprocessing
-        dt_train <- dt_train_list[[i]]
-        pp_train <- caret::preProcess(dplyr::select(dt_train, -Peptide), method=c("center", "scale"))
-        dt_train <- predict(pp_train, dt_train)
-
-        ## Model training
-        trgt <- merge(dt_train, metadata_train, by="Peptide", sort=F)$"Immunogenicity"
-        tab <- as.numeric(table(trgt))
-        w <- 1/tab[trgt]
-        mat <- as.matrix(dplyr::select(dt_train, -Peptide))
-        et <- extraTrees::extraTrees(
-          x=mat, y=trgt,
-          mtry=35, numRandomCuts=2, weights=w,
-          numThreads=ifelse(is.null(coreN), 1, coreN)
-        )
-
-        ## Prediction
-        if(is.null(featureDFFileNames_predict)) dt_pred <- dt_pred_list[[i]]
-        mat <- as.matrix(predict(pp_train, dplyr::select(dt_pred, -Peptide, -DataSource)))
-        pred <- cbind(
-          dplyr::select(dt_pred, Peptide, DataSource),
-          data.frame(PredictedImmunogenicity=predict(et, mat, probability=F)),
-          as.data.frame(predict(et, mat, probability=T))
-        )
-        pred <- data.table::as.data.table(pred)
-
-        ## Output
-        gc();gc()
-        return(pred)
-      }
+    ## Model training
+    trgt <- merge(dt_train, metadata_train, by="Peptide", sort=F)$"Immunogenicity"
+    tab <- as.numeric(table(trgt))
+    w <- 1/tab[trgt]
+    mat <- as.matrix(dplyr::select(dt_train, -Peptide))
+    et <- extraTrees::extraTrees(
+      x=mat, y=trgt,
+      mtry=35, numRandomCuts=2, weights=w,
+      numThreads=ifelse(is.null(coreN), 1, coreN)
     )
 
-    set.seed(seed)
-    predDT <- data.table::rbindlist(predDTList)
-    if(is.null(featureDFFileNames_predict)){
-      predDT <- merge(predDT, metadata_train, by="Peptide", sort=F)
-    }
-    predDT[,Seed:=seed]
+    ## Prediction
+    mat <- as.matrix(predict(pp_train, dplyr::select(dt_pred, -Peptide, -DataSource_Pred, -Seed)))
+    predDT <- cbind(
+      dplyr::select(dt_pred, Peptide, DataSource_Pred, Seed),
+      data.frame(PredictedImmunogenicity=predict(et, mat, probability=F)),
+      as.data.frame(predict(et, mat, probability=T))
+    ) %>%
+      dplyr::mutate(DataSource_Train=unique(dt_train$DataSource_Train)) %>%
+      data.table::as.data.table()
+    data.table::setcolorder(predDT, c("Peptide","PredictedImmunogenicity","Positive","Negative","DataSource_Train","DataSource_Pred","Seed"))
+
+    ## Output
+    gc();gc()
     return(predDT)
   }
 
-  # Batch workflow
-  dt <- data.table::rbindlist(lapply(1:length(seedSet), function(i){
+  immscore_batch <- function(dt_train_list, dt_pred_list){
+    if(length(dt_train_list)==length(dt_pred_list)){
+      predDTList <- pbapply::pblapply(
+        1:length(dt_train_list),
+        function(i){immscore(dt_train_list[[i]], dt_pred_list[[i]])}
+      )
+    }else{
+      comb <- expand.grid(1:length(dt_train_list), 1:length(dt_pred_list))
+      predDTList <- pbapply::pblapply(
+        1:nrow(comb),
+        function(i){
+          a <- comb[i, 1]
+          b <- comb[i, 2]
+          immscore(dt_train_list[[a]], dt_pred_list[[b]])
+        }
+      )
+    }
+    predDT <- data.table::rbindlist(predDTList)
+    if(is.null(featureDFFileNames_predict)){
+      predDT <- merge(predDT, metadata_train, by="Peptide", sort=F)
+      data.table::setcolorder(predDT, c("Peptide","Immunogenicity","PredictedImmunogenicity","Positive","Negative","DataSource_Train","DataSource_Pred","Seed"))
+    }
+    return(predDT)
+  }
+
+  # Batch analysis
+  immScoreDT <- data.table::rbindlist(lapply(1:length(seedSet), function(i){
     s <- seedSet[i]
     cat(i, "/", length(seedSet), " | Seed = ", s, "\n", sep="")
-    dt <- Immunogenicity_Score_Single(
+    dts <- dt_lists(
       featureDFFileNames_train,
       featureDFFileNames_predict,
-      metadata_train,
       featureSet,
-      seed=s,
-      maxJavaMemory,
-      coreN
+      seed=s
     )
+    immScoreDT <- immscore_batch(dts[[1]], dts[[2]])
+    rm(list=setdiff(ls(), "immScoreDT"))
     gc();gc()
-    return(dt)
+    return(immScoreDT)
   }))
-  if(is.null(featureDFFileNames_predict)){
-    data.table::setcolorder(dt, c("Peptide","Immunogenicity","PredictedImmunogenicity","Positive","Negative","Seed","DataSource"))
-  }else{
-    data.table::setcolorder(dt, c("Peptide","PredictedImmunogenicity","Positive","Negative","Seed","DataSource"))
-  }
-  return(dt)
+
+  # Output
+  rm(list=setdiff(ls(), "immScoreDT"))
+  gc();gc()
+  return(immScoreDT)
 }
