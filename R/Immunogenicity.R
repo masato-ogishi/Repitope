@@ -6,7 +6,6 @@
 #' @param featureSet A set of features to be used for model training. If "all", all features in the training dataframe except "DataType", "Immunogenicity", "Peptide", and "Cluster" will be used.
 #' @param destDir A directory for loading & exporting data.
 #' @param outputHeader A file/folder name header for the outputs to be saved.
-#' @param maxJavaMemory The upper limit of memory for Java virtual machine in megabytes.
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr select
@@ -31,11 +30,10 @@
 Immunogenicity <- function(
   preprocessedDFList=NULL, featureSet="all",
   destDir="./Immunogenicity/", outputHeader="Output",
-  maxJavaMemory="6G", coreN=parallel::detectCores()
+  coreN=parallel::detectCores()
 ){
   # Working environment
   dir.create(destDir, showWarnings=F, recursive=T)
-  options(java.parameters=paste0("-Xmx", maxJavaMemory))
 
   # Internally used functions
   machine_learning <- function(preprocessedDFList, i){

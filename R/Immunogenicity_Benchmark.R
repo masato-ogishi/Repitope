@@ -8,7 +8,6 @@
 #' @param omitLearnerSet (Optional) A set of learner strings to be omitted from model benchmarking. Set \code{NULL} to ignore.
 #' @param destDir A directory for loading & exporting data.
 #' @param outputHeader A file/folder name header for the outputs to be saved.
-#' @param maxJavaMemory The upper limit of memory for Java virtual machine in megabytes.
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr select
@@ -51,11 +50,10 @@
 #' @name Immunogenicity_Benchmark
 Immunogenicity_Benchmark <- function(
   preprocessedDFList, learnerSet=NULL, omitLearnerSet=NULL,
-  destDir="./Benchmark/", maxJavaMemory="6G", coreN=parallel::detectCores()
+  destDir="./Benchmark/", coreN=parallel::detectCores()
 ){
   # Working environment
   dir.create(destDir, showWarnings=F, recursive=T)
-  options(java.parameters=paste0("-Xmx", maxJavaMemory))
 
   # Input check
   if(any(class(preprocessedDFList[[1]])=="data.frame")) preprocessedDFList <- lapply(preprocessedDFList, function(d){list("dt"=d)})

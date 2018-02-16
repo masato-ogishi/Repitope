@@ -7,7 +7,6 @@
 #' @param metadata_train A dataframe containig "Peptide" and "Immunogenicity" columns for model training.
 #' @param featureSet A set of features for model training.
 #' @param seedSet A set of random seeds for bootstrapping. Can be a single value when \code{featureDFFileNames_predict} is provided.
-#' @param maxJavaMemory The upper limit of memory for Java virtual machine in megabytes.
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr select
@@ -30,11 +29,9 @@ Immunogenicity_Score <- function(
   metadata_train,
   featureSet="all",
   seedSet=1:10,
-  maxJavaMemory="6G",
   coreN=parallel::detectCores()
 ){
-  options(java.parameters=paste0("-Xmx", maxJavaMemory))
-
+  # Working functions
   dt_lists <- function(
     featureDFFileNames_train,
     featureDFFileNames_predict=NULL,
@@ -43,22 +40,23 @@ Immunogenicity_Score <- function(
   ){
     set.seed(seed)
 
-    # Data for model training
+    ## Data for model training
     leng <- length(featureDFFileNames_train)
     dt_train_list <- lapply(featureDFFileNames_train, fst::read_fst, as.data.table=T)
     if(identical(featureSet, "all")){
       featureSet <- sort(unique(unlist(
-        lapply(dt_train_list, function(dt){setdiff(colnames(dt), "Peptide")})
+        lapply(dt_train_list, function(dt){setdiff(colnames(dt), c("Peptide", "Immunogenicity", "DataType", "Cluster"))})
       )))
     }
     dt_train_list <- lapply(1:leng, function(i){
       dt_train_list[[i]] %>%
         dplyr::select(c("Peptide", featureSet)) %>%
         dplyr::mutate(DataSource_Train=featureDFFileNames_train[i],
-                      Seed=NA)
+                      Seed=NA) %>%
+        data.table::as.data.table()
     })
 
-    # Data for predicting immunogenicity
+    ## Data for predicting immunogenicity
     if(is.null(featureDFFileNames_predict)){
       peptideSet <- sort(unique(unlist(
         lapply(dt_train_list, function(dt){dt$"Peptide"})
@@ -93,14 +91,14 @@ Immunogenicity_Score <- function(
 
   immscore <- function(dt_train, dt_pred){
     ## Preprocessing
-    pp_train <- caret::preProcess(dplyr::select(dt_train, -Peptide, -DataSource_Train, -Seed), method=c("center", "scale"))
+    pp_train <- caret::preProcess(dplyr::select(dt_train, featureSet), method=c("center", "scale"))
     dt_train <- predict(pp_train, dt_train)
 
     ## Model training
     trgt <- merge(dt_train, metadata_train, by="Peptide", sort=F)$"Immunogenicity"
     tab <- as.numeric(table(trgt))
     w <- 1/tab[trgt]
-    mat <- as.matrix(dplyr::select(dt_train, -Peptide))
+    mat <- as.matrix(dplyr::select(dt_train, featureSet))
     et <- extraTrees::extraTrees(
       x=mat, y=trgt,
       mtry=35, numRandomCuts=2, weights=w,
@@ -108,7 +106,7 @@ Immunogenicity_Score <- function(
     )
 
     ## Prediction
-    mat <- as.matrix(predict(pp_train, dplyr::select(dt_pred, -Peptide, -DataSource_Pred, -Seed)))
+    mat <- as.matrix(predict(pp_train, dplyr::select(dt_pred, featureSet)))
     predDT <- cbind(
       dplyr::select(dt_pred, Peptide, DataSource_Pred, Seed),
       data.frame(PredictedImmunogenicity=predict(et, mat, probability=F)),
@@ -133,11 +131,7 @@ Immunogenicity_Score <- function(
       comb <- expand.grid(1:length(dt_train_list), 1:length(dt_pred_list))
       predDTList <- pbapply::pblapply(
         1:nrow(comb),
-        function(i){
-          a <- comb[i, 1]
-          b <- comb[i, 2]
-          immscore(dt_train_list[[a]], dt_pred_list[[b]])
-        }
+        function(i){immscore(dt_train_list[[comb[i, 1]]], dt_pred_list[[comb[i, 2]]])}
       )
     }
     predDT <- data.table::rbindlist(predDTList)

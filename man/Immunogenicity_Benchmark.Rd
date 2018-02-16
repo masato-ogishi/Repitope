@@ -5,7 +5,7 @@
 \title{Benchmarking various algorithms for immunogenicity prediction.}
 \usage{
 Immunogenicity_Benchmark(preprocessedDFList, learnerSet = NULL,
-  omitLearnerSet = NULL, destDir = "./Benchmark/", maxJavaMemory = "6G",
+  omitLearnerSet = NULL, destDir = "./Benchmark/",
   coreN = parallel::detectCores())
 }
 \arguments{
@@ -16,8 +16,6 @@ Immunogenicity_Benchmark(preprocessedDFList, learnerSet = NULL,
 \item{omitLearnerSet}{(Optional) A set of learner strings to be omitted from model benchmarking. Set \code{NULL} to ignore.}
 
 \item{destDir}{A directory for loading & exporting data.}
-
-\item{maxJavaMemory}{The upper limit of memory for Java virtual machine in megabytes.}
 
 \item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.}
 

@@ -6,7 +6,7 @@
 \usage{
 Immunogenicity_Score(featureDFFileNames_train,
   featureDFFileNames_predict = NULL, metadata_train, featureSet = "all",
-  seedSet = 1:10, maxJavaMemory = "6G", coreN = parallel::detectCores())
+  seedSet = 1:10, coreN = parallel::detectCores())
 }
 \arguments{
 \item{featureDFFileNames_train}{A character vector of the fst file names of feature dataframes for model training.}
@@ -18,8 +18,6 @@ Immunogenicity_Score(featureDFFileNames_train,
 \item{featureSet}{A set of features for model training.}
 
 \item{seedSet}{A set of random seeds for bootstrapping. Can be a single value when \code{featureDFFileNames_predict} is provided.}
-
-\item{maxJavaMemory}{The upper limit of memory for Java virtual machine in megabytes.}
 
 \item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.}
 }
