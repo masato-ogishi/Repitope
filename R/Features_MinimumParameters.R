@@ -32,13 +32,22 @@ Features_MinimumParameters <- function(preprocessedDFList, criteria="intersect")
   # Decode additional parameter sets from the minimally selected features
   featureSet <- setdiff(Reduce(criteria, lapply(preprocessedDFList, function(l){colnames(l$"dt")})), c("DataType", "Peptide", "Immunogenicity", "Cluster"))
   featureSet_pept <- grep("PeptDesc_", featureSet, value=T)
-  featureSet_pept <- as.data.frame(t(as.data.frame(stringr::str_split(featureSet_pept, stringr::fixed("_")), fix.empty.names=F)))
-  fragLenSet_pept <- as.numeric(as.character(unique(featureSet_pept[[4]])))
+  if(length(featureSet_pept)>=1){
+    featureSet_pept <- as.data.frame(t(as.data.frame(stringr::str_split(featureSet_pept, stringr::fixed("_")), fix.empty.names=F)))
+    fragLenSet_pept <- as.numeric(as.character(unique(featureSet_pept[[4]])))
+  }else{
+    fragLenSet_pept <- numeric(0)
+  }
   featureSet_rTPCP <- grep("rTPCP_", featureSet, value=T)
-  featureSet_rTPCP <- as.data.frame(t(as.data.frame(stringr::str_split(featureSet_rTPCP, stringr::fixed("_")), fix.empty.names=F)))
-  fragLenSet_rTPCP <- as.numeric(as.character(unique(featureSet_rTPCP[[5]])))
+  if(length(featureSet_rTPCP)>=1){
+    featureSet_rTPCP <- as.data.frame(t(as.data.frame(stringr::str_split(featureSet_rTPCP, stringr::fixed("_")), fix.empty.names=F)))
+    fragLenSet_rTPCP <- as.numeric(as.character(unique(featureSet_rTPCP[[5]])))
+    aaIndexIDSet <- sort(as.character(unique(gsub("inv$", "", featureSet_rTPCP[[4]]))))
+  }else{
+    fragLenSet_rTPCP <- numeric(0)
+    aaIndexIDSet <- character(0)
+  }
   fragLenSet <- sort(union(fragLenSet_pept, fragLenSet_rTPCP))
-  aaIndexIDSet <- sort(as.character(unique(gsub("inv$", "", featureSet_rTPCP[[4]]))))
   message("Fragment lengths: ", paste0(fragLenSet, collapse=", "))
   message("AAIndex scales: ", paste0(aaIndexIDSet, collapse=", "))
 
