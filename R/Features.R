@@ -92,6 +92,7 @@ Features_PeptideDescriptor <- function(peptideSet, fragLenSet=3:8, tmpDir=tempdi
   }
 
   # Start calculation
+  set.seed(12345)
   time.start <- proc.time()
 
   # Working functions
@@ -183,6 +184,7 @@ Features_rTPCP <- function(
 ){
   # Start calculation
   dir.create(tmpDir, showWarnings=F, recursive=T)
+  set.seed(12345)
   time.start <- proc.time()
 
   # Pairwise contact potential matrices derived from AAIndex scales
@@ -293,15 +295,16 @@ Features_rTPCP <- function(
   TCRFragDict_descfile <- paste0("TCRFragDict.desc")
   if(!file.exists(file.path(tmpDir, TCRFragDict_descfile))){
     TCRFragDict <- bigmemory::as.big.matrix(
-      as.matrix(TCRFragDict), type = "double", separated = F,
-      backingpath = tmpDir,
-      backingfile = TCRFragDict_binfile,
-      descriptorfile = TCRFragDict_descfile
+      as.matrix(TCRFragDict), type="double", separated=F,
+      backingpath=tmpDir,
+      backingfile=TCRFragDict_binfile,
+      descriptorfile=TCRFragDict_descfile
     )
   }
   message("Preparation of TCR fragment dictionary was finished.")
 
   # Fragment matching analysis
+  set.seed(12345)
 
   ## Working functions
   load_AAIndexMatrix <- function(AAIndexID){
@@ -366,6 +369,7 @@ Features_rTPCP <- function(
     )
     dt <- snow::parLapply(cl=cl,
       peptideSet, function(pept){
+        set.seed(12345)
         aaIndexMatrix_Tmp <- load_AAIndexMatrix(AAIndexID)
         TCRSet_Tmp <- load_TCRSet(TCRParameterString)
         calculate_stats_single(pept, TCRSet_Tmp, aaIndexMatrix_Tmp, alignType, statSet)
@@ -401,7 +405,7 @@ Features_rTPCP <- function(
   ## Final formatting
   message("Data formatting...")
   dt_feature <- pbapply::pblapply(
-    list.files(pattern="^dt_feature_rTPCP.+fst$", path=tmpDir, full.names=T), fst::read.fst
+    list.files(pattern="^dt_feature_rTPCP.+fst$", path=tmpDir, full.names=T), fst::read.fst, as.data.table=T
   ) %>% data.table::rbindlist() %>% data.table::as.data.table()
   dt_feature <- cbind(
     dt_feature,
