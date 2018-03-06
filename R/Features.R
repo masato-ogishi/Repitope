@@ -225,11 +225,8 @@ Features_rTPCP <- function(
   TCRFragDictSet <- function(TCRSet, fragLen, depth, seed){
     fragDict <- function(sequenceSet, fragLen, depth, seed){
       set.seed(seed)
-      s <- c(sequenceSet, Biostrings::reverse(sequenceSet))
-      f <- sapply(1:(max(nchar(s), na.rm=T)-fragLen+1), function(i){stringr::str_sub(s, i, i+fragLen-1)})
-      f <- f[nchar(f)==fragLen]
-      l <- length(f)
-      pr <- table(f)/l
+      fr <- sequenceSlidingWindow(c(sequenceSet, Biostrings::reverse(sequenceSet)), fragLen)
+      pr <- table(fr)/length(fr)
       sample(names(pr), size=depth, replace=T, prob=pr)
     }
     TCRSet.FR <- fragDict(TCRSet, fragLen, depth, seed)

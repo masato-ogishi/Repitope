@@ -2,6 +2,8 @@
 % Please edit documentation in R/Utility.R
 \name{Utility}
 \alias{Utility}
+\alias{sequenceSlidingWindow}
+\alias{Utility}
 \alias{sequenceFilter}
 \alias{Utility}
 \alias{compressedToLongFormat}
@@ -9,6 +11,8 @@
 \alias{standardizeHLAString}
 \title{Miscellaneous utility functions.}
 \usage{
+sequenceSlidingWindow(sequenceSet, windowSize)
+
 sequenceFilter(sequenceSet)
 
 compressedToLongFormat(df, compressedColumnName)
@@ -18,6 +22,8 @@ standardizeHLAString(HLAStrings)
 \arguments{
 \item{sequenceSet}{A set of amino acid sequences.}
 
+\item{windowSize}{A size of the sliding window.}
+
 \item{df}{A dataframe like \code{Repitope::EpitopeDataset} which has compressed columns.}
 
 \item{compressedColumnName}{A string indicating the names of the compressed column to be converted into a long format.}
@@ -25,6 +31,7 @@ standardizeHLAString(HLAStrings)
 \item{HLAStrings}{A character vector of HLA class I strings to be standardized.}
 }
 \description{
+\code{sequenceSlidingWindow} does a sliding window with a fixed window size.
 \code{sequenceFilter} filters amino acid sequences so that those containing non-standard letters are excluded.
 \code{compressedToLongFormat} converts a compresed dataframe into a long-format dataframe. The compressed strings should be separated by "|".
 \code{standardizeHLAString} standardizes HLA class I strings.

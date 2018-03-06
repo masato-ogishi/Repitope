@@ -1,10 +1,12 @@
 #' Miscellaneous utility functions.
 #'
+#' \code{sequenceSlidingWindow} does a sliding window with a fixed window size.
 #' \code{sequenceFilter} filters amino acid sequences so that those containing non-standard letters are excluded.
 #' \code{compressedToLongFormat} converts a compresed dataframe into a long-format dataframe. The compressed strings should be separated by "|".
 #' \code{standardizeHLAString} standardizes HLA class I strings.
 #'
 #' @param sequenceSet A set of amino acid sequences.
+#' @param windowSize A size of the sliding window.
 #' @param df A dataframe like \code{Repitope::EpitopeDataset} which has compressed columns.
 #' @param compressedColumnName A string indicating the names of the compressed column to be converted into a long format.
 #' @param HLAStrings A character vector of HLA class I strings to be standardized.
@@ -16,6 +18,16 @@
 #' @importFrom zoo coredata
 #' @importFrom data.table rbindlist
 #' @importFrom purrr flatten
+#' @export
+#' @rdname Utility
+#' @name Utility
+sequenceSlidingWindow <- function(sequenceSet, windowSize){
+  f <- sapply(1:(max(nchar(sequenceSet), na.rm=T)-windowSize+1),
+              function(i){stringr::str_sub(sequenceSet, i, i+windowSize-1)})
+  f <- f[nchar(f)==windowSize]
+  return(f)
+}
+
 #' @export
 #' @rdname Utility
 #' @name Utility
