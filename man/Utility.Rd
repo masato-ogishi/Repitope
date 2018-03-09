@@ -9,6 +9,8 @@
 \alias{compressedToLongFormat}
 \alias{Utility}
 \alias{standardizeHLAString}
+\alias{Utility}
+\alias{convertToHLASupertypes}
 \title{Miscellaneous utility functions.}
 \usage{
 sequenceSlidingWindow(sequenceSet, windowSize)
@@ -18,6 +20,8 @@ sequenceFilter(sequenceSet)
 compressedToLongFormat(df, compressedColumnName)
 
 standardizeHLAString(HLAStrings)
+
+convertToHLASupertypes(HLAStrings)
 }
 \arguments{
 \item{sequenceSet}{A set of amino acid sequences.}
@@ -28,11 +32,12 @@ standardizeHLAString(HLAStrings)
 
 \item{compressedColumnName}{A string indicating the names of the compressed column to be converted into a long format.}
 
-\item{HLAStrings}{A character vector of HLA class I strings to be standardized.}
+\item{HLAStrings}{A character vector of HLA class I strings.}
 }
 \description{
-\code{sequenceSlidingWindow} does a sliding window with a fixed window size.
-\code{sequenceFilter} filters amino acid sequences so that those containing non-standard letters are excluded.
-\code{compressedToLongFormat} converts a compresed dataframe into a long-format dataframe. The compressed strings should be separated by "|".
-\code{standardizeHLAString} standardizes HLA class I strings.
+\code{sequenceSlidingWindow} does a sliding window with a fixed window size.\cr
+\code{sequenceFilter} filters amino acid sequences so that those containing non-standard letters are excluded.\cr
+\code{compressedToLongFormat} converts a compresed dataframe into a long-format dataframe. The compressed strings should be separated by "|".\cr
+\code{standardizeHLAString} standardizes HLA class I strings.\cr
+\code{convertToHLASupertypes} classifies standardized HLA class I strings into 10 major HLA supertypes. Note: this function is intended for use with the internally stored \code{EpitopeDataset} and therefore does not cover all HLAs.\cr
 }
