@@ -20,5 +20,5 @@ Immunogenicity(preprocessedDFList = NULL, featureSet = "all",
 \item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.}
 }
 \description{
-\code{Immunogenicity} is a wrapper function for training and evaluating a classifier. The optimized algorithm is used by default.\cr
+\code{Immunogenicity} is a wrapper function for training and evaluating a classifier of peptide immunogenicity. The optimized machine learning algorithm is used internally.\cr
 }

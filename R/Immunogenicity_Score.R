@@ -1,7 +1,5 @@
 #' Immunogenicity score.
 #'
-#' \code{Immunogenicity_Score} calculates immunogenicity scores.
-#'
 #' @param featureDFFileNames_train A character vector of the fst file names of feature dataframes for model training.
 #' @param featureDFFileNames_predict A character vector of the fst file names of feature dataframes for predicting immunogenicity scores. If the length equals to that of \code{featureDFFileNames_train}, each dataframe will be subject to the prediction by the classifier trained from the corresponding training dataframe. Otherwise, they will be subject to the prediction in an all-by-all manner. If \code{NULL}, model training dataframe will be splitted into training and prediction dataframes.
 #' @param metadata_train A dataframe containig "Peptide" and "Immunogenicity" columns for model training.

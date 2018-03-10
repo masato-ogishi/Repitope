@@ -2,7 +2,7 @@
 #'
 #' \code{Features} is a wrapper function, generating a list of dataframes of peptide features calculated with different parameter sets.
 #' \code{Features_PeptideDescriptor} calculates descriptive statistics using peptide descriptors.\cr
-#' \code{Features_rTPCP} calculates descriptive statistics of repertoire-wide TCR-peptide pairwise contact potentials.\cr
+#' \code{Features_rTPCP} calculates descriptive statistics of repertoire-wide TCR-peptide pairwise contact profiles.\cr
 #'
 #' @param peptideSet A set of peptide sequences.
 #' @param TCRSet Either a set of TCR sequences (as a character vector) or a list of sets of TCR sequences. If provided as a list, it must be the same length with the seedSet. Note: the maximum size is limited to 100000 sequences.
@@ -76,6 +76,11 @@ Features <- function(
 
   message("Combining the results.")
   df_feature_list <- lapply(dt_feature_rTPCP, function(dt){tibble::as_tibble(cbind(df_feature_peptDesc, dt[,"Peptide":=NULL]))})
+  gc();gc()
+
+  message("Erase the temporary folder...")
+  unlink(tmpDir, recursive=T)
+
   return(df_feature_list)
 }
 

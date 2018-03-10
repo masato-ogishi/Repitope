@@ -22,5 +22,5 @@ Immunogenicity_Score(featureDFFileNames_train,
 \item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.}
 }
 \description{
-\code{Immunogenicity_Score} calculates immunogenicity scores.
+Immunogenicity score.
 }

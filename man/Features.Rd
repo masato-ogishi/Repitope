@@ -38,5 +38,5 @@ Features_rTPCP(peptideSet, TCRSet, fragLenSet = 3:8, aaIndexIDSet = "all",
 \description{
 \code{Features} is a wrapper function, generating a list of dataframes of peptide features calculated with different parameter sets.
 \code{Features_PeptideDescriptor} calculates descriptive statistics using peptide descriptors.\cr
-\code{Features_rTPCP} calculates descriptive statistics of repertoire-wide TCR-peptide pairwise contact potentials.\cr
+\code{Features_rTPCP} calculates descriptive statistics of repertoire-wide TCR-peptide pairwise contact profiles.\cr
 }
