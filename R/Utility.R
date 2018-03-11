@@ -1,7 +1,7 @@
 #' Miscellaneous utility functions.
 #'
-#' \code{sequenceSlidingWindow} does a sliding window with a fixed window size.\cr
 #' \code{sequenceFilter} filters amino acid sequences so that those containing non-standard letters are excluded.\cr
+#' \code{sequenceSlidingWindow} does a sliding window with a fixed window size.\cr
 #' \code{compressedToLongFormat} converts a compresed dataframe into a long-format dataframe. The compressed strings should be separated by "|".\cr
 #' \code{hlaGenotypeToSupertype} translates HLA class I genotype strings to corresponding supertypes. Uses the genotype-supertype relation dataset from Sidney et al., 2008. \cr
 #'
@@ -30,16 +30,6 @@
 #' @export
 #' @rdname Utility
 #' @name Utility
-sequenceSlidingWindow <- function(sequenceSet, windowSize){
-  f <- sapply(1:(max(nchar(sequenceSet), na.rm=T)-windowSize+1),
-              function(i){stringr::str_sub(sequenceSet, i, i+windowSize-1)})
-  f <- f[nchar(f)==windowSize]
-  return(f)
-}
-
-#' @export
-#' @rdname Utility
-#' @name Utility
 sequenceFilter <- function(sequenceSet){
   s <- sequenceSet[!is.na(sequenceSet)]
   s <- toupper(s)
@@ -49,6 +39,16 @@ sequenceFilter <- function(sequenceSet){
     s <- s[!stringr::str_detect(s, stringr::fixed(l))]
   }
   return(s)
+}
+
+#' @export
+#' @rdname Utility
+#' @name Utility
+sequenceSlidingWindow <- function(sequenceSet, windowSize){
+  f <- sapply(1:(max(nchar(sequenceSet), na.rm=T)-windowSize+1),
+              function(i){stringr::str_sub(sequenceSet, i, i+windowSize-1)})
+  f <- f[nchar(f)==windowSize]
+  return(f)
 }
 
 #' @export

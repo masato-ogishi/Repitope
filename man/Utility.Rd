@@ -2,18 +2,18 @@
 % Please edit documentation in R/Utility.R
 \name{Utility}
 \alias{Utility}
-\alias{sequenceSlidingWindow}
-\alias{Utility}
 \alias{sequenceFilter}
+\alias{Utility}
+\alias{sequenceSlidingWindow}
 \alias{Utility}
 \alias{compressedToLongFormat}
 \alias{Utility}
 \alias{hlaGenotypeToSupertype}
 \title{Miscellaneous utility functions.}
 \usage{
-sequenceSlidingWindow(sequenceSet, windowSize)
-
 sequenceFilter(sequenceSet)
+
+sequenceSlidingWindow(sequenceSet, windowSize)
 
 compressedToLongFormat(df, compressedColumnName)
 
@@ -33,8 +33,8 @@ hlaGenotypeToSupertype(HLAStrings, as.data.frame = T)
 \item{as.data.frame}{Logical. Whether the result should be summarized into a dataframe of dummy variables.}
 }
 \description{
-\code{sequenceSlidingWindow} does a sliding window with a fixed window size.\cr
 \code{sequenceFilter} filters amino acid sequences so that those containing non-standard letters are excluded.\cr
+\code{sequenceSlidingWindow} does a sliding window with a fixed window size.\cr
 \code{compressedToLongFormat} converts a compresed dataframe into a long-format dataframe. The compressed strings should be separated by "|".\cr
 \code{hlaGenotypeToSupertype} translates HLA class I genotype strings to corresponding supertypes. Uses the genotype-supertype relation dataset from Sidney et al., 2008. \cr
 }
