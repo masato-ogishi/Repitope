@@ -1,7 +1,7 @@
-Repitope: Epitope prediction via repertoire-wide TCR-peptide contact profiles
+Repitope: Epitope immunogenicity prediction from interresidue contact potential profiling
 ===============================================
 
-The 'Repitope' package provides some easy-to-use functions for conducting epitope prediction analysis via repertoire-wide TCR-peptide contact profiles.
+The 'Repitope' package provides a structured framework of quantitative prediction of the immunogenicity of MHC-I-loaded peptides through interresidue contact potential profiling.
 Note: Repitope is currently under construction.
 
 Installation
@@ -34,4 +34,4 @@ Usage
 Reference
 ------------------------
 
-Ogishi, M and Yotsuyanagi, H. (2017) "Epitope prediction through quantitative modeling of repertoire-wide epitope-TCR interactions in human." (Manuscript in preparation)
+Ogishi, M and Yotsuyanagi, H. (2018) "Quantifiable formularization of MHC-I epitope immunogenicity from interresidue contact potential profiling." (Manuscript in preparation)
