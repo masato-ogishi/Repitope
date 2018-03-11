@@ -297,8 +297,8 @@ Features_CPP <- function(
   message("Erase the temporary folder...")
   rm(list=setdiff(ls(), c("tmpDir", "AACPMatrix_binfile", "FragLib_binfile", "dt_cpp")))
   gc();gc()
-  file.remove(file.path(tmp.dir, AACPMatrix_binfile))
-  file.remove(file.path(tmp.dir, FragLib_binfile))
+  file.remove(file.path(tmpDir, AACPMatrix_binfile))
+  file.remove(file.path(tmpDir, FragLib_binfile))
   file.remove(list.files(pattern="^dt_feature_cpp.+fst$", path=tmpDir, full.names=T))
 
   # Output
@@ -317,8 +317,11 @@ Features <- function(
   coreN=parallel::detectCores(),
   tmpDir=tempdir()
 ){
+  message("Peptide descriptor analysis...")
   dt_peptdesc <- Features_PeptDesc(peptideSet, fragLenSet)
+  message("Peptide contact potential profiling analysis...")
   dt_cpp <- Features_CPP(peptideSet, aaIndexIDSet, fragLenSet, fragDepthSet, seedSet, coreN, tmpDir)
+  message("Merging...")
   dt <- merge(dt_peptdesc, dt_cpp, by="Peptide")
   dt[,"FragDepth":=format(FragDepth, scientific=F)]
   return(split(dt, by=c("Library", "FragDepth")))
