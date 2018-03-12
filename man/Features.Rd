@@ -10,11 +10,11 @@
 Features_PeptDesc(peptideSet, fragLenSet = 3:8)
 
 Features_CPP(peptideSet, aaIndexIDSet = "all", fragLenSet = 3:8,
-  fragDepthSet = 1e+05, seedSet = 1:5, coreN = parallel::detectCores(),
+  fragDepthSet = 10000, seedSet = 1:5, coreN = parallel::detectCores(),
   tmpDir = tempdir())
 
 Features(peptideSet, aaIndexIDSet = "all", fragLenSet = 3:8,
-  fragDepthSet = 1e+05, seedSet = 1:5, coreN = parallel::detectCores(),
+  fragDepthSet = 10000, seedSet = 1:5, coreN = parallel::detectCores(),
   tmpDir = tempdir())
 }
 \arguments{

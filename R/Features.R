@@ -64,7 +64,7 @@ Features_PeptDesc <- function(
   # Start calculation
   set.seed(12345)
   time.start <- proc.time()
-  
+
   # Working functions
   peptideDescriptor.Batch <- function(peptide){
     unlist(list(
@@ -97,7 +97,7 @@ Features_PeptDesc <- function(
                "Mean"=matrixStats::rowMeans2(d),
                "Median"=matrixStats::rowMedians(d))
   }
-  
+
   # Parallelized calculation of descriptive statistics
   parameterGrid <- expand.grid(peptideSet, fragLenSet, stringsAsFactors=F)
   cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
@@ -113,7 +113,7 @@ Features_PeptDesc <- function(
   )
   parallel::stopCluster(cl)
   gc();gc();
-  
+
   # Formatting
   df_feature <- data.table::rbindlist(df_feature) %>%
     tidyr::gather(Stat, Value, -Peptide, -FragLen, -AADescriptor) %>%
@@ -121,7 +121,7 @@ Features_PeptDesc <- function(
     tidyr::spread(Feature, Value)
   colnames(df_feature) <- paste0("PeptDesc_", colnames(df_feature))
   colnames(df_feature)[1] <- "Peptide"
-  
+
   # Basic peptide information
   df_basic <- data.frame("Peptide"=peptideSet, "Peptide_Length"=nchar(peptideSet))
   for(aa in Biostrings::AA_STANDARD){
@@ -129,7 +129,7 @@ Features_PeptDesc <- function(
   }
   df_feature <- suppressWarnings(dplyr::left_join(df_basic, df_feature, by="Peptide"))
   rownames(df_feature) <- 1:nrow(df_feature)
-  
+
   # Output
   time.end <- proc.time()
   message("Overall time required = ", format((time.end-time.start)[3], nsmall=2), "[sec]")
@@ -143,18 +143,18 @@ Features_CPP <- function(
   peptideSet,
   aaIndexIDSet="all",
   fragLenSet=3:8,
-  fragDepthSet=100000,
+  fragDepthSet=10000,
   seedSet=1:5,
   coreN=parallel::detectCores(),
   tmpDir=tempdir()
 ){
   # Temp directory check
   dir.create(tmpDir, showWarnings=F, recursive=T)
-  
+
   # Start calculation
   set.seed(12345)
   time.start <- proc.time()
-  
+
   # Pairwise contact potential matrix
   AACPMatrix <- CPP_AACPMatrix()
   if(identical(aaIndexIDSet, "all")){
@@ -175,7 +175,7 @@ Features_CPP <- function(
       descriptorfile=AACPMatrix_descfile
     )
   }
-  
+
   # Fragment library for matching
   FragLib_TCR <- fst::read_fst(system.file("TCRFragmentLibrary.fst", package="Repitope"), as.data.table=T) ## fragmentLibrary(TCRSet_Public, 3:8)
   FragLib_TCR <- FragLib_TCR[FragmentLength %in% fragLenSet,]
@@ -191,7 +191,7 @@ Features_CPP <- function(
       descriptorfile=FragLib_descfile
     )
   }
-  
+
   # Contact potential profiling
   ## Working functions
   load_AACPMatrix <- function(aaIndexID){
@@ -248,7 +248,7 @@ Features_CPP <- function(
     dt[,"Peptide":=peptideSet]
     return(dt)
   }
-  
+
   ## Main
   parameterGrid <- expand.grid(aaIndexIDSet, fragLenSet, fragDepthSet, seedSet, stringsAsFactors=F) %>%
     magrittr::set_colnames(c("AAIndexID","FragLen","FragDepth","Seed"))
@@ -277,7 +277,7 @@ Features_CPP <- function(
     }
   )
   parallel::stopCluster(cl)
-  
+
   ## Final formatting
   message("Data formatting...")
   dt_cpp <- pbapply::pblapply(
@@ -290,11 +290,11 @@ Features_CPP <- function(
   dt_cpp <- data.table::melt.data.table(dt_cpp, id=col_id, measure=col_val, variable.name="Stat", value.name="Value")
   dt_cpp[,"Feature":=paste0("CPP_", AAIndexID, "_", Stat, "_", FragLen)][,"AAIndexID":=NULL][,"FragLen":=NULL][,"Stat":=NULL]
   dt_cpp <- data.table::dcast.data.table(dt_cpp, Peptide+FragDepth+Library~Feature, value.var="Value", fun.aggregate=mean)
-  
+
   # Finish the timer
   time.end <- proc.time()
   message("Overall time required = ", format((time.end-time.start)[3], nsmall=2), "[sec]")
-  
+
   # Clear logs
   message("Erase the temporary folder...")
   rm(list=setdiff(ls(), c("tmpDir", "AACPMatrix_binfile", "FragLib_binfile", "dt_cpp")))
@@ -302,7 +302,7 @@ Features_CPP <- function(
   file.remove(file.path(tmpDir, AACPMatrix_binfile))
   file.remove(file.path(tmpDir, FragLib_binfile))
   file.remove(list.files(pattern="^dt_feature_cpp.+fst$", path=tmpDir, full.names=T))
-  
+
   # Output
   return(dt_cpp)
 }
@@ -314,7 +314,7 @@ Features <- function(
   peptideSet,
   aaIndexIDSet="all",
   fragLenSet=3:8,
-  fragDepthSet=100000,
+  fragDepthSet=10000,
   seedSet=1:5,
   coreN=parallel::detectCores(),
   tmpDir=tempdir()
