@@ -175,16 +175,17 @@ Features_CPP <- function(
   # Contact potential profiling
   parameterGrid <- expand.grid(aaIndexIDSet, fragLenSet, fragDepthSet, seedSet, fragLibTypeSet, stringsAsFactors=F) %>%
     magrittr::set_colnames(c("AAIndexID","FragLen","FragDepth","Seed","Library"))
-  paramCombN <- nrow(parameterGrid)
-  message("Number of parameter combinations = ", paramCombN)
+  done_id_list <- list.files(pattern="^dt_feature_cpp.+fst$", path=tmpDir, full.names=T)
+  done_id_list <- stringr::str_replace(stringr::str_replace(basename(done_id_list), "dt_feature_cpp_", ""), ".fst", "")
+  done_id_list <- as.numeric(done_id_list)
+  remaining_id_list <- setdiff(1:nrow(parameterGrid), as.numeric(done_id_list))
+  message("Number of parameter combinations = ", length(remaining_id_list))
   message("Launching parallel clusters...")
   if(is.null(coreN)) coreN <- 1
   cl <- parallel::makeCluster(coreN, type="SOCK")
   message("Contact potential profiling...")
-  dt_done_list <- list.files(pattern="^dt_feature_cpp.+fst$", path=tmpDir, full.names=T)
-  dt_done_list <- stringr::str_replace(stringr::str_replace(dt_done_list, "dt_feature_cpp_", ""), ".fst", "")
   dt_cpp <- pbapply::pblapply(
-    setdiff(1:paramCombN, as.numeric(dt_done_list)),
+    remaining_id_list,
     function(i){
       aaIndexID <- parameterGrid[i,1]
       fragLen <- parameterGrid[i,2]
