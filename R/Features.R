@@ -270,10 +270,10 @@ Features <- function(
   coreN=parallel::detectCores(),
   tmpDir=tempdir()
 ){
-  message("Peptide descriptor analysis...")
-  dt_peptdesc <- Features_PeptDesc(peptideSet, fragLenSet)
   message("Peptide contact potential profiling analysis...")
   dt_cpp <- Features_CPP(peptideSet, fragLib, aaIndexIDSet, fragLenSet, fragDepthSet, fragLibTypeSet, seedSet, coreN, tmpDir)
+  message("Peptide descriptor analysis...")
+  dt_peptdesc <- Features_PeptDesc(peptideSet, fragLenSet)
   message("Merging...")
   dt <- merge(dt_peptdesc, dt_cpp, by="Peptide")
   dt[,"FragDepth":=format(FragDepth, scientific=F)]
