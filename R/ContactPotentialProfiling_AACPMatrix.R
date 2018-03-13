@@ -14,6 +14,7 @@
 #' @importFrom tidyr nest
 #' @importFrom stringr str_sub
 #' @importFrom readr read_csv
+#' @importFrom magrittr set_rownames
 #' @importFrom data.table rbindlist
 #' @importFrom data.table setcolorder
 #' @importFrom Biostrings reverse
@@ -54,6 +55,8 @@ CPP_AACPMatrix <- function(sourceFile=system.file("AACPMatrix.csv", package="Rep
   names(AACP_DT) <- aaIndexIDSet
   AACP_DT <- data.table::rbindlist(lapply(AACP_DT, as.data.frame))
   AACP_DT[["AAIndexID"]] <- unlist(lapply(aaIndexIDSet, function(id){rep(id, length(Biostrings::AA_STANDARD))}))
-  data.table::setcolorder(AACP_DT, c("AAIndexID", setdiff(colnames(AACP_DT), "AAIndexID")))
-  return(AACP_DT)
+  AACPMatrixList <- split(AACP_DT, by="AAIndexID", keep.by=F)
+  AACPMatrixList <- lapply(AACPMatrixList, as.matrix)
+  AACPMatrixList <- lapply(AACPMatrixList, magrittr::set_rownames, sort(Biostrings::AA_STANDARD))
+  return(AACPMatrixList)
 }

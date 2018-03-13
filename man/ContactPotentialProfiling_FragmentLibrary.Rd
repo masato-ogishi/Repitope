@@ -5,12 +5,17 @@
 \alias{CPP_FragmentLibrary}
 \title{Generate sequence fragment libraries.}
 \usage{
-CPP_FragmentLibrary(sequenceSet, windowSizeSet)
+CPP_FragmentLibrary(sequenceSet, fragLenSet = 3:8, maxFragDepth = 1e+05,
+  seedSet = 1:5)
 }
 \arguments{
 \item{sequenceSet}{A set of amino acid sequences.}
 
-\item{windowSizeSet}{A set of sliding window sizes.}
+\item{fragLenSet}{A set of sliding window sizes. Must be between 3 and 8.}
+
+\item{maxFragDepth}{The maximum size of the fragment library.}
+
+\item{seedSet}{A set of random seeds.}
 }
 \description{
 Generate sequence fragment libraries.
