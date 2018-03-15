@@ -240,7 +240,7 @@ Features_CPP <- function(
   col_val <- setdiff(colnames(dt_cpp), col_id)
   dt_cpp <- data.table::melt.data.table(dt_cpp, id=col_id, measure=col_val, variable.name="Stat", value.name="Value")
   dt_cpp[,"Feature":=paste0("CPP_", AAIndexID, "_", Stat, "_", FragLen)][,"AAIndexID":=NULL][,"FragLen":=NULL][,"Stat":=NULL]
-  dt_cpp <- data.table::dcast.data.table(dt_cpp, Peptide+FragDepth+Library~Feature, value.var="Value", fun.aggregate=mean)
+  dt_cpp_mean <- data.table::dcast.data.table(dt_cpp, Peptide+FragDepth+Library~Feature, value.var="Value", fun.aggregate=mean)
 
   # Finish the timer
   time.end <- proc.time()
@@ -248,12 +248,13 @@ Features_CPP <- function(
 
   # Clear logs
   message("Erase the temporary files...")
-  rm(list=setdiff(ls(), c("tmpDir", "dt_cpp")))
+  rm(list=setdiff(ls(), c("tmpDir", "dt_cpp", "dt_cpp_mean")))
   file.remove(list.files(pattern="^dt_feature_cpp.+fst$", path=tmpDir, full.names=T))
   gc();gc()
 
   # Output
-  return(dt_cpp)
+  fst::write_fst(dt_cpp, file.path(tmpDir, "dt_feature_cpp.fst"))
+  return(dt_cpp_mean)
 }
 
 #' @export
