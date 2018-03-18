@@ -175,6 +175,7 @@ Features_CPP <- function(
   # Contact potential profiling
   parameterGrid <- expand.grid(aaIndexIDSet, fragLenSet, fragDepthSet, seedSet, fragLibTypeSet, stringsAsFactors=F) %>%
     magrittr::set_colnames(c("AAIndexID","FragLen","FragDepth","Seed","Library"))
+  maxDigit <- floor(log10(nrow(parameterGrid)))+1
   done_id_list <- list.files(pattern="^dt_feature_cpp.+fst$", path=tmpDir, full.names=T)
   done_id_list <- stringr::str_replace(stringr::str_replace(basename(done_id_list), "dt_feature_cpp_", ""), ".fst", "")
   done_id_list <- as.numeric(done_id_list)
@@ -222,7 +223,7 @@ Features_CPP <- function(
       colnames(dt) <- c("Mean","SD","Med","TrM","MAD","Skew","Kurt","SE","IQR","Q10","Q90")
       dt[,"Peptide":=peptideSet]
       data.table::setcolorder(dt, c("Peptide", "Mean","SD","Med","TrM","MAD","Skew","Kurt","SE","IQR","Q10","Q90"))
-      fst::write_fst(dt, file.path(tmpDir, paste0("dt_feature_cpp_", i, ".fst")))
+      fst::write_fst(dt, file.path(tmpDir, paste0("dt_feature_cpp_", formatC(i, width=maxDigit, flag="0"), ".fst")))
       return(NULL)
     }
   )
