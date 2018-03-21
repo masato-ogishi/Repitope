@@ -52,8 +52,7 @@ Features_Importance <- function(preprocessedDFList, featureN=100){
       dt[,DataType:=NULL][,Peptide:=NULL][,Cluster:=NULL]
       if(nrow(dt)>maxRowN) dt <- dplyr::slice(dt, sample(1:nrow(dt), maxRowN))
       dt <- as.data.frame(dt)
-      tsk <- mlr::makeClassifTask(data=dt, target="Immunogenicity")
-      target <- mlr::getTaskTargets(tsk)
+      target <- dt$"Immunogenicity"
       tab <- as.numeric(table(target))
       w <- 1/tab[target]
       tsk <- mlr::makeClassifTask(data=dt, target="Immunogenicity", weights=w)

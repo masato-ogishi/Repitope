@@ -54,8 +54,6 @@
 #' @importFrom pbapply pbapply
 #' @importFrom pbapply pblapply
 #' @importFrom snow parLapply
-#' @importFrom bigmemory as.big.matrix
-#' @importFrom bigmemory attach.big.matrix
 #' @import Peptides
 #' @export
 #' @rdname Features
