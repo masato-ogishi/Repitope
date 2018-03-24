@@ -80,19 +80,20 @@ Features_Preprocess <- function(featureDFList, metadataDF, seedSet=1:5){
 
   # Feature rescaling
   rescaleFeatures <- function(featureDF){
-    featureSet <- setdiff(colnames(featureDF), c("DataType", "Peptide", "Immunogenicity", "Cluster"))
+    featureSet <- setdiff(colnames(featureDF), "Peptide")
     dummyFeatureSet <- grep("Peptide_", featureSet, value=T)
-    pp <- caret::preProcess(
-      dplyr::select(featureDF, setdiff(featureSet, dummyFeatureSet)),
-      method=c("center", "scale"), verbose=F
-    )
-    dt <- data.table::as.data.table(predict(pp, dt))
+    df <- as.data.frame(dplyr::select(featureDF, setdiff(featureSet, dummyFeatureSet)))
+    pp <- caret::preProcess(df, method=c("center", "scale"), verbose=F)
+    df <- predict(pp, df)
+    dt <- data.table::as.data.table(cbind(dplyr::select(featureDF, c("Peptide", dummyFeatureSet)), df))
     list("dt"=dt, "pp"=pp)
   }
 
   # A wrapper function
   preprocessWrapper <- function(featureDF, metadataDF, seed=12345){
     # Input peptide check
+    metadataDF <- data.table::as.data.table(metadataDF)
+    featureDF <- data.table::as.data.table(featureDF)
     peptideSet <- intersect(metadataDF$"Peptide", featureDF$"Peptide")
     metadataDF <- metadataDF[Peptide %in% peptideSet,]
     featureDF <- featureDF[Peptide %in% peptideSet,]

@@ -12,7 +12,8 @@
 #' @name Features_IO
 readFeatureDFList <- function(featureDFFileNames){
   paramSet <- gsub(".rds$", "", gsub(".fst$", "", basename(featureDFFileNames)))
-  paramSet <- as.character(t(as.data.frame(strsplit(paramSet, "_", fixed = T), stringsAsFactors = F))[, 2])
+  paramSet <- data.table::transpose(as.data.frame(strsplit(paramSet, "_", fixed = T), stringsAsFactors = F))
+  paramSet <- as.character(dplyr::last(paramSet))
   pos.fst <- which(stringr::str_detect(basename(featureDFFileNames), ".fst"))
   pos.rds <- which(stringr::str_detect(basename(featureDFFileNames), ".rds"))
   files.fst <- featureDFFileNames[pos.fst]

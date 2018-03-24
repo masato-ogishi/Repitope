@@ -233,13 +233,14 @@ Features_CPP <- function(
   dt_cpp <- pbapply::pblapply(
     list.files(pattern="^dt_feature_cpp.+fst$", path=tmpDir, full.names=T), fst::read_fst, as.data.table=T
   ) %>% data.table::rbindlist() %>% data.table::as.data.table()
-  dt_cpp <- data.table::as.data.table(cbind(parameterGrid, dt_cpp))
+  dt_cpp <- cbind(data.table::as.data.table(parameterGrid), dt_cpp)
   data.table::setorder(dt_cpp, Peptide, AAIndexID, FragLen, FragDepth, Library, Seed)
   col_id <- c("Peptide", "AAIndexID", "FragLen", "FragDepth", "Library", "Seed")
   col_val <- setdiff(colnames(dt_cpp), col_id)
   dt_cpp <- data.table::melt.data.table(dt_cpp, id=col_id, measure=col_val, variable.name="Stat", value.name="Value")
   dt_cpp[,"Feature":=paste0("CPP_", AAIndexID, "_", Stat, "_", FragLen)][,"AAIndexID":=NULL][,"FragLen":=NULL][,"Stat":=NULL]
-  dt_cpp_mean <- data.table::dcast.data.table(dt_cpp, Peptide+FragDepth+Library~Feature, value.var="Value", fun.aggregate=mean)
+  data.table::setcolorder(dt_cpp, c("Peptide", "FragDepth", "Library", "Feature", "Seed", "Value"))
+  dt_cpp_mean <- data.table::dcast.data.table(dt_cpp, Peptide+FragDepth+Library~Feature, value.var="Value", fun=mean)
 
   # Finish the timer
   time.end <- proc.time()
