@@ -278,5 +278,5 @@ Features <- function(
   message("Merging...")
   dt <- merge(dt_peptdesc, dt_cpp, by="Peptide")
   dt[,"FragDepth":=format(FragDepth, trim=T, scientific=F)]
-  return(split(dt, by=c("Library", "FragDepth")))
+  return(split(dt, by=c("Library", "FragDepth"), keep.by=F))
 }
