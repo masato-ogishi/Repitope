@@ -174,10 +174,10 @@ Features_CPP <- function(
   parameterGrid <- expand.grid(aaIndexIDSet, fragLenSet, fragDepthSet, seedSet, fragLibTypeSet, stringsAsFactors=F) %>%
     magrittr::set_colnames(c("AAIndexID","FragLen","FragDepth","Seed","Library"))
   maxDigit <- floor(log10(nrow(parameterGrid)))+1
-  done_id_list <- list.files(pattern="^dt_feature_cpp.+fst$", path=tmpDir, full.names=T)
+  done_id_list <- list.files(pattern="^dt_feature_cpp_.+fst$", path=tmpDir, full.names=T)
   done_id_list <- stringr::str_replace(stringr::str_replace(basename(done_id_list), "dt_feature_cpp_", ""), ".fst", "")
   done_id_list <- as.numeric(done_id_list)
-  remaining_id_list <- setdiff(1:nrow(parameterGrid), as.numeric(done_id_list))
+  remaining_id_list <- setdiff(1:nrow(parameterGrid), done_id_list)
   message("Number of parameter combinations = ", length(remaining_id_list))
   message("Launching parallel clusters...")
   if(is.null(coreN)) coreN <- 1
@@ -231,7 +231,7 @@ Features_CPP <- function(
   ## Final formatting
   message("Data formatting...")
   dt_cpp <- pbapply::pblapply(
-    list.files(pattern="^dt_feature_cpp.+fst$", path=tmpDir, full.names=T), fst::read_fst, as.data.table=T
+    list.files(pattern="^dt_feature_cpp_.+fst$", path=tmpDir, full.names=T), fst::read_fst, as.data.table=T
   ) %>% data.table::rbindlist() %>% data.table::as.data.table()
   dt_cpp <- cbind(data.table::as.data.table(parameterGrid), dt_cpp)
   data.table::setorder(dt_cpp, Peptide, AAIndexID, FragLen, FragDepth, Library, Seed)
@@ -249,7 +249,7 @@ Features_CPP <- function(
   # Clear logs
   message("Erase the temporary files...")
   rm(list=setdiff(ls(), c("tmpDir", "dt_cpp", "dt_cpp_mean")))
-  file.remove(list.files(pattern="^dt_feature_cpp.+fst$", path=tmpDir, full.names=T))
+  file.remove(list.files(pattern="^dt_feature_cpp_.+fst$", path=tmpDir, full.names=T))
   gc();gc()
 
   # Output
