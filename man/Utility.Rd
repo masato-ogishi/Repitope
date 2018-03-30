@@ -7,8 +7,6 @@
 \alias{sequenceSlidingWindow}
 \alias{Utility}
 \alias{compressedToLongFormat}
-\alias{Utility}
-\alias{hlaGenotypeToSupertype}
 \title{Miscellaneous utility functions.}
 \usage{
 sequenceFilter(sequenceSet)
@@ -16,8 +14,6 @@ sequenceFilter(sequenceSet)
 sequenceSlidingWindow(sequenceSet, windowSize)
 
 compressedToLongFormat(df, compressedColumnName)
-
-hlaGenotypeToSupertype(HLAStrings, as.data.frame = T)
 }
 \arguments{
 \item{sequenceSet}{A set of amino acid sequences.}
@@ -27,14 +23,9 @@ hlaGenotypeToSupertype(HLAStrings, as.data.frame = T)
 \item{df}{A dataframe like \code{Repitope::EpitopeDataset} which has compressed columns.}
 
 \item{compressedColumnName}{A string indicating the names of the compressed column to be converted into a long format.}
-
-\item{HLAStrings}{A character vector of HLA class I strings.}
-
-\item{as.data.frame}{Logical. Whether the result should be summarized into a dataframe of dummy variables.}
 }
 \description{
 \code{sequenceFilter} filters amino acid sequences so that those containing non-standard letters are excluded.\cr
 \code{sequenceSlidingWindow} does a sliding window with a fixed window size.\cr
 \code{compressedToLongFormat} converts a compresed dataframe into a long-format dataframe. The compressed strings should be separated by "|".\cr
-\code{hlaGenotypeToSupertype} translates HLA class I genotype strings to corresponding supertypes. Uses the genotype-supertype relation dataset from Sidney et al., 2008. \cr
 }
