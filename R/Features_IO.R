@@ -36,6 +36,7 @@ readFeatureDFList <- function(featureDFFileNames){
 #' @rdname Features_IO
 #' @name Features_IO
 saveFeatureDFList <- function(featureDFList, fileNameHeader){
+  dir.create(dirname(fileNameHeader), showWarnings=F, recursive=T)
   dataFrameQ <- sapply(featureDFList, is.data.frame)
   if(any(dataFrameQ==F)){
     message("Saving rds files...")

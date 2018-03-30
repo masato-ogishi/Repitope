@@ -3,7 +3,6 @@
 \name{Features_PeptDesc}
 \alias{Features_PeptDesc}
 \alias{Features_CPP}
-\alias{Features_CPP}
 \alias{Features}
 \title{Generate peptide features.}
 \usage{

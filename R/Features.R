@@ -187,7 +187,7 @@ Features_CPP <- function(
   message("Contact potential profiling...")
   cpp <- function(clusterObject, seedNumber=12345){
     snow::clusterSetupRNGstream(clusterObject, seed=rep(seedNumber, 6))
-    pbapply::pblapply(
+    dt <- pbapply::pblapply(
       1:nrow(parameterGrid),
       function(i){
         pept <- parameterGrid[i,1]
@@ -221,6 +221,7 @@ Features_CPP <- function(
   dt_cpp <- foreach::foreach(s=seedSet)%do%{
     cat("Random seed = ", s, "\n", sep="")
     cpp(cl, seedNumber=s)
+    gc();gc()
   }
   parallel::stopCluster(cl)
   gc();gc()
@@ -234,26 +235,23 @@ Features_CPP <- function(
   dt_cpp <- data.table::melt.data.table(dt_cpp, id=col_id, measure=col_val, variable.name="Stat", value.name="Value")
   dt_cpp[,"Feature":=paste0("CPP_", AAIndexID, "_", Stat, "_", FragLen)][,"AAIndexID":=NULL][,"FragLen":=NULL][,"Stat":=NULL]
   data.table::setcolorder(dt_cpp, c("Peptide", "FragDepth", "Library", "Feature", "Seed", "Value"))
-  dt_cpp_mean <- data.table::dcast.data.table(dt_cpp, Peptide+FragDepth+Library~Feature, value.var="Value", fun=mean)
+  dt_cpp <- data.table::dcast.data.table(dt_cpp, Peptide+FragDepth+Library~Feature, value.var="Value", fun=mean)
 
   # Finish the timer
   time.end <- proc.time()
   message("Overall time required = ", format((time.end-time.start)[3], nsmall=2), "[sec]")
 
   # Clear logs
-  message("Erase the temporary files...")
-  rm(list=setdiff(ls(), c("tmpDir", "dt_cpp", "dt_cpp_mean")))
-  file.remove(list.files(pattern="^dt_feature_cpp_.+fst$", path=tmpDir, full.names=T))
+  rm(list=setdiff(ls(), c("dt_cpp")))
   gc();gc()
 
   # Output
-  fst::write_fst(dt_cpp, file.path(tmpDir, "dt_feature_cpp.fst"))
-  return(dt_cpp_mean)
+  return(dt_cpp)
 }
 
 #' @export
 #' @rdname Features
-#' @name Features_CPP
+#' @name Features
 Features <- function(
   peptideSet,
   fragLib,

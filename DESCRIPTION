@@ -1,13 +1,13 @@
 Package: Repitope
 Type: Package
 Title: Quantifying epitope immunogenicity from interresidue contact potential profiling
-Version: 0.7.3
+Version: 0.7.3.1
 Author: Masato Ogishi
 Maintainer: Masato Ogishi <oogishi-tky@umin.ac.jp>
 Description: Quantification of the immunogenicity of MHC-loaded peptides in silico is a critical component of precision immunotherapy.
     Although various sequence-based prediction models have been proposed, none of them has achieved clinically meaningful accuracy and robustness.
     Here, we developped a framework that enables accurate classification between epitopes (immunogenic MHC-loaded peptides) and MHC ligands (non-immunogenic MHC-loaded peptides).
-Depends: R (>= 3.4.3) 
+Depends: R (>= 3.4.4) 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -19,13 +19,13 @@ Imports:
     Biostrings (>= 2.44.2),
     caret (>= 6.0-78),
     classifierplots (>= 1.3.3),
-    data.table (>= 1.10.4),
+    data.table (>= 1.10.4-3),
     DescTools (>= 0.99.21),
     doParallel (>= 1.0.11),
     dplyr (>= 0.7.3),
     extraTrees (>= 1.0.5),
     foreach (>= 1.4.4),
-    fst (>= 0.8.2),
+    fst (>= 0.8.4),
     ggplot2 (>= 2.2.1),
     ggsci (>= 2.8),
     ggthemes (>= 3.4.0),
@@ -35,17 +35,18 @@ Imports:
     magrittr (>= 1.5),
     Matrix (>= 1.2-11),
     matrixStats (>= 0.52.2),
-    mlr (>= 2.11),
+    mlr (>= 2.12),
     parallel (>= 3.4.3),
     parallelMap (>= 1.3), 
     pacman (>= 0.4.6),
     pbapply (>= 1.3-3),
-    Peptides (>= 2.2),
+    Peptides (>= 2.3),
     pROC (>= 1.10.0),
     psych (>= 1.7.8),
     purrr (>= 0.2.3),
     readr (>= 1.1.1),
     rlang (>= 0.1.2),
+    rlecuyer (>= 0.3-4),
     randomForestSRC (>= 2.5.1),
     S4Vectors (>= 0.14.7),
     scales (>= 0.4.1),
