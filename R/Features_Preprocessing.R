@@ -65,7 +65,7 @@ Features_Preprocess <- function(featureDFList, metadataDF, seedSet=1:5){
     dt[, Immunogenicity:=factor(Immunogenicity, levels=c("Positive", "Negative"))]
     return(dt)
   }
-  
+
   # Data splitting
   splitData <- function(metadata, seed=12345, trainRatio=0.8){
     set.seed(seed)
@@ -77,7 +77,7 @@ Features_Preprocess <- function(featureDFList, metadataDF, seedSet=1:5){
     data.table::setcolorder(dt, unique(c("DataType", colnames(dt))))
     return(dt)
   }
-  
+
   # Feature rescaling
   rescaleFeatures <- function(featureDF, metadataDF){
     df <- dplyr::left_join(metadataDF, featureDF, by="Peptide")
@@ -93,7 +93,7 @@ Features_Preprocess <- function(featureDFList, metadataDF, seedSet=1:5){
     dt <- data.table::as.data.table(df)
     list("dt"=dt, "pp_train"=pp_train)
   }
-  
+
   # A wrapper function
   preprocessWrapper <- function(featureDF, metadataDF, seed=12345){
     # Input peptide check
@@ -102,21 +102,21 @@ Features_Preprocess <- function(featureDFList, metadataDF, seedSet=1:5){
     peptideSet <- intersect(dt_meta$"Peptide", dt_feature$"Peptide")
     dt_meta <- dt_meta[Peptide %in% peptideSet,]
     dt_feature <- dt_feature[Peptide %in% peptideSet,]
-    
+
     # Metadata preprocessing
     dt_meta <- splitData(peptideClustering(dt_meta, seed=seed), seed=seed, trainRatio=0.8)
-    
+
     # Feature preprocessing
     dt_feature <- rescaleFeatures(dt_feature, dt_meta)
     pp_train <- dt_feature$"pp_train"
     dt_feature <- dt_feature$"dt"
-    
+
     # Output
     rm(list=setdiff(ls(), c("dt_feature", "pp_train")))
     gc();gc()
     list("dt"=dt_feature, "pp_train"=pp_train)
   }
-  
+
   # Main workflow
   message("Preprocessing...")
   parameterGrid <- expand.grid(1:length(featureDFList), seedSet)
@@ -154,7 +154,7 @@ Features_CorFilter <- function(preprocessedDFList, corThreshold=0.75, coreN=para
     gc();gc()
     return(list("dt"=dt, "corMat"=corMat))
   }
-  
+
   # Main workflow
   message("Correlation-based feature elimination...")
   time.start <- proc.time()
@@ -212,13 +212,13 @@ Features_FeatureSelect <- function(preprocessedDFList, featureN=100, coreN=paral
     dt <- data.table::as.data.table(df)
     message(length(setdiff(colnames(dt), sbfFeatureSet)), " features were removed.")
     dt <- dt[, sbfFeatureSet, with=F]
-    
+
     # Output
     rm(list=setdiff(ls(), c("dt", "sbfRes")))
     gc();gc()
     list("dt"=dt, "sbfRes"=sbfRes)
   }
-  
+
   # Recursive feature elimination
   Features_RFE_Single <- function(df, sizes=100, seed=12345, coreN=NULL){
     caretSeeds_RFE <- function(seed=12345, number=10){
@@ -260,13 +260,13 @@ Features_FeatureSelect <- function(preprocessedDFList, featureN=100, coreN=paral
     dt <- data.table::as.data.table(df)
     message(length(setdiff(colnames(dt), rfeFeatureSet)), " features were removed.")
     dt <- dt[, rfeFeatureSet, with=F]
-    
+
     # Output
     rm(list=setdiff(ls(), c("dt", "rfeRes")))
     gc();gc()
     list("dt"=dt, "rfeRes"=rfeRes)
   }
-  
+
   # Main workflow
   message("Feature selection...")
   time.start <- proc.time()

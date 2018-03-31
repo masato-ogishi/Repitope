@@ -90,7 +90,7 @@ Features_Importance <- function(preprocessedDFList, featureN=100){
 
 #' @export
 #' @rdname Features_Importance
-#' @name Features_Importance_Reduce
+#' @name Features_Importance
 Features_Importance_Reduce <- function(featureImportanceDFList, featureN=30){
   lapply(featureImportanceDFList, function(l){
     feat <- l$feat[1:featureN]

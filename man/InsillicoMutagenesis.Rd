@@ -2,12 +2,14 @@
 % Please edit documentation in R/InsillicoMutagenesis.R
 \name{InsillicoMutagenesis}
 \alias{InsillicoMutagenesis}
-\alias{InsillicoMutagenesis_GenerateIntermediates}
+\alias{InSillicoMutagenesis}
 \title{In sillico mutagenesis analysis.}
 \usage{
-InsillicoMutagenesis_GenerateIntermediates(peptide.start, peptide.goal)
+InSillicoMutagenesis(peptideSet)
 }
 \arguments{
+\item{peptideSet}{A set of peptide sequences.}
+
 \item{peptide.start}{A peptide sequence.}
 
 \item{peptide.goal}{A peptide sequence.}
