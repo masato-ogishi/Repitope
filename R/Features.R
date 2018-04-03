@@ -54,8 +54,6 @@
 #' @importFrom pbapply pbapply
 #' @importFrom pbapply pblapply
 #' @importFrom snow clusterSetupRNGstream
-#' @importFrom foreach %do%
-#' @importFrom foreach foreach
 #' @import Peptides
 #' @export
 #' @rdname Features
@@ -218,7 +216,7 @@ Features_CPP <- function(
     fst::write_fst(dt, file.path(tmpDir, paste0("dt_feature_cpp_seed", seedNumber, ".fst")))
     return(dt)
   }
-  dt_cpp <- foreach::foreach(s=seedSet)%do%{
+  for(s in seedSet){
     cat("Random seed = ", s, "\n", sep="")
     cpp(cl, seedNumber=s)
     gc();gc()
@@ -228,13 +226,12 @@ Features_CPP <- function(
 
   ## Final formatting
   message("Data formatting...")
-  dt_cpp <- data.table::rbindlist(dt_cpp)
+  dt_cpp <- data.table::rbindlist(lapply(list.files(pattern="dt_feature_cpp_seed.+fst", path=tmpDir, full.names=T), fst::read_fst, as.data.table=T))
   data.table::setorder(dt_cpp, Peptide, AAIndexID, FragLen, FragDepth, Library, Seed)
   col_id <- c("Peptide", "AAIndexID", "FragLen", "FragDepth", "Library", "Seed")
   col_val <- setdiff(colnames(dt_cpp), col_id)
   dt_cpp <- data.table::melt.data.table(dt_cpp, id=col_id, measure=col_val, variable.name="Stat", value.name="Value")
   dt_cpp[,"Feature":=paste0("CPP_", AAIndexID, "_", Stat, "_", FragLen)][,"AAIndexID":=NULL][,"FragLen":=NULL][,"Stat":=NULL]
-  data.table::setcolorder(dt_cpp, c("Peptide", "FragDepth", "Library", "Feature", "Seed", "Value"))
   dt_cpp <- data.table::dcast.data.table(dt_cpp, Peptide+FragDepth+Library~Feature, value.var="Value", fun=mean)
 
   # Finish the timer
