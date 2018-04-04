@@ -1,13 +1,23 @@
 #' Compile epitope datasets retrieved from IEDB and other sources.
 #'
+#' \code{Epitope_Import} imports IEDB and other epitope files.\cr
+#' \code{Epitope_SolveImmunogenicityContradiction} solves contradicted annotations on immunogenicity.\cr
+#' \code{Epitope_Add_Disease} adds metadata of being related to diseases or not obtained from the IEDB database.\cr
+#' \code{Epitope_Add_HLASerotypes} adds HLA serotype metadata obtained from the IEDB database.\cr
+#' \code{compressedToLongFormat} converts a compresed column into a long-format column. The compressed strings should be separated by "|".\cr
+#' \code{compressedToDummyDF} converts a compresed column into a dummy variable dataframe. The compressed strings should be separated by "|".\cr
+#' \code{Epitope_Convert_HLASupertypes} converts the compressed HLA genotype information into HLA supertypes. The definition of HLA supertypes is derived from the Additional File 1 of Sidney et al., 2008.\cr
+#'
 #' @param df An epitope dataframe.
+#' @param compressedColumnName A string indicating the names of the compressed column to be converted into a long format.
 #' @param IEDBAssayFileName A set of T cell assay results obtained from IEDB.
-#' @param OtherFileNames Other sources. Must contain a "Dataset" column indicating the data source.
+#' @param OtherFileNames Other epitope source files. Must contain a "Dataset" column indicating the data source.
 #' @param IEDBEpitopeFileName A set of epitopes obtained from IEDB.
 #' @param IEDBEpitopeFileNames A set of epitope files from IEDB.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr left_join
 #' @importFrom dplyr bind_rows
+#' @importFrom dplyr bind_cols
 #' @importFrom dplyr filter
 #' @importFrom dplyr select
 #' @importFrom dplyr mutate
@@ -15,14 +25,21 @@
 #' @importFrom dplyr group_by
 #' @importFrom dplyr summarise
 #' @importFrom dplyr ungroup
+#' @importFrom dplyr first
+#' @importFrom dplyr last
+#' @importFrom tidyr drop_na
+#' @importFrom tidyr spread
 #' @importFrom purrr flatten_chr
+#' @importFrom purrr flatten_dfr
 #' @importFrom readr read_csv
 #' @importFrom magrittr set_colnames
 #' @importFrom stringr str_replace
 #' @importFrom stringr str_replace_all
 #' @importFrom stringr str_detect
 #' @importFrom stringr str_split
+#' @importFrom stringr fixed
 #' @importFrom scales percent
+#' @importFrom zoo coredata
 #' @export
 #' @rdname DataPreparation_EpitopeDataset
 #' @name DataPreparation_EpitopeDataset
@@ -129,4 +146,85 @@ Epitope_Add_HLASerotypes <- function(df, IEDBEpitopeFileNames=system.file("IEDB_
     dplyr::filter(Peptide %in% sequenceFilter(Peptide))
   df <- dplyr::left_join(df, df.meta, by="Peptide")
   return(df)
+}
+
+#' @export
+#' @rdname DataPreparation_EpitopeDataset
+#' @name DataPreparation_EpitopeDataset
+compressedToLongFormat <- function(df, compressedColumnName){
+  cmp <- stringr::str_split(df[[compressedColumnName]], stringr::fixed("|"))
+  l <- sapply(cmp, length)
+  df_long <- lapply(1:nrow(df), function(i){replicate(l[i], zoo::coredata(df[i,]), simplify=F)})
+  df_long <- purrr::flatten_dfr(df_long)
+  df_long[[compressedColumnName]] <- unlist(cmp)
+  return(df_long)
+}
+
+#' @export
+#' @rdname DataPreparation_EpitopeDataset
+#' @name DataPreparation_EpitopeDataset
+compressedToDummyDF <- function(df, compressedColumnName){
+  df_dummy <- compressedToLongFormat(df, compressedColumnName) %>%
+    dplyr::mutate(Value=1) %>%
+    tidyr::drop_na(compressedColumnName) %>%
+    tidyr::spread(compressedColumnName, Value, fill=0)
+  dplyr::left_join(df, df_dummy)
+}
+
+#' @export
+#' @rdname DataPreparation_EpitopeDataset
+#' @name DataPreparation_EpitopeDataset
+Epitope_Convert_HLASupertypes <- function(df, compressedColumnName="MHC"){
+  # Stanadrdize HLA strings
+  HLAStrings <- df[[compressedColumnName]]
+  hla <- HLAStrings %>%
+    stringr::str_replace_all("HLA-", "") %>%
+    stringr::str_replace_all("HLA ", "") %>%
+    stringr::str_replace_all(":", "") %>%
+    stringr::str_split(stringr::fixed("|"))
+  hlaStandardize <- function(HLAStrings){
+    hla.a <- stringr::str_detect(HLAStrings, "^A.+")
+    hla.b <- stringr::str_detect(HLAStrings, "^B.+")
+    hla <- hla.a | hla.b
+    HLAStrings[which(hla==F)] <- NA
+    HLAStrings <- unique(unlist(lapply(stringr::str_split(HLAStrings, " "), dplyr::first)))
+    HLAStrings <- stringr::str_replace(HLAStrings, stringr::fixed("*"), "")
+    HLAStrings <- stringr::str_replace(HLAStrings, "^A1$", "A01")
+    HLAStrings <- stringr::str_replace(HLAStrings, "^A2$", "A02")
+    HLAStrings <- stringr::str_replace(HLAStrings, "^A3$", "A03")
+    HLAStrings <- stringr::str_replace(HLAStrings, "^B7$", "B07")
+    HLAStrings <- stringr::str_replace(HLAStrings, "^B8$", "B08")
+    return(HLAStrings)
+  }
+  cat("Standardizing HLA genotype strings...\n")
+  hla <- pbapply::pblapply(hla, hlaStandardize)
+
+  # Match supertypes
+  HLA_ST <- suppressMessages(readr::read_csv(system.file("HLASupertypeConversion.csv", package="Repitope")))  ## Sidney et al., 2008. Additional File 1.
+  HLA_ST <- HLA_ST[1:2]
+  colnames(HLA_ST) <- c("Allele", "Supertype")
+  HLA_ST$Supertype[which(HLA_ST$Supertype=="Unclassified")] <- NA
+  HLA_ST$Supertype <- stringr::str_replace_all(HLA_ST$Supertype, " ", "|")
+  HLA_ST$Allele <- stringr::str_replace_all(HLA_ST$Allele, stringr::fixed("*"), "")
+  hlaSupertype_CompleteMatch <- function(HLAStrings){
+    s <- paste0(paste0("^", HLAStrings, "$"), collapse="|")
+    s <- dplyr::filter(HLA_ST, stringr::str_detect(Allele, s))$Supertype
+    s <- sort(unique(unlist(stringr::str_split(s, stringr::fixed("|")))))
+    return(s)
+  }
+  hlaSupertype_TwoDigitMatch <- function(HLAStrings){
+    s <- paste0(paste0("^", HLAStrings, ".+"), collapse="|")
+    s <- dplyr::filter(HLA_ST, stringr::str_detect(Allele, s))$Supertype
+    s <- unlist(stringr::str_split(s, stringr::fixed("|")))
+    s <- dplyr::last(names(sort(table(s))))
+    return(s)
+  }
+  cat("Matching HLA genotypes to supertypes...\n")
+  hla_comp <- pbapply::pblapply(hla, hlaSupertype_CompleteMatch)
+  hla_tg <- pbapply::pblapply(hla, hlaSupertype_TwoDigitMatch)
+  hla <- mapply(c, hla_comp, hla_tg, SIMPLIFY=F)
+  hla <- lapply(hla, unique)
+  hla[which(sapply(hla, length)==0)] <- NA
+  hla <- unlist(lapply(hla, paste0, collapse="|"))
+  return(dplyr::mutate(df, HLASupertype=hla))
 }
