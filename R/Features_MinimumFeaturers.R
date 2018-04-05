@@ -44,8 +44,8 @@ Features_MinimumParameters <- function(preprocessedDFList, criteria="intersect")
   featureSet_CPP <- grep("CPP_", featureSet, value=T)
   if(length(featureSet_CPP)>=1){
     featureSet_CPP <- as.data.frame(t(as.data.frame(stringr::str_split(featureSet_CPP, stringr::fixed("_")), fix.empty.names=F)))
-    fragLenSet_CPP <- as.numeric(as.character(unique(featureSet_CPP[[5]])))
-    aaIndexIDSet <- sort(as.character(unique(gsub("inv$", "", featureSet_CPP[[4]]))))
+    fragLenSet_CPP <- as.numeric(as.character(unique(featureSet_CPP[[4]])))
+    aaIndexIDSet <- sort(as.character(unique(gsub("inv$", "", featureSet_CPP[[2]]))))
   }else{
     fragLenSet_CPP <- numeric(0)
     aaIndexIDSet <- character(0)
