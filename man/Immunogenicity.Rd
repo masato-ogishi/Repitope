@@ -33,6 +33,8 @@ Immunogenicity_Predict(externalFeatureDFList, trainModelResults)
 \item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to disable.}
 
 \item{trainModelResults}{The model training result returned by \code{Immunogenicity_TrainModels}.}
+
+\item{externalFeatureDFList}{The feature dataframes for which immunogenicity is to be predicted.}
 }
 \description{
 \code{Immunogenicity_TrainModels} trains extremely randomized tree models, and internally predicts immunogenicity scores on the entire dataset provided.\cr

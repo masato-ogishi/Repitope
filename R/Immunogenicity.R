@@ -11,6 +11,7 @@
 #' @param seedSet A set of random seeds.
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to disable.
 #' @param trainModelResults The model training result returned by \code{Immunogenicity_TrainModels}.
+#' @param externalFeatureDFList The feature dataframes for which immunogenicity is to be predicted.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr transmute
 #' @importFrom dplyr select

@@ -1,11 +1,22 @@
 #' In sillico mutagenesis analysis.
 #'
 #' @param peptideSet A set of peptide sequences.
-#' @param peptide.start A peptide sequence.
-#' @param peptide.goal A peptide sequence.
+#' @param peptidePair A pair of peptide sequences.
+#' @param peptidePairDF A dataframe which has two columns of paired peptide sequences.
+#' @param union Logical. Whether the list of similarity networks should be combined.
+#' @param coreN The number of threads.
 #' @importFrom Biostrings AA_STANDARD
 #' @importFrom stringdist stringdist
+#' @importFrom Matrix t
+#' @importFrom igraph graph_from_adjacency_matrix
+#' @importFrom igraph set_vertex_attr
+#' @importFrom igraph union
+#' @importFrom igraph simplify
 #' @importFrom pbapply pblapply
+#' @importFrom parallel makeCluster
+#' @importFrom parallel stopCluster
+#' @importFrom snow clusterEvalQ
+#' @importFrom snow clusterExport
 #' @export
 #' @rdname InsillicoMutagenesis
 #' @name InsillicoMutagenesis
@@ -17,7 +28,15 @@ InSillicoMutagenesis <- function(peptideSet){
     }
   )))
 }
-InsillicoMutagenesis_GenerateIntermediates <- function(peptide.start, peptide.goal){
+
+#' @export
+#' @rdname InsillicoMutagenesis
+#' @name InsillicoMutagenesis
+InsillicoMutagenesis_GenerateIntermediates <- function(peptidePair){
+  # Peptides
+  peptide.start <- peptidePair[[1]]
+  peptide.goal <- peptidePair[[2]]
+
   # The minimum levenstein distance
   minDist <- stringdist::stringdist(peptide.start, peptide.goal, method="lv")
   cat("The minimum number of required substitution: ", minDist, "\n", sep="")
@@ -36,4 +55,34 @@ InsillicoMutagenesis_GenerateIntermediates <- function(peptide.start, peptide.go
     peptide.mut.list[[i+1]] <- Nth_Distant_Peptides(peptide.mut.list[[i]], peptide.goal, nth=minDist-i)
   }
   return(unique(unlist(peptide.mut.list)))
+}
+
+#' @export
+#' @rdname InsillicoMutagenesis
+#' @name InsillicoMutagenesis
+InsillicoMutagenesis_PairwiseSimilarityNetwork <- function(peptidePairDF, union=T, coreN=NULL){
+  simnet_singlepair <- function(pept1, pept2){
+    peptideSet.mut <- Repitope::InSillicoMutagenesis(c(pept1, pept2))
+    d <- Repitope::distMat_Auto(peptideSet.mut)
+    d <- d|Matrix::t(d)
+    g <- igraph::graph_from_adjacency_matrix(d, mode="undirected", weighted=NULL, diag=F)
+    g <- igraph::set_vertex_attr(g, "name", value=peptideSet.mut)
+    return(g)
+  }
+  if(is.null(coreN)){
+    cl <- NULL
+  }else{
+    cl <- parallel::makeCluster(coreN)
+    snow::clusterExport(cl=cl, list=c("peptidePairDF","simnet_singlepair"), envir=environment())
+  }
+  simNet <- pbapply::pblapply(1:nrow(peptidePairDF),
+                              function(i){simnet_singlepair(peptidePairDF[i,1], peptidePairDF[i,2])},
+                              cl=cl)
+  if(!is.null(coreN)) parallel::stopCluster(cl=cl)
+  gc();gc()
+  if(union==T){
+    simNet <- do.call(igraph::union, simNet)
+    simNet <- igraph::simplify(simNet)
+  }
+  return(simNet)
 }

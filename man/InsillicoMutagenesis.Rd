@@ -3,16 +3,29 @@
 \name{InsillicoMutagenesis}
 \alias{InsillicoMutagenesis}
 \alias{InSillicoMutagenesis}
+\alias{InsillicoMutagenesis}
+\alias{InsillicoMutagenesis_GenerateIntermediates}
+\alias{InsillicoMutagenesis}
+\alias{InsillicoMutagenesis_PairwiseSimilarityNetwork}
 \title{In sillico mutagenesis analysis.}
 \usage{
 InSillicoMutagenesis(peptideSet)
+
+InsillicoMutagenesis_GenerateIntermediates(peptidePair)
+
+InsillicoMutagenesis_PairwiseSimilarityNetwork(peptidePairDF, union = T,
+  coreN = NULL)
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}
 
-\item{peptide.start}{A peptide sequence.}
+\item{peptidePair}{A pair of peptide sequences.}
 
-\item{peptide.goal}{A peptide sequence.}
+\item{peptidePairDF}{A dataframe which has two columns of paired peptide sequences.}
+
+\item{union}{Logical. Whether the list of similarity networks should be combined.}
+
+\item{coreN}{The number of threads.}
 }
 \description{
 In sillico mutagenesis analysis.
