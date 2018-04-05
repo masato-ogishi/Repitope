@@ -15,8 +15,7 @@
 #' @importFrom pbapply pblapply
 #' @importFrom parallel makeCluster
 #' @importFrom parallel stopCluster
-#' @importFrom snow clusterEvalQ
-#' @importFrom snow clusterExport
+#' @importFrom parallel clusterExport
 #' @export
 #' @rdname InsillicoMutagenesis
 #' @name InsillicoMutagenesis
@@ -73,7 +72,7 @@ InsillicoMutagenesis_PairwiseSimilarityNetwork <- function(peptidePairDF, union=
     cl <- NULL
   }else{
     cl <- parallel::makeCluster(coreN)
-    snow::clusterExport(cl=cl, list=c("peptidePairDF","simnet_singlepair"), envir=environment())
+    parallel::clusterExport(cl=cl, list=c("peptidePairDF","simnet_singlepair"), envir=environment())
   }
   simNet <- pbapply::pblapply(1:nrow(peptidePairDF),
                               function(i){simnet_singlepair(peptidePairDF[i,1], peptidePairDF[i,2])},
