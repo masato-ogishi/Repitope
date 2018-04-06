@@ -37,7 +37,7 @@ Immunogenicity_TrainModels <- function(
   coreN=parallel::detectCores()
 ){
   # A combined feature dataframe
-  dt <- data.table::as.data.table(dplyr::left_join(metadataDF, featureDF))
+  dt <- data.table::as.data.table(dplyr::left_join(metadataDF, featureDF, by="Peptide"))
   if(identical(featureSet, "all")){
     featureSet <- setdiff(colnames(dt), c("Peptide", "Immunogenicity"))
   }else{
@@ -67,7 +67,7 @@ Immunogenicity_TrainModels <- function(
     mat_test <- as.matrix(as.data.frame(dt_test))
     predDT <- data.table::as.data.table(
       dplyr::transmute(
-        as.data.frame(predict(ert, mat, probability=T)),
+        as.data.frame(predict(ert, mat_test, probability=T)),
         "Peptide"=dt_test$"Peptide",
         "ImmunogenicityScore"=Positive
       ))
