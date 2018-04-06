@@ -8,6 +8,8 @@
 \alias{Immunogenicity}
 \alias{Immunogenicity_Score}
 \alias{Immunogenicity}
+\alias{Immunogenicity_Score_Cluster}
+\alias{Immunogenicity}
 \alias{Immunogenicity_Predict}
 \title{Immunogenicity score.}
 \usage{
@@ -18,6 +20,9 @@ Immunogenicity_SummarizeInternalScores(trainModelResults)
 
 Immunogenicity_Score(featureDF, metadataDF, featureSet = "all",
   seedSet = 1:5, coreN = parallel::detectCores())
+
+Immunogenicity_Score_Cluster(featureDF, metadataDF, clusterDF,
+  featureSet = "all", seedSet = 1:5, coreN = parallel::detectCores())
 
 Immunogenicity_Predict(externalFeatureDFList, trainModelResults)
 }
@@ -34,11 +39,14 @@ Immunogenicity_Predict(externalFeatureDFList, trainModelResults)
 
 \item{trainModelResults}{The model training result returned by \code{Immunogenicity_TrainModels}.}
 
+\item{clusterDF}{A dataframe containing cluster metadata, consisting of "Peptide" and "Cluster" columns.}
+
 \item{externalFeatureDFList}{The feature dataframes for which immunogenicity is to be predicted.}
 }
 \description{
 \code{Immunogenicity_TrainModels} trains extremely randomized tree models, and internally predicts immunogenicity scores on the entire dataset provided.\cr
 \code{Immunogenicity_SummarizeInternalScores} summarizes internally calculated immunogenicity scores.\cr
 \code{Immunogenicity_Score} is a wrapper function of \code{Immunogenicity_TrainModels} and \code{Immunogenicity_SummarizeInternalScores}.\cr
+\code{Immunogenicity_Score_Cluster} is similar to \code{Immunogenicity_Score}, but takes \code{clusterDF} to filter peptides based on their similarities.
 \code{Immunogenicity_Predict} predicts immunogenicity scores on external datasets. Models trained by \code{Immunogenicity_TrainModels} are necessary. Note that, due to Java constraints, models have to be constructed in each new R session.
 }
