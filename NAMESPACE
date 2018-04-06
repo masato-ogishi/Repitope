@@ -3,6 +3,7 @@
 export(CPP_AACPMatrix)
 export(CPP_FragmentLibrary)
 export(Epitope_Add_Disease)
+export(Epitope_Add_HLARestrictions)
 export(Epitope_Add_HLASerotypes)
 export(Epitope_Convert_HLASupertypes)
 export(Epitope_Import)

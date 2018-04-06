@@ -3,10 +3,11 @@
 #' \code{Epitope_Import} imports IEDB and other epitope files.\cr
 #' \code{Epitope_SolveImmunogenicityContradiction} solves contradicted annotations on immunogenicity.\cr
 #' \code{Epitope_Add_Disease} adds metadata of being related to diseases or not obtained from the IEDB database.\cr
-#' \code{Epitope_Add_HLASerotypes} adds HLA serotype metadata obtained from the IEDB database.\cr
 #' \code{compressedToLongFormat} converts a compresed column into a long-format column. The compressed strings should be separated by "|".\cr
 #' \code{compressedToDummyDF} converts a compresed column into a dummy variable dataframe. The compressed strings should be separated by "|".\cr
+#' \code{Epitope_Add_HLASerotypes} adds HLA serotype metadata obtained from the IEDB database.\cr
 #' \code{Epitope_Convert_HLASupertypes} converts the compressed HLA genotype information into HLA supertypes. The definition of HLA supertypes is derived from the Additional File 1 of Sidney et al., 2008.\cr
+#' \code{Epitope_Add_HLARestrictions} merges HLA serotypes and HLA supertypes.
 #'
 #' @param df An epitope dataframe.
 #' @param compressedColumnName A string indicating the names of the compressed column to be converted into a long format.
@@ -130,27 +131,6 @@ Epitope_Add_Disease <- function(df, IEDBEpitopeFileName=system.file("IEDB_Epitop
 #' @export
 #' @rdname DataPreparation_EpitopeDataset
 #' @name DataPreparation_EpitopeDataset
-Epitope_Add_HLASerotypes <- function(df, IEDBEpitopeFileNames=system.file("IEDB_Epitope_Serotype_HLA-A01.csv.gz", package="Repitope")){
-  hlaSerotypeDF <- function(IEDBEpitopeFileName){
-    df.meta <- suppressWarnings(readr::read_csv(IEDBEpitopeFileName, skip=1))
-    pept.meta <- df.meta$Description
-    sero <- grep("HLA-", strsplit(basename(IEDBEpitopeFileName), "_")[[1]], value=T)
-    sero <- stringr::str_replace(strsplit(sero, ".", fixed=T)[[1]][[1]], "HLA-", "")
-    df.meta <- data.frame("Peptide"=pept.meta, "HLASerotype"=sero, stringsAsFactors=F)
-    return(df.meta)
-  }
-  df.meta <- dplyr::bind_rows(lapply(IEDBEpitopeFileNames, hlaSerotypeDF)) %>%
-    dplyr::group_by(Peptide) %>%
-    dplyr::summarise(HLASerotype=paste0(sort(unique(HLASerotype)), collapse="|")) %>%
-    dplyr::filter(nchar(Peptide) %in% 8:11) %>%
-    dplyr::filter(Peptide %in% sequenceFilter(Peptide))
-  df <- dplyr::left_join(df, df.meta, by="Peptide")
-  return(df)
-}
-
-#' @export
-#' @rdname DataPreparation_EpitopeDataset
-#' @name DataPreparation_EpitopeDataset
 compressedToLongFormat <- function(df, compressedColumnName){
   cmp <- stringr::str_split(df[[compressedColumnName]], stringr::fixed("|"))
   l <- sapply(cmp, length)
@@ -169,6 +149,27 @@ compressedToDummyDF <- function(df, compressedColumnName){
     tidyr::drop_na(compressedColumnName) %>%
     tidyr::spread(compressedColumnName, Value, fill=0)
   dplyr::left_join(df, df_dummy)
+}
+
+#' @export
+#' @rdname DataPreparation_EpitopeDataset
+#' @name DataPreparation_EpitopeDataset
+Epitope_Add_HLASerotypes <- function(df, IEDBEpitopeFileNames=system.file("IEDB_Epitope_Serotype_HLA-A01.csv.gz", package="Repitope")){
+  hlaSerotypeDF <- function(IEDBEpitopeFileName){
+    df.meta <- suppressWarnings(readr::read_csv(IEDBEpitopeFileName, skip=1))
+    pept.meta <- df.meta$Description
+    sero <- grep("HLA-", strsplit(basename(IEDBEpitopeFileName), "_")[[1]], value=T)
+    sero <- stringr::str_replace(strsplit(sero, ".", fixed=T)[[1]][[1]], "HLA-", "")
+    df.meta <- data.frame("Peptide"=pept.meta, "HLASerotype"=sero, stringsAsFactors=F)
+    return(df.meta)
+  }
+  df.meta <- dplyr::bind_rows(lapply(IEDBEpitopeFileNames, hlaSerotypeDF)) %>%
+    dplyr::group_by(Peptide) %>%
+    dplyr::summarise(HLASerotype=paste0(sort(unique(HLASerotype)), collapse="|")) %>%
+    dplyr::filter(nchar(Peptide) %in% 8:11) %>%
+    dplyr::filter(Peptide %in% sequenceFilter(Peptide))
+  df <- dplyr::left_join(df, df.meta, by="Peptide")
+  return(df)
 }
 
 #' @export
@@ -226,5 +227,16 @@ Epitope_Convert_HLASupertypes <- function(df, compressedColumnName="MHC"){
   hla <- lapply(hla, unique)
   hla[which(sapply(hla, length)==0)] <- NA
   hla <- unlist(lapply(hla, paste0, collapse="|"))
+  hla[hla=="NA"] <- NA
   return(dplyr::mutate(df, HLASupertype=hla))
+}
+
+#' @export
+#' @rdname DataPreparation_EpitopeDataset
+#' @name DataPreparation_EpitopeDataset
+Epitope_Add_HLARestrictions <- function(df){
+  hla <- mapply(function(x, y){paste0(sort(unique(unlist(list(strsplit(x, "|", fixed=T), strsplit(y, "|", fixed=T))))), collapse="|")}, df$"HLASerotype", df$"HLASupertype", SIMPLIFY=T)
+  hla[hla==""] <- NA
+  df$"HLARestriction" <- hla
+  return(df)
 }

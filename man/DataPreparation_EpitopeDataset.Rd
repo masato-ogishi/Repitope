@@ -8,13 +8,15 @@
 \alias{DataPreparation_EpitopeDataset}
 \alias{Epitope_Add_Disease}
 \alias{DataPreparation_EpitopeDataset}
-\alias{Epitope_Add_HLASerotypes}
-\alias{DataPreparation_EpitopeDataset}
 \alias{compressedToLongFormat}
 \alias{DataPreparation_EpitopeDataset}
 \alias{compressedToDummyDF}
 \alias{DataPreparation_EpitopeDataset}
+\alias{Epitope_Add_HLASerotypes}
+\alias{DataPreparation_EpitopeDataset}
 \alias{Epitope_Convert_HLASupertypes}
+\alias{DataPreparation_EpitopeDataset}
+\alias{Epitope_Add_HLARestrictions}
 \title{Compile epitope datasets retrieved from IEDB and other sources.}
 \usage{
 Epitope_Import(IEDBAssayFileName, OtherFileNames = NULL)
@@ -25,15 +27,17 @@ Epitope_Add_Disease(df,
   IEDBEpitopeFileName = system.file("IEDB_Epitope_Healthy.csv.gz", package =
   "Repitope"))
 
-Epitope_Add_HLASerotypes(df,
-  IEDBEpitopeFileNames = system.file("IEDB_Epitope_Serotype_HLA-A01.csv.gz",
-  package = "Repitope"))
-
 compressedToLongFormat(df, compressedColumnName)
 
 compressedToDummyDF(df, compressedColumnName)
 
+Epitope_Add_HLASerotypes(df,
+  IEDBEpitopeFileNames = system.file("IEDB_Epitope_Serotype_HLA-A01.csv.gz",
+  package = "Repitope"))
+
 Epitope_Convert_HLASupertypes(df, compressedColumnName = "MHC")
+
+Epitope_Add_HLARestrictions(df)
 }
 \arguments{
 \item{IEDBAssayFileName}{A set of T cell assay results obtained from IEDB.}
@@ -44,16 +48,17 @@ Epitope_Convert_HLASupertypes(df, compressedColumnName = "MHC")
 
 \item{IEDBEpitopeFileName}{A set of epitopes obtained from IEDB.}
 
-\item{IEDBEpitopeFileNames}{A set of epitope files from IEDB.}
-
 \item{compressedColumnName}{A string indicating the names of the compressed column to be converted into a long format.}
+
+\item{IEDBEpitopeFileNames}{A set of epitope files from IEDB.}
 }
 \description{
 \code{Epitope_Import} imports IEDB and other epitope files.\cr
 \code{Epitope_SolveImmunogenicityContradiction} solves contradicted annotations on immunogenicity.\cr
 \code{Epitope_Add_Disease} adds metadata of being related to diseases or not obtained from the IEDB database.\cr
-\code{Epitope_Add_HLASerotypes} adds HLA serotype metadata obtained from the IEDB database.\cr
 \code{compressedToLongFormat} converts a compresed column into a long-format column. The compressed strings should be separated by "|".\cr
 \code{compressedToDummyDF} converts a compresed column into a dummy variable dataframe. The compressed strings should be separated by "|".\cr
+\code{Epitope_Add_HLASerotypes} adds HLA serotype metadata obtained from the IEDB database.\cr
 \code{Epitope_Convert_HLASupertypes} converts the compressed HLA genotype information into HLA supertypes. The definition of HLA supertypes is derived from the Additional File 1 of Sidney et al., 2008.\cr
+\code{Epitope_Add_HLARestrictions} merges HLA serotypes and HLA supertypes.
 }
