@@ -148,7 +148,14 @@ compressedToDummyDF <- function(df, compressedColumnName){
     dplyr::mutate(Value=1) %>%
     tidyr::drop_na(compressedColumnName) %>%
     tidyr::spread(compressedColumnName, Value, fill=0)
-  dplyr::left_join(df, df_dummy)
+  left_join_0 <- function(x, y, fill=0){
+    z <- dplyr::left_join(x, y)
+    tmp <- setdiff(names(z), names(x))
+    z <- tidyr::replace_na(z, setNames(as.list(rep(fill, length(tmp))), tmp))
+    return(z)
+  }
+  df_dummy <- left_join_0(df, df_dummy, fill=0)
+  return(df_dummy)
 }
 
 #' @export
