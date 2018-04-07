@@ -10,6 +10,7 @@
 #' @param fragLenSet A set of sliding window sizes. Must be between 3 and 8.
 #' @param fragDepthSet A set of fragment library sizes. Must be below 100000.
 #' @param fragLibTypeSet A set of strings indicating the types of fragment libraries to be used.
+#' @param featureSet A minimum set of features. Combinations of fragment lengths and AAIndex IDs are internally extracted for calculating CPPs.
 #' @param seedSet A set of random seeds.
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.
 #' @param tmpDir Destination directory to save intermediate files.
@@ -60,7 +61,8 @@
 #' @name Features_PeptDesc
 Features_PeptDesc <- function(
   peptideSet,
-  fragLenSet=3:8
+  fragLenSet=3:8,
+  featureSet=NULL
 ){
   # Start calculation
   set.seed(12345)
@@ -100,15 +102,15 @@ Features_PeptDesc <- function(
   }
 
   # Parallelized calculation of descriptive statistics
-  parameterGrid <- expand.grid(peptideSet, fragLenSet, stringsAsFactors=F)
+  parameterDF <- expand.grid(peptideSet, fragLenSet, stringsAsFactors=F)
   cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
   parallel::clusterExport(
     cl=cl,
-    list("parameterGrid", "peptideDescriptor.FragStat.Single", "peptideDescriptor.Batch", "peptideDescriptor.NameSet"),
+    list("parameterDF", "peptideDescriptor.FragStat.Single", "peptideDescriptor.Batch", "peptideDescriptor.NameSet"),
     envir=environment()
   )
   df_feature <- pbapply::pbapply(
-    parameterGrid, 1,
+    parameterDF, 1,
     function(v){peptideDescriptor.FragStat.Single(v[1], as.numeric(v[2]))},
     cl=cl
   )
@@ -130,11 +132,24 @@ Features_PeptDesc <- function(
   }
   df_feature <- suppressWarnings(dplyr::left_join(df_basic, df_feature, by="Peptide"))
   rownames(df_feature) <- 1:nrow(df_feature)
+  dt_pept <- data.table::as.data.table(df_feature)
 
-  # Output
+  # Minimum set of features (optional)
+  if(!is.null(featureSet)){
+    featureSet <- intersect(colnames(dt_pept), featureSet)
+    dt_pept <- dt_pept[, c("Peptide", featureSet), with=F]
+  }
+
+  # Finish the timer
   time.end <- proc.time()
   message("Overall time required = ", format((time.end-time.start)[3], nsmall=2), "[sec]")
-  return(data.table::as.data.table(df_feature))
+
+  # Clear logs
+  rm(list=setdiff(ls(), c("dt_pept")))
+  gc();gc()
+
+  # Output
+  return(dt_pept)
 }
 
 #' @export
@@ -147,6 +162,7 @@ Features_CPP <- function(
   fragLenSet=3:8,
   fragDepthSet=10000,
   fragLibTypeSet=c("Deduplicated", "Weighted", "Mock"),
+  featureSet=NULL,
   seedSet=1:5,
   coreN=parallel::detectCores(),
   tmpDir=tempdir()
@@ -171,29 +187,37 @@ Features_CPP <- function(
   if(is.character(fragLib)) fragLib <- fst::read_fst(fragLib)
 
   # Contact potential profiling
-  parameterGrid <- expand.grid(peptideSet, aaIndexIDSet, fragLenSet, fragDepthSet, fragLibTypeSet, stringsAsFactors=F) %>%
-    magrittr::set_colnames(c("Peptide","AAIndexID","FragLen","FragDepth","Library"))
-  message("Number of parameter combinations = ", nrow(parameterGrid))
+  parameterDT <- expand.grid(peptideSet, aaIndexIDSet, fragLenSet, fragDepthSet, fragLibTypeSet, stringsAsFactors=F) %>%
+    magrittr::set_colnames(c("Peptide","AAIndexID","FragLen","FragDepth","Library")) %>%
+    data.table::as.data.table()
+  if(!is.null(featureSet)){
+    featureDT <- as.data.frame(t(as.data.frame(strsplit(grep("^CPP_", featureSet, value=T), "_")))) %>%
+      dplyr::transmute(AAIndexID=V2, FragLen=as.integer(V4)) %>%
+      data.table::as.data.table()
+    parameterDT <- merge(featureDT, parameterDT, by=c("AAIndexID", "FragLen"), all.x=T, all.y=F)
+    data.table::setcolorder(parameterDT, c("Peptide","AAIndexID","FragLen","FragDepth","Library"))
+  }
+  message("Number of parameter combinations = ", nrow(parameterDT))
   message("Launching parallel clusters...")
   if(is.null(coreN)) coreN <- 1
   cl <- parallel::makeCluster(coreN, type="SOCK")
   parallel::clusterExport(
     cl=cl,
-    list("parameterGrid","AACPMatrixList","fragLib"),
+    list("parameterDT","AACPMatrixList","fragLib"),
     envir=environment()
   )
   message("Contact potential profiling...")
   cpp <- function(clusterObject, seedNumber=12345){
     snow::clusterSetupRNGstream(clusterObject, seed=rep(seedNumber, 6))
     dt <- pbapply::pblapply(
-      1:nrow(parameterGrid),
+      1:nrow(parameterDT),
       function(i){
-        pept <- parameterGrid[i,1]
-        aaIndexID <- parameterGrid[i,2]
+        pept <- parameterDT[i,1]
+        aaIndexID <- parameterDT[i,2]
         aacpMat <- AACPMatrixList[[aaIndexID]]
-        fragLen <- parameterGrid[i,3]
-        fragDepth <- parameterGrid[i,4]
-        libraryType <- parameterGrid[i,5]
+        fragLen <- parameterDT[i,3]
+        fragDepth <- parameterDT[i,4]
+        libraryType <- parameterDT[i,5]
         libraryID <- paste0(c(libraryType, fragLen, seedNumber), collapse="_")
         fragSet <- sample(fragLib[[libraryID]], size=fragDepth)
         al <- Biostrings::pairwiseAlignment(
@@ -210,7 +234,7 @@ Features_CPP <- function(
       data.table::as.data.table() %>%
       data.table::transpose()
     colnames(dt) <- c("Mean","SD","Med","TrM","MAD","Skew","Kurt","SE","IQR","Q10","Q90")
-    dt_param <- data.table::as.data.table(parameterGrid)
+    dt_param <- data.table::as.data.table(parameterDT)
     dt_param[,"Seed":=seedNumber]
     dt <- cbind(dt_param, dt)
     fst::write_fst(dt, file.path(tmpDir, paste0("dt_feature_cpp_seed", seedNumber, ".fst")))
@@ -256,16 +280,17 @@ Features <- function(
   fragLenSet=3:8,
   fragDepthSet=10000,
   fragLibTypeSet=c("Deduplicated", "Weighted", "Mock"),
+  featureSet=NULL,
   seedSet=1:5,
   coreN=parallel::detectCores(),
   tmpDir=tempdir()
 ){
   message("Peptide contact potential profiling analysis...")
-  dt_cpp <- Features_CPP(peptideSet, fragLib, aaIndexIDSet, fragLenSet, fragDepthSet, fragLibTypeSet, seedSet, coreN, tmpDir)
+  dt_cpp <- Features_CPP(peptideSet, fragLib, aaIndexIDSet, fragLenSet, fragDepthSet, fragLibTypeSet, featureSet, seedSet, coreN, tmpDir)
   message("Peptide descriptor analysis...")
-  dt_peptdesc <- Features_PeptDesc(peptideSet, fragLenSet)
+  dt_pept <- Features_PeptDesc(peptideSet, fragLenSet, featureSet)
   message("Merging...")
-  dt <- merge(dt_peptdesc, dt_cpp, by="Peptide")
+  dt <- merge(dt_pept, dt_cpp, by="Peptide")
   dt[,"FragDepth":=format(FragDepth, trim=T, scientific=F)]
   return(split(dt, by=c("Library", "FragDepth"), keep.by=F))
 }

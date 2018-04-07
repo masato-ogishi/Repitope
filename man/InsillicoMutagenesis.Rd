@@ -9,7 +9,7 @@
 \alias{InsillicoMutagenesis_PairwiseSimilarityNetwork}
 \title{In sillico mutagenesis analysis.}
 \usage{
-InSillicoMutagenesis(peptideSet)
+InSillicoMutagenesis(peptideSet, union = T, coreN = NULL)
 
 InsillicoMutagenesis_GenerateIntermediates(peptidePair)
 
@@ -19,14 +19,16 @@ InsillicoMutagenesis_PairwiseSimilarityNetwork(peptidePairDF, union = T,
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}
 
+\item{union}{Logical. Whether the output list should be combined.}
+
+\item{coreN}{The number of threads.}
+
 \item{peptidePair}{A pair of peptide sequences.}
 
 \item{peptidePairDF}{A dataframe which has two columns of paired peptide sequences.}
-
-\item{union}{Logical. Whether the list of similarity networks should be combined.}
-
-\item{coreN}{The number of threads.}
 }
 \description{
-In sillico mutagenesis analysis.
+\code{InSillicoMutagenesis} generates single-mutated peptide sequences.
+\code{InsillicoMutagenesis_GenerateIntermediates} generates mutational intermediates between two peptide sequences.
+\code{InsillicoMutagenesis_PairwiseSimilarityNetwork} generates single-mutated peptide sequences and construct similarity networks.
 }

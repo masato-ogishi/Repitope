@@ -1,9 +1,13 @@
 #' In sillico mutagenesis analysis.
 #'
+#' \code{InSillicoMutagenesis} generates single-mutated peptide sequences.
+#' \code{InsillicoMutagenesis_GenerateIntermediates} generates mutational intermediates between two peptide sequences.
+#' \code{InsillicoMutagenesis_PairwiseSimilarityNetwork} generates single-mutated peptide sequences and construct similarity networks.
+#'
 #' @param peptideSet A set of peptide sequences.
 #' @param peptidePair A pair of peptide sequences.
 #' @param peptidePairDF A dataframe which has two columns of paired peptide sequences.
-#' @param union Logical. Whether the list of similarity networks should be combined.
+#' @param union Logical. Whether the output list should be combined.
 #' @param coreN The number of threads.
 #' @importFrom Biostrings AA_STANDARD
 #' @importFrom stringdist stringdist
@@ -19,13 +23,23 @@
 #' @export
 #' @rdname InsillicoMutagenesis
 #' @name InsillicoMutagenesis
-InSillicoMutagenesis <- function(peptideSet){
-  unique(unlist(lapply(
+InSillicoMutagenesis <- function(peptideSet, union=T, coreN=NULL){
+  if(is.null(coreN)){
+    cl <- NULL
+  }else{
+    cl <- parallel::makeCluster(coreN)
+  }
+  mut <- pbapply::pblapply(
     peptideSet,
     function(pept){
       apply(expand.grid(1:nchar(pept), Biostrings::AA_STANDARD), 1, function(v){substr(pept, v[1], v[1]) <- v[2];return(pept)})
-    }
-  )))
+    },
+    cl=cl
+  )
+  if(!is.null(coreN)) parallel::stopCluster(cl=cl)
+  gc();gc()
+  if(union==T) mut <- unique(unlist(mut))
+  return(mut)
 }
 
 #' @export
