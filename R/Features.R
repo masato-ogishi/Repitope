@@ -22,8 +22,11 @@
 #' @importFrom tidyr gather
 #' @importFrom tidyr spread
 #' @importFrom tidyr unite
+#' @importFrom tidyr crossing
 #' @importFrom data.table :=
+#' @importFrom data.table CJ
 #' @importFrom data.table as.data.table
+#' @importFrom data.table transpose
 #' @importFrom data.table rbindlist
 #' @importFrom data.table setorder
 #' @importFrom data.table setcolorder
@@ -102,7 +105,7 @@ Features_PeptDesc <- function(
   }
 
   # Parallelized calculation of descriptive statistics
-  parameterDF <- expand.grid(peptideSet, fragLenSet, stringsAsFactors=F)
+  parameterDF <- tidyr::crossing(peptideSet, fragLenSet)
   cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
   parallel::clusterExport(
     cl=cl,
@@ -187,15 +190,27 @@ Features_CPP <- function(
   if(is.character(fragLib)) fragLib <- fst::read_fst(fragLib)
 
   # Contact potential profiling
-  parameterDT <- expand.grid(peptideSet, aaIndexIDSet, fragLenSet, fragDepthSet, fragLibTypeSet, stringsAsFactors=F) %>%
-    magrittr::set_colnames(c("Peptide","AAIndexID","FragLen","FragDepth","Library")) %>%
-    data.table::as.data.table()
-  if(!is.null(featureSet)){
-    featureDT <- as.data.frame(t(as.data.frame(strsplit(grep("^CPP_", featureSet, value=T), "_"), stringsAsFactors=F)), stringsAsFactors=F) %>%
-      dplyr::transmute(AAIndexID=V2, FragLen=as.integer(V4)) %>%
-      data.table::as.data.table()
-    parameterDT <- merge(featureDT, parameterDT, by=c("AAIndexID", "FragLen"), all.x=T, all.y=F)
+  if(is.null(featureSet)){
+    parameterDT <- data.table::CJ(peptideSet, aaIndexIDSet, fragLenSet, fragDepthSet, fragLibTypeSet) %>%
+      magrittr::set_colnames(c("Peptide","AAIndexID","FragLen","FragDepth","Library"))
+    data.table::setorder(parameterDT)
+  }else{
+    cjdt <- function(a,b){
+      cj = data.table::CJ(1:nrow(a), 1:nrow(b))
+      cbind(a[cj[[1]],], b[cj[[2]],])
+    }
+    featureDT <- strsplit(grep("^CPP_", featureSet, value=T), "_") %>%
+      data.table::as.data.table() %>%
+      data.table::transpose() %>%
+      dplyr::select(V2, V4) %>%
+      magrittr::set_colnames(c("AAIndexID", "FragLen")) %>%
+      dplyr::distinct(.keep_all=T)
+    featureDT[,FragLen:=as.integer(FragLen)]
+    parameterDT <- data.table::CJ(peptideSet, fragDepthSet, fragLibTypeSet) %>%
+      magrittr::set_colnames(c("Peptide","FragDepth","Library"))
+    parameterDT <- cjdt(parameterDT, featureDT)
     data.table::setcolorder(parameterDT, c("Peptide","AAIndexID","FragLen","FragDepth","Library"))
+    data.table::setorder(parameterDT)
   }
   message("Number of parameter combinations = ", nrow(parameterDT))
   message("Launching parallel clusters...")
