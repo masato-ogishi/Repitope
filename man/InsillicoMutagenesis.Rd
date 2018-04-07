@@ -13,8 +13,7 @@ InSillicoMutagenesis(peptideSet, union = T, coreN = NULL)
 
 InsillicoMutagenesis_GenerateIntermediates(peptidePair)
 
-InsillicoMutagenesis_PairwiseSimilarityNetwork(peptidePairDF, union = T,
-  coreN = NULL)
+InsillicoMutagenesis_PairwiseSimilarityNetwork(peptidePairDF, coreN = NULL)
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}

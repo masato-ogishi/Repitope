@@ -212,12 +212,12 @@ Features_CPP <- function(
     dt <- pbapply::pblapply(
       1:nrow(parameterDT),
       function(i){
-        pept <- parameterDT[i,1]
-        aaIndexID <- parameterDT[i,2]
+        pept <- parameterDT[[i,1]]
+        aaIndexID <- parameterDT[[i,2]]
         aacpMat <- AACPMatrixList[[aaIndexID]]
-        fragLen <- parameterDT[i,3]
-        fragDepth <- parameterDT[i,4]
-        libraryType <- parameterDT[i,5]
+        fragLen <- parameterDT[[i,3]]
+        fragDepth <- parameterDT[[i,4]]
+        libraryType <- parameterDT[[i,5]]
         libraryID <- paste0(c(libraryType, fragLen, seedNumber), collapse="_")
         fragSet <- sample(fragLib[[libraryID]], size=fragDepth)
         al <- Biostrings::pairwiseAlignment(
@@ -234,9 +234,8 @@ Features_CPP <- function(
       data.table::as.data.table() %>%
       data.table::transpose()
     colnames(dt) <- c("Mean","SD","Med","TrM","MAD","Skew","Kurt","SE","IQR","Q10","Q90")
-    dt_param <- data.table::as.data.table(parameterDT)
-    dt_param[,"Seed":=seedNumber]
-    dt <- cbind(dt_param, dt)
+    parameterDT[,"Seed":=seedNumber]
+    dt <- cbind(parameterDT, dt)
     fst::write_fst(dt, file.path(tmpDir, paste0("dt_feature_cpp_seed", seedNumber, ".fst")))
     return(dt)
   }

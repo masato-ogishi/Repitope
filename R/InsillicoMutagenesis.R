@@ -73,7 +73,7 @@ InsillicoMutagenesis_GenerateIntermediates <- function(peptidePair){
 #' @export
 #' @rdname InsillicoMutagenesis
 #' @name InsillicoMutagenesis
-InsillicoMutagenesis_PairwiseSimilarityNetwork <- function(peptidePairDF, union=T, coreN=NULL){
+InsillicoMutagenesis_PairwiseSimilarityNetwork <- function(peptidePairDF, coreN=NULL){
   simnet_singlepair <- function(pept1, pept2){
     peptideSet.mut <- Repitope::InSillicoMutagenesis(c(pept1, pept2))
     d <- Repitope::distMat_Auto(peptideSet.mut)
@@ -88,14 +88,12 @@ InsillicoMutagenesis_PairwiseSimilarityNetwork <- function(peptidePairDF, union=
     cl <- parallel::makeCluster(coreN)
     parallel::clusterExport(cl=cl, list=c("peptidePairDF","simnet_singlepair"), envir=environment())
   }
-  simNet <- pbapply::pblapply(1:nrow(peptidePairDF),
-                              function(i){simnet_singlepair(peptidePairDF[i,1], peptidePairDF[i,2])},
-                              cl=cl)
+  simNetList <- pbapply::pblapply(
+    1:nrow(peptidePairDF),
+    function(i){simnet_singlepair(peptidePairDF[i,1], peptidePairDF[i,2])},
+    cl=cl
+  )
   if(!is.null(coreN)) parallel::stopCluster(cl=cl)
   gc();gc()
-  if(union==T){
-    simNet <- do.call(igraph::union, simNet)
-    simNet <- igraph::simplify(simNet)
-  }
-  return(simNet)
+  return(simNetList)
 }
