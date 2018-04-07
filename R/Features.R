@@ -191,7 +191,7 @@ Features_CPP <- function(
     magrittr::set_colnames(c("Peptide","AAIndexID","FragLen","FragDepth","Library")) %>%
     data.table::as.data.table()
   if(!is.null(featureSet)){
-    featureDT <- as.data.frame(t(as.data.frame(strsplit(grep("^CPP_", featureSet, value=T), "_")))) %>%
+    featureDT <- as.data.frame(t(as.data.frame(strsplit(grep("^CPP_", featureSet, value=T), "_"), stringsAsFactors=F)), stringsAsFactors=F) %>%
       dplyr::transmute(AAIndexID=V2, FragLen=as.integer(V4)) %>%
       data.table::as.data.table()
     parameterDT <- merge(featureDT, parameterDT, by=c("AAIndexID", "FragLen"), all.x=T, all.y=F)
