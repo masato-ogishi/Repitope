@@ -271,6 +271,10 @@ Features_CPP <- function(
   dt_cpp <- data.table::melt.data.table(dt_cpp, id=col_id, measure=col_val, variable.name="Stat", value.name="Value")
   dt_cpp[,"Feature":=paste0("CPP_", AAIndexID, "_", Stat, "_", FragLen)][,"AAIndexID":=NULL][,"FragLen":=NULL][,"Stat":=NULL]
   dt_cpp <- data.table::dcast.data.table(dt_cpp, Peptide+FragDepth+Library~Feature, value.var="Value", fun=mean)
+  if(!is.null(featureSet)){
+    featureSet <- intersect(colnames(dt_cpp), featureSet)
+    dt_cpp <- dt_cpp[, c("Peptide", featureSet), with=F]
+  }
 
   # Finish the timer
   time.end <- proc.time()
