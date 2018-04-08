@@ -1,7 +1,7 @@
 Package: Repitope
 Type: Package
 Title: Epitope immunogenicity prediction via TCR-peptide interresidue contact potential profiling
-Version: 0.7.7.7
+Version: 0.8.0
 Author: Masato Ogishi
 Maintainer: Masato Ogishi <oogishi-tky@umin.ac.jp>
 Description: Quantification of the immunogenicity of MHC-loaded peptides in silico is a critical component of precision immunotherapy.
@@ -17,12 +17,12 @@ Imports:
     BBmisc (>= 1.11),
     bigmemory (>= 4.5.31),
     Biostrings (>= 2.44.2),
-    caret (>= 6.0-78),
+    caret (>= 6.0-79),
     classifierplots (>= 1.3.3),
     data.table (>= 1.10.4-3),
     DescTools (>= 0.99.21),
     doParallel (>= 1.0.11),
-    dplyr (>= 0.7.3),
+    dplyr (>= 0.7.4),
     extraTrees (>= 1.0.5),
     foreach (>= 1.4.4),
     fst (>= 0.8.4),
@@ -39,10 +39,10 @@ Imports:
     parallel (>= 3.4.3),
     parallelMap (>= 1.3), 
     pacman (>= 0.4.6),
-    pbapply (>= 1.3-3),
+    pbapply (>= 1.3-4),
     Peptides (>= 2.3),
     pROC (>= 1.10.0),
-    psych (>= 1.7.8),
+    psych (>= 1.8.3.3),
     purrr (>= 0.2.3),
     readr (>= 1.1.1),
     rlang (>= 0.1.2),
