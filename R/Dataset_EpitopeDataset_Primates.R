@@ -1,6 +1,6 @@
-#' A compiled dataset of primates MHC class I epitopes and ligands.
+#' A compiled dataset of primate MHC class I epitopes and ligands.
 #'
-#' @format A tibble with 536 rows and 7 variables
+#' @format A tibble with 411 rows and 7 variables
 #' @docType data
 #' @keywords datasets
 #' @name Dataset_EpitopeDataset_Primates

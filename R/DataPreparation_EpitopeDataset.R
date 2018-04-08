@@ -1,7 +1,6 @@
 #' Compile epitope datasets retrieved from IEDB and other sources.
 #'
-#' \code{Epitope_Import} imports IEDB and other epitope files.\cr
-#' \code{Epitope_SolveImmunogenicityContradiction} solves contradicted annotations on immunogenicity.\cr
+#' \code{Epitope_Import} imports IEDB and other epitope files. Contradicting immunogenicity annotations are internally resolved. \cr
 #' \code{Epitope_Add_Disease} adds metadata of being related to diseases or not obtained from the IEDB database.\cr
 #' \code{compressedToLongFormat} converts a compresed column into a long-format column. The compressed strings should be separated by "|".\cr
 #' \code{compressedToDummyDF} converts a compresed column into a dummy variable dataframe. The compressed strings should be separated by "|".\cr
@@ -45,32 +44,28 @@
 #' @rdname DataPreparation_EpitopeDataset
 #' @name DataPreparation_EpitopeDataset
 Epitope_Import <- function(IEDBAssayFileName, OtherFileNames=NULL){
-  df.epitope.iedb <- readr::read_csv(IEDBAssayFileName, skip=1) %>%
+  immEvi <- suppressMessages(readr::read_csv(system.file("IEDB_ImmunogenicityEvidenceTable.csv", package="Repitope"))[[1]])
+  df <- suppressWarnings(suppressMessages(readr::read_csv(IEDBAssayFileName, skip=1))) %>%
     magrittr::set_colnames(stringr::str_replace_all(colnames(.), " ", "")) %>%
     dplyr::transmute(
       Peptide=Description,
-      Host=Name,
-      Immunogenicity=ifelse(stringr::str_detect(QualitativeMeasure, "Positive"), "Positive", "Negative"),
+      Immunogenicity=factor(ifelse(stringr::str_detect(QualitativeMeasure, "Positive"), "Positive", "Negative"), levels=c("Positive", "Negative")),
       ImmunogenicityEvidence=AssayGroup,
       MHC=AlleleName,
       MHCEvidence=AlleleEvidenceCode,
+      Host=Name,
       Dataset="IEDB"
     ) %>%
-    dplyr::filter(ImmunogenicityEvidence %in% readr::read_csv(system.file("IEDB_ImmunogenicityEvidenceTable.csv", package="Repitope"))[[1]])
+    dplyr::filter(ImmunogenicityEvidence %in% immEvi)
   if(!is.null(OtherFileNames)){
-    df.epitope.others <- dplyr::bind_rows(lapply(OtherFileNames, readr::read_csv))
-    df.epitope.iedb <- dplyr::bind_rows(df.epitope.iedb, df.epitope.others)
+    df.others <- dplyr::bind_rows(lapply(OtherFileNames, function(f){suppressWarnings(suppressMessages(readr::read_csv(f)))}))
+    df <- suppressWarnings(suppressMessages(dplyr::bind_rows(df, df.others)))
+    df <- dplyr::mutate(df, Immunogenicity=factor(Immunogenicity, levels=c("Positive", "Negative")))
   }
-  df.epitope.iedb <- df.epitope.iedb %>%
+  df <- df %>%
     dplyr::filter(nchar(Peptide) %in% 8:11) %>%         ## Length check.
     dplyr::filter(Peptide %in% sequenceFilter(Peptide)) ## Sequences with non-standard characters were discarded.
-  return(df.epitope.iedb)
-}
 
-#' @export
-#' @rdname DataPreparation_EpitopeDataset
-#' @name DataPreparation_EpitopeDataset
-Epitope_SolveImmunogenicityContradiction <- function(df){
   df <- df %>%
     dplyr::group_by(Peptide) %>%
     dplyr::summarise(
@@ -80,39 +75,46 @@ Epitope_SolveImmunogenicityContradiction <- function(df){
       MHCEvidence=paste0(sort(unique(MHCEvidence)), collapse="|"),
       Host=paste0(sort(unique(Host)), collapse="|"),
       Dataset=paste0(sort(unique(Dataset)), collapse="|")
-    ) %>%
-    dplyr::mutate(Immunogenicity_Contradiction=stringr::str_detect(Immunogenicity, stringr::fixed("Negative|Positive")))
+    )
 
-  cont <- table(df$"Immunogenicity_Contradiction")
-  cat(cont[[2]], "/", nrow(df), " (", scales::percent(cont[[2]]/nrow(df)), ") peptides have contradicting annotations.\n", sep="")
+  resolveImmunogenicityContradiction <- function(df){
+    df <- df %>%
+      dplyr::mutate(Immunogenicity_Contradiction=stringr::str_detect(Immunogenicity, stringr::fixed("Positive|Negative")))
 
-  chooseOneImmunogenicity_Definitive <- function(ImmunogenicityString){
-    paste0(unique(purrr::flatten_chr(stringr::str_split(ImmunogenicityString, stringr::fixed("|")))), collapse="|")
+    cont <- table(df$"Immunogenicity_Contradiction")
+    cat(cont[[2]], "/", nrow(df), " (", scales::percent(cont[[2]]/nrow(df)), ") peptides have contradicting annotations.\n", sep="")
+
+    chooseOneImmunogenicity_Definitive <- function(ImmunogenicityString){
+      paste0(unique(purrr::flatten_chr(stringr::str_split(ImmunogenicityString, stringr::fixed("|")))), collapse="|")
+    }
+    chooseOneImmunogenicity_Consensus <- function(ImmunogenicityString){
+      which.max(table(purrr::flatten_chr(stringr::str_split(ImmunogenicityString, stringr::fixed("|")))))
+    }
+    df <- df %>%
+      dplyr::mutate(
+        #Immunogenicity_Definitive=sapply(Immunogenicity, chooseOneImmunogenicity_Definitive)
+        Immunogenicity_Loose=ifelse(stringr::str_detect(Immunogenicity, "Positive"), "Positive", "Negative")
+        #Immunogenicity_Strict=ifelse(stringr::str_detect(Immunogenicity, "Negative"), "Negative", "Positive")
+        #Immunogenicity_Consensus=sapply(Immunogenicity, chooseOneImmunogenicity_Consensus)
+      ) %>%
+      dplyr::transmute(
+        Peptide,
+        Immunogenicity=Immunogenicity_Loose,  ## Seems the best
+        ImmunogenicityEvidence,
+        MHC,
+        MHCEvidence,
+        Host,
+        Dataset
+      ) %>%
+      dplyr::filter(Immunogenicity %in% c("Positive", "Negative")) %>%
+      dplyr::mutate(Immunogenicity=factor(Immunogenicity, levels=c("Positive", "Negative")))
+
+    imm <- table(df$"Immunogenicity")
+    cat(imm[[1]], "/", nrow(df), " (", scales::percent(imm[[1]]/nrow(df)), ") peptides are immunogenic in at least one of the observations.\n", sep="")
+
+    return(df)
   }
-  chooseOneImmunogenicity_Consensus <- function(ImmunogenicityString){
-    which.max(table(purrr::flatten_chr(stringr::str_split(ImmunogenicityString, stringr::fixed("|")))))
-  }
-  df <- df %>%
-    dplyr::mutate(
-      #Immunogenicity_Definitive=sapply(Immunogenicity, chooseOneImmunogenicity_Definitive)
-      Immunogenicity_Loose=ifelse(stringr::str_detect(Immunogenicity, "Positive"), "Positive", "Negative")
-      #Immunogenicity_Strict=ifelse(stringr::str_detect(Immunogenicity, "Negative"), "Negative", "Positive")
-      #Immunogenicity_Consensus=sapply(Immunogenicity, chooseOneImmunogenicity_Consensus)
-    ) %>%
-    dplyr::transmute(
-      Peptide,
-      Immunogenicity=Immunogenicity_Loose,  ## Seems the best
-      ImmunogenicityEvidence,
-      MHC,
-      MHCEvidence,
-      Host,
-      Dataset
-    ) %>%
-    dplyr::filter(Immunogenicity %in% c("Positive", "Negative")) %>%
-    dplyr::mutate(Immunogenicity=factor(Immunogenicity, levels=c("Positive", "Negative")))
-
-  imm <- table(df$"Immunogenicity")
-  cat(imm[[1]], "/", nrow(df), " (", scales::percent(imm[[1]]/nrow(df)), ") peptides are immunogenic in at least one of the observations.\n", sep="")
+  df <- resolveImmunogenicityContradiction(df)
 
   return(df)
 }
@@ -121,7 +123,7 @@ Epitope_SolveImmunogenicityContradiction <- function(df){
 #' @rdname DataPreparation_EpitopeDataset
 #' @name DataPreparation_EpitopeDataset
 Epitope_Add_Disease <- function(df, IEDBEpitopeFileName=system.file("IEDB_Epitope_Healthy.csv.gz", package="Repitope")){
-  df.meta <- suppressWarnings(readr::read_csv(IEDBEpitopeFileName, skip=1))
+  df.meta <- suppressWarnings(suppressMessages(readr::read_csv(IEDBEpitopeFileName, skip=1)))
   pept.meta <- df.meta$Description
   df$"Disease" <- "Disease"
   df$"Disease"[which(df$"Peptide" %in% pept.meta)] <- "Healthy"
@@ -163,7 +165,7 @@ compressedToDummyDF <- function(df, compressedColumnName){
 #' @name DataPreparation_EpitopeDataset
 Epitope_Add_HLASerotypes <- function(df, IEDBEpitopeFileNames=system.file("IEDB_Epitope_Serotype_HLA-A01.csv.gz", package="Repitope")){
   hlaSerotypeDF <- function(IEDBEpitopeFileName){
-    df.meta <- suppressWarnings(readr::read_csv(IEDBEpitopeFileName, skip=1))
+    df.meta <- suppressWarnings(suppressMessages(readr::read_csv(IEDBEpitopeFileName, skip=1)))
     pept.meta <- df.meta$Description
     sero <- grep("HLA-", strsplit(basename(IEDBEpitopeFileName), "_")[[1]], value=T)
     sero <- stringr::str_replace(strsplit(sero, ".", fixed=T)[[1]][[1]], "HLA-", "")

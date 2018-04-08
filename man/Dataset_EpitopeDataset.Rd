@@ -5,7 +5,7 @@
 \alias{Dataset_EpitopeDataset}
 \alias{EpitopeDataset}
 \title{A compiled dataset of human MHC class I epitopes and ligands.}
-\format{A tibble with 21146 rows and 9 variables}
+\format{A tibble with 21146 rows and 11 variables}
 \usage{
 EpitopeDataset
 }

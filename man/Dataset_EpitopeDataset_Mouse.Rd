@@ -5,7 +5,7 @@
 \alias{Dataset_EpitopeDataset_Mouse}
 \alias{EpitopeDataset_Mouse}
 \title{A compiled dataset of mouse MHC class I epitopes and ligands.}
-\format{A tibble with 17558 rows and 7 variables}
+\format{A tibble with 8693 rows and 7 variables}
 \usage{
 EpitopeDataset_Mouse
 }

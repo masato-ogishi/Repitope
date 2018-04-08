@@ -4,8 +4,6 @@
 \alias{DataPreparation_EpitopeDataset}
 \alias{Epitope_Import}
 \alias{DataPreparation_EpitopeDataset}
-\alias{Epitope_SolveImmunogenicityContradiction}
-\alias{DataPreparation_EpitopeDataset}
 \alias{Epitope_Add_Disease}
 \alias{DataPreparation_EpitopeDataset}
 \alias{compressedToLongFormat}
@@ -20,8 +18,6 @@
 \title{Compile epitope datasets retrieved from IEDB and other sources.}
 \usage{
 Epitope_Import(IEDBAssayFileName, OtherFileNames = NULL)
-
-Epitope_SolveImmunogenicityContradiction(df)
 
 Epitope_Add_Disease(df,
   IEDBEpitopeFileName = system.file("IEDB_Epitope_Healthy.csv.gz", package =
@@ -53,8 +49,7 @@ Epitope_Add_HLARestrictions(df)
 \item{IEDBEpitopeFileNames}{A set of epitope files from IEDB.}
 }
 \description{
-\code{Epitope_Import} imports IEDB and other epitope files.\cr
-\code{Epitope_SolveImmunogenicityContradiction} solves contradicted annotations on immunogenicity.\cr
+\code{Epitope_Import} imports IEDB and other epitope files. Contradicting immunogenicity annotations are internally resolved. \cr
 \code{Epitope_Add_Disease} adds metadata of being related to diseases or not obtained from the IEDB database.\cr
 \code{compressedToLongFormat} converts a compresed column into a long-format column. The compressed strings should be separated by "|".\cr
 \code{compressedToDummyDF} converts a compresed column into a dummy variable dataframe. The compressed strings should be separated by "|".\cr
