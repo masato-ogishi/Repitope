@@ -14,11 +14,9 @@
 #' @importFrom dplyr if_else
 #' @importFrom dplyr bind_rows
 #' @importFrom dplyr inner_join
-#' @importFrom DescTools Sort
-#' @importFrom data.table last
+#' @importFrom dplyr last
 #' @importFrom stringr str_sub
 #' @importFrom stringr str_split
-#' @importFrom stringi stri_reverse
 #' @importFrom S4Vectors nchar
 #' @importFrom Biostrings AAStringSet
 #' @importFrom Biostrings pairwiseAlignment
@@ -203,7 +201,7 @@ singleAASimilarityNetwork <- function(peptideSet, numSet=NULL, directed=T, weigh
         leng_longer <- nchar(longerSeq)
         longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
         longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
-        del.pos <- data.table::last(which(longerSeq.degenerate==shorterseq))
+        del.pos <- dplyr::last(which(longerSeq.degenerate==shorterseq))
         sbst <- paste0(c("-", del.pos, substr(longerSeq, del.pos, del.pos)), collapse="_")
         return(sbst)
       }
@@ -213,7 +211,7 @@ singleAASimilarityNetwork <- function(peptideSet, numSet=NULL, directed=T, weigh
         leng_longer <- nchar(longerSeq)
         longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
         longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
-        del.pos <- data.table::last(which(longerSeq.degenerate==shorterseq))
+        del.pos <- dplyr::last(which(longerSeq.degenerate==shorterseq))
         sbst <- paste0(c(substr(longerSeq, del.pos, del.pos), del.pos, "-"), collapse="_")
         return(sbst)
       }
@@ -247,13 +245,14 @@ singleAASimilarityNetwork <- function(peptideSet, numSet=NULL, directed=T, weigh
     dplyr::inner_join(df_num, by=c("AASeq2"="Peptide")) %>%
     dplyr::transmute(AASeq1, AASeq2, Score1=Score.x, Score2=Score.y, MutType, MutPattern)
   mutType_Rev <- function(mutType){
-    paste0(lapply(strsplit(mutType, "|", fixed=T)[[1]], function(mut){stringi::stri_reverse(mut)}), collapse="|")
+    paste0(rev(strsplit(mutType, "_", fixed=T)[[1]]), collapse="_")
   }
   simNet_PairsDF_DW <- dplyr::bind_rows(
     simNet_PairsDF_DW,
     simNet_PairsDF_DW %>%
       dplyr::rename(AASeq1=AASeq2, AASeq2=AASeq1, Score1=Score2, Score2=Score1) %>%
-      dplyr::mutate(MutType=sapply(MutType, mutType_Rev))
+      dplyr::mutate(MutType=sapply(MutType, mutType_Rev),
+                    MutPattern=dplyr::if_else(MutPattern=="Insertion", "Deletion", MutPattern))
   ) %>%
     dplyr::filter(Score1<=Score2) %>%
     dplyr::transmute(AASeq1, AASeq2, Score1, Score2, DeltaScore=Score2-Score1, MutType, MutPattern)
