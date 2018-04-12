@@ -133,14 +133,14 @@ singleAASimilarityNetwork <- function(peptideSet, numSet=NULL, directed=T, weigh
     }
 
     ## Serialized adjacency matrix calculation
-    aaStringSetList <- split(peptideSet, S4Vectors::nchar(peptideSet))
-    if(length(names(aaStringSetList))>=2){
+    peptideSetList <- split(peptideSet, S4Vectors::nchar(peptideSet))
+    if(length(names(peptideSetList))>=2){
       sequenceLengthPairGrid <- suppressWarnings(dplyr::bind_rows(
-        data.frame(V1=names(aaStringSetList), V2=names(aaStringSetList), Type="Auto"),
-        data.frame(as.data.frame(t(combn(names(aaStringSetList), 2))), Type="Juxtaposed")
+        data.frame(V1=names(peptideSetList), V2=names(peptideSetList), Type="Auto"),
+        data.frame(as.data.frame(t(combn(names(peptideSetList), 2))), Type="Juxtaposed")
       )) %>% dplyr::rename(V2="V1", V1="V2") %>% dplyr::select(V1, V2, Type)
     }else{
-      sequenceLengthPairGrid <- data.frame(V1=names(aaStringSetList), V2=names(aaStringSetList), Type="Auto")
+      sequenceLengthPairGrid <- data.frame(V1=names(peptideSetList), V2=names(peptideSetList), Type="Auto")
     }
     sequenceLengthPairGrid <- sequenceLengthPairGrid %>%
       dplyr::filter((as.numeric(V1)-as.numeric(V2)) %in% c(0, 1)) ## V1>=V2
@@ -149,24 +149,24 @@ singleAASimilarityNetwork <- function(peptideSet, numSet=NULL, directed=T, weigh
     ends <- as.numeric(cumsum(table(S4Vectors::nchar(peptideSet))))
     starts <- (c(0, ends)+1)[1:length(ends)]
     positionGrid <- as.data.frame(t(data.frame(starts, ends)))
-    colnames(positionGrid) <- names(aaStringSetList)
+    colnames(positionGrid) <- names(peptideSetList)
 
     DistMat <- Matrix::sparseMatrix(c(), c(), x=F, dims=rep(length(peptideSet), 2))
 
     message(paste0("Number of sequence length pairs = ", sequenceLengthPairN))
     for(i in which(sequenceLengthPairGrid$"Type"=="Auto")){
       message(paste0("Pair ", i, "/", sequenceLengthPairN, " | Auto: sequence length = ", sequenceLengthPairGrid[i,1]))
-      s1 <- aaStringSetList[[sequenceLengthPairGrid[i,1]]]
+      s1 <- peptideSetList[[sequenceLengthPairGrid[i,1]]]
       p1 <- positionGrid[[sequenceLengthPairGrid[i,1]]]
       p1 <- seq(p1[1], p1[2])
       DistMat[p1, p1] <- distMat_Auto(s1)
     }
     for(i in which(sequenceLengthPairGrid$"Type"=="Juxtaposed")){
       message(paste0("Pair ", i, "/", sequenceLengthPairN, " | Juxtaposed: sequence length pair = ", sequenceLengthPairGrid[i,1], " and ", sequenceLengthPairGrid[i,2]))
-      s1 <- aaStringSetList[[sequenceLengthPairGrid[i,1]]]
+      s1 <- peptideSetList[[sequenceLengthPairGrid[i,1]]]
       p1 <- positionGrid[[sequenceLengthPairGrid[i,1]]]
       p1 <- seq(p1[1], p1[2])
-      s2 <- aaStringSetList[[sequenceLengthPairGrid[i,2]]]
+      s2 <- peptideSetList[[sequenceLengthPairGrid[i,2]]]
       p2 <- positionGrid[[sequenceLengthPairGrid[i,2]]]
       p2 <- seq(p2[1], p2[2])
       DistMat[p1, p2] <- distMat_Juxtaposed(s1, s2)
@@ -176,7 +176,7 @@ singleAASimilarityNetwork <- function(peptideSet, numSet=NULL, directed=T, weigh
     ## Similarity network
     simNet <- DistMat %>%
       igraph::graph_from_adjacency_matrix(mode="undirected", weighted=NULL, diag=F) %>%
-      igraph::set_vertex_attr("label", value=as.character(unlist(lapply(aaStringSetList, as.character)))) %>%
+      igraph::set_vertex_attr("label", value=as.character(unlist(lapply(peptideSetList, as.character)))) %>%
       igraph::simplify()
     return(simNet)
   }
@@ -256,8 +256,8 @@ singleAASimilarityNetwork <- function(peptideSet, numSet=NULL, directed=T, weigh
       dplyr::rename(AASeq1=AASeq2, AASeq2=AASeq1, Score1=Score2, Score2=Score1) %>%
       dplyr::mutate(MutType=sapply(MutType, mutType_Rev))
   ) %>%
-    dplyr::filter(Score1>=Score2) %>%
-    dplyr::transmute(AASeq1, AASeq2, Score1, Score2, DeltaScore=Score1-Score2, MutType, MutPattern)
+    dplyr::filter(Score1<=Score2) %>%
+    dplyr::transmute(AASeq1, AASeq2, Score1, Score2, DeltaScore=Score2-Score1, MutType, MutPattern)
   simNet_DW <- igraph::graph_from_data_frame(simNet_PairsDF_DW, directed=directed)
   simNet_DW <- igraph::set_vertex_attr(simNet_DW, name="label", value=igraph::V(simNet_DW)$name)
   if(weighted==T) igraph::E(simNet_DW)$weight <- igraph::E(simNet_DW)$DeltaScore
