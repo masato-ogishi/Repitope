@@ -230,7 +230,7 @@ singleAASimilarityNetwork <- function(peptideSet, numSet=NULL, directed=T, weigh
     }else{
       df[["MutType"]] <- NA
     }
-    df[["MutPattern"]] <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutType(df$"AASeq1"[[i]], df$"AASeq2"[[i]])}))
+    df[["MutPattern"]] <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutPattern(df$"AASeq1"[[i]], df$"AASeq2"[[i]])}))
 
     ## Output
     return(df)
