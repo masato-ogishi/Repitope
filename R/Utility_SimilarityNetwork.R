@@ -17,6 +17,7 @@
 #' @importFrom DescTools Sort
 #' @importFrom stringr str_sub
 #' @importFrom stringr str_split
+#' @importFrom stringi stri_reverse
 #' @importFrom S4Vectors nchar
 #' @importFrom Biostrings AAStringSet
 #' @importFrom Biostrings pairwiseAlignment
@@ -241,12 +242,16 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
     dplyr::inner_join(df_num, by=c("AASeq1"="Peptide")) %>%
     dplyr::inner_join(df_num, by=c("AASeq2"="Peptide")) %>%
     dplyr::transmute(AASeq1, AASeq2, Score1=Score.x, Score2=Score.y, MutType, MutPattern)
+  mutType_Rev <- function(mutType){
+    paste0(lapply(strsplit(mutType, "|", fixed=T)[[1]], function(mut){stringi::stri_reverse(mut)}), collapse="|")
+  }
   simNet_PairsDF_Directional <- dplyr::bind_rows(
     simNet_PairsDF_Directional,
     simNet_PairsDF_Directional %>%
       dplyr::rename(AASeq1=AASeq2, AASeq2=AASeq1, Score1=Score2, Score2=Score1) %>%
-      dplyr::mutate(MutType=unlist(lapply(lapply(stringr::str_split(MutType, "_"), rev), paste0, collapse="_")))
-  ) %>% dplyr::filter(Score1>=Score2) %>%
+      dplyr::mutate(MutType=sapply(MutType, mutType_Rev))
+  ) %>% 
+    dplyr::filter(Score1>=Score2) %>%
     dplyr::transmute(AASeq1, AASeq2, Score1, Score2, DeltaScore=Score1-Score2, MutType, MutPattern)
   simNet_Directional <- simNet_PairsDF_Directional %>%
     igraph::graph_from_data_frame(directed=T)
