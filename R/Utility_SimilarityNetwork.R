@@ -202,7 +202,7 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
         longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
         longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
         del.pos <- which(longerSeq.degenerate==shorterseq)
-        sbst <- sapply(del.pos, function(p){paste0(c("-", p, substr(pept2, p, p)), collapse="_")})
+        sbst <- sapply(del.pos, function(p){paste0(c("-", p, substr(longerSeq, p, p)), collapse="_")})
         sbst <- paste0(sbst, collapse="|")
         return(sbst)
       }
@@ -213,7 +213,7 @@ singleAASimilarityNetwork <- function(aaStringSet, numSet=NULL, directed=T, weig
         longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
         longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
         del.pos <- which(longerSeq.degenerate==shorterseq)
-        sbst <- sapply(del.pos, function(p){paste0(c(substr(pept2, p, p), p, "-"), collapse="_")})
+        sbst <- sapply(del.pos, function(p){paste0(c(substr(longerSeq, p, p), p, "-"), collapse="_")})
         sbst <- paste0(sbst, collapse="|")
         return(sbst)
       }
