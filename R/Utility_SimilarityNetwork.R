@@ -15,6 +15,7 @@
 #' @importFrom dplyr bind_rows
 #' @importFrom dplyr inner_join
 #' @importFrom DescTools Sort
+#' @importFrom data.table last
 #' @importFrom stringr str_sub
 #' @importFrom stringr str_split
 #' @importFrom stringi stri_reverse
@@ -202,9 +203,8 @@ singleAASimilarityNetwork <- function(peptideSet, numSet=NULL, directed=T, weigh
         leng_longer <- nchar(longerSeq)
         longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
         longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
-        del.pos <- which(longerSeq.degenerate==shorterseq)
-        sbst <- sapply(del.pos, function(p){paste0(c("-", p, substr(longerSeq, p, p)), collapse="_")})
-        sbst <- paste0(sbst, collapse="|")
+        del.pos <- data.table::last(which(longerSeq.degenerate==shorterseq))
+        sbst <- paste0(c("-", del.pos, substr(longerSeq, del.pos, del.pos)), collapse="_")
         return(sbst)
       }
       if(nchar(pept1)>nchar(pept2)){
@@ -213,9 +213,8 @@ singleAASimilarityNetwork <- function(peptideSet, numSet=NULL, directed=T, weigh
         leng_longer <- nchar(longerSeq)
         longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
         longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
-        del.pos <- which(longerSeq.degenerate==shorterseq)
-        sbst <- sapply(del.pos, function(p){paste0(c(substr(longerSeq, p, p), p, "-"), collapse="_")})
-        sbst <- paste0(sbst, collapse="|")
+        del.pos <- data.table::last(which(longerSeq.degenerate==shorterseq))
+        sbst <- paste0(c(substr(longerSeq, del.pos, del.pos), del.pos, "-"), collapse="_")
         return(sbst)
       }
     }
