@@ -9,19 +9,19 @@
 \alias{singleAASimilarityNetwork}
 \title{Similarity network analysis.}
 \usage{
-distMat_Auto(aaStringSet)
+distMat_Auto(peptideSet)
 
-distMat_Juxtaposed(longerAAStringSet, shorterAAStringSet)
+distMat_Juxtaposed(longerPeptideSet, shorterPeptideSet)
 
-singleAASimilarityNetwork(aaStringSet, numSet = NULL, directed = T,
+singleAASimilarityNetwork(peptideSet, numSet = NULL, directed = T,
   weighted = T, forceMutType = F)
 }
 \arguments{
-\item{aaStringSet}{A set of sequences. Simple character strings will be internally converted to an AAStringSet object.}
+\item{peptideSet}{A set of peptide sequences.}
 
-\item{longerAAStringSet}{A set of sequences. Should be one amino acid longer than \code{shorterAAStringSet}.}
+\item{longerPeptideSet}{A set of peptide sequences. Should be one amino acid longer than \code{shorterPeptideSet}.}
 
-\item{shorterAAStringSet}{A set of sequences. Should be one amino acid shorter than \code{longerAAStringSet}.}
+\item{shorterPeptideSet}{A set of peptide sequences. Should be one amino acid shorter than \code{longerPeptideSet}.}
 
 \item{numSet}{An attribute for the vertices.}
 
