@@ -13,8 +13,8 @@ neighborNetwork_ConnectedSubGraph(neighborNetResult, peptide)
 
 neighborNetwork_Cluster(peptide, graph, metadataDF, seed = 12345, plot = T)
 
-neighborNetwork_ImmuneEscapePotential(peptide, graph, metadataDF,
-  seed = 12345)
+neighborNetwork_ImmuneEscapePotential(neighborNetResult, metadataDF,
+  seed = 12345, coreN = parallel::detectCores())
 }
 \arguments{
 \item{neighborNetResult}{The result returned from \code{neighborNetwork}.}
@@ -28,9 +28,11 @@ neighborNetwork_ImmuneEscapePotential(peptide, graph, metadataDF,
 \item{seed}{A random seed.}
 
 \item{plot}{Logical. Whether the network cluster plot shuould be generated.}
+
+\item{coreN}{The number of threads for parallelization.}
 }
 \description{
 \code{neighborNetwork_ConnectedSubGraph} extracts the minimum connected subgraph.\cr
 \code{neighborNetwork_Cluster} does network clustering using a walktrap algorithm.\cr
-\code{neighborNetwork_ImmuneEscapePotential} calculates the difference between the immunogenicity score of the target peptide and the average score of the peptides in the cluster to which the target peptide belongs.\cr
+\code{neighborNetwork_ImmuneEscapePotential} calculates immune escape potential, i.e., the difference between the immunogenicity score of the target peptide and the average score of the peptides in the cluster to which the target peptide belongs.\cr
 }

@@ -7,7 +7,7 @@
 #' @param peptideSet A set of peptide sequences.
 #' @param peptidePair A pair of peptide sequences.
 #' @param peptidePairDF A dataframe which has two columns of paired peptide sequences.
-#' @param coreN The number of threads.
+#' @param coreN The number of threads for parallelization.
 #' @importFrom Biostrings AA_STANDARD
 #' @importFrom stringdist stringdist
 #' @importFrom Matrix t
@@ -71,7 +71,7 @@ InsillicoMutagenesis_GenerateIntermediates <- function(peptidePair){
 #' @export
 #' @rdname NeighborNetwork_InsillicoMutagenesis
 #' @name NeighborNetwork_InsillicoMutagenesis
-InsillicoMutagenesis_PairwiseNeighborNetwork <- function(peptidePairDF, coreN=NULL){
+InsillicoMutagenesis_PairwiseNeighborNetwork <- function(peptidePairDF, coreN=parallel::detectCores()){
   net_singlepair <- function(pept1, pept2){
     peptideSet.mut <- Repitope::InSillicoMutagenesis(c(pept1, pept2))
     d <- Repitope::distMat_Sbst(peptideSet.mut)
@@ -83,8 +83,8 @@ InsillicoMutagenesis_PairwiseNeighborNetwork <- function(peptidePairDF, coreN=NU
   if(is.null(coreN)){
     cl <- NULL
   }else{
-    cl <- parallel::makeCluster(coreN)
-    parallel::clusterExport(cl=cl, list=c("peptidePairDF","net_singlepair"), envir=environment())
+    cl <- parallel::makeCluster(coreN, type="SOCK")
+    parallel::clusterExport(cl=cl, varlist=c("peptidePairDF","net_singlepair"), envir=environment())
   }
   neighborNetList <- pbapply::pblapply(
     1:nrow(peptidePairDF),

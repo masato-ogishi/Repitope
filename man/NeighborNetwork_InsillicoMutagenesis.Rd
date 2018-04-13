@@ -13,12 +13,13 @@ InSillicoMutagenesis(peptideSet, coreN = NULL)
 
 InsillicoMutagenesis_GenerateIntermediates(peptidePair)
 
-InsillicoMutagenesis_PairwiseNeighborNetwork(peptidePairDF, coreN = NULL)
+InsillicoMutagenesis_PairwiseNeighborNetwork(peptidePairDF,
+  coreN = parallel::detectCores())
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}
 
-\item{coreN}{The number of threads.}
+\item{coreN}{The number of threads for parallelization.}
 
 \item{peptidePair}{A pair of peptide sequences.}
 

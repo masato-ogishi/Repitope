@@ -2,7 +2,7 @@
 #'
 #' \code{neighborNetwork_ConnectedSubGraph} extracts the minimum connected subgraph.\cr
 #' \code{neighborNetwork_Cluster} does network clustering using a walktrap algorithm.\cr
-#' \code{neighborNetwork_ImmuneEscapePotential} calculates the difference between the immunogenicity score of the target peptide and the average score of the peptides in the cluster to which the target peptide belongs.\cr
+#' \code{neighborNetwork_ImmuneEscapePotential} calculates immune escape potential, i.e., the difference between the immunogenicity score of the target peptide and the average score of the peptides in the cluster to which the target peptide belongs.\cr
 #'
 #' @param neighborNetResult The result returned from \code{neighborNetwork}.
 #' @param peptide The target peptide sequence.
@@ -10,6 +10,7 @@
 #' @param metadataDF A dataframe which has "Peptide", "Immunogenicity", and "ImmunogenicityScore" columns.
 #' @param seed A random seed.
 #' @param plot Logical. Whether the network cluster plot shuould be generated.
+#' @param coreN The number of threads for parallelization.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr filter
 #' @importFrom dplyr select
@@ -34,6 +35,10 @@
 #' @importFrom ggpubr rremove
 #' @importFrom ggsci pal_d3
 #' @import ggplot2
+#' @importFrom pbapply pblapply
+#' @importFrom parallel makeCluster
+#' @importFrom parallel stopCluster
+#' @importFrom parallel clusterExport
 #' @export
 #' @rdname NeighborNetwork_ImmuneEscapePotential
 #' @name NeighborNetwork_ImmuneEscapePotential
@@ -56,10 +61,10 @@ neighborNetwork_ConnectedSubGraph <- function(neighborNetResult, peptide){
 neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot=T){
   ## Peptide labels
   peptideLabels <- peptide
+  peptideSet <- igraph::V(graph)$"name"
   igraph::V(graph)$label[!peptideSet %in% peptideLabels] <- ""
 
   ## Metadata
-  peptideSet <- igraph::V(graph)$"name"
   df_meta <- dplyr::filter(metadataDF, Peptide %in% peptideSet) %>%
     dplyr::select(Peptide, Immunogenicity, ImmunogenicityScore)
   igraph::V(graph)$Immunogenicity <- df_meta$Immunogenicity
@@ -172,12 +177,36 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
 #' @export
 #' @rdname NeighborNetwork_ImmuneEscapePotential
 #' @name NeighborNetwork_ImmuneEscapePotential
-neighborNetwork_ImmuneEscapePotential <- function(peptide, graph, metadataDF, seed=12345){
-  df_meta <- neighborNetwork_Cluster(peptide, graph, metadataDF, seed, plot=F)
-  pos <- grep("Target", df_meta$"Target")
-  clust <- df_meta$"ClusterID"[[pos]]
-  score <- df_meta$"ImmunogenicityScore"[[pos]]
-  score_mean <- mean(dplyr::filter(df_meta, ClusterID==clust)$"ImmunogenicityScore")
-  esc <- score - score_mean
-  return(esc)
+neighborNetwork_ImmuneEscapePotential <- function(neighborNetResult, metadataDF, seed=12345, coreN=parallel::detectCores()){
+  escapePotential_single <- function(peptide, neighborNetResult, metadataDF, seed=12345){
+    graph <- Repitope::neighborNetwork_ConnectedSubGraph(neighborNetResult, peptide)
+    df_meta <- Repitope::neighborNetwork_Cluster(peptide, graph, metadataDF, seed, plot=F)
+    pos <- grep("Target", df_meta$"Target")
+    clust <- df_meta$"ClusterID"[[pos]]
+    score <- df_meta$"ImmunogenicityScore"[[pos]]
+    score_mean <- mean(dplyr::filter(df_meta, ClusterID==clust)$"ImmunogenicityScore")
+    esc <- score - score_mean
+    return(esc)
+  }
+  if(is.null(coreN)){
+    cl <- NULL
+  }else{
+    cl <- parallel::makeCluster(coreN, type="SOCK")
+    parallel::clusterExport(cl=cl, varlist=c("escapePotential_single","neighborNetResult","metadataDF"), envir=environment())
+    snow::clusterSetupRNGstream(cl, seed=rep(seed, 6))
+  }
+  peptideSet <- igraph::V(neighborNetResult$"NeighborNetwork_DW")$"name"
+  escapePotentials <- unlist(pbapply::pblapply(
+    peptideSet,
+    function(pept){
+      escapePotential_single(pept, neighborNetResult=neighborNetResult, metadataDF=metadataDF, seed=seed)
+    },
+    cl=cl
+  ))
+  df_esc <- dplyr::tibble("Peptide"=peptideSet, "EscapePotential"=escapePotentials)
+  if(!is.null(coreN)) parallel::stopCluster(cl=cl)
+  gc();gc()
+  return(df_esc)
 }
+
+
