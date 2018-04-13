@@ -7,15 +7,12 @@
 #' @param peptideSet A set of peptide sequences.
 #' @param peptidePair A pair of peptide sequences.
 #' @param peptidePairDF A dataframe which has two columns of paired peptide sequences.
-#' @param union Logical. Whether the output list should be combined.
 #' @param coreN The number of threads.
 #' @importFrom Biostrings AA_STANDARD
 #' @importFrom stringdist stringdist
 #' @importFrom Matrix t
 #' @importFrom igraph graph_from_adjacency_matrix
 #' @importFrom igraph set_vertex_attr
-#' @importFrom igraph union
-#' @importFrom igraph simplify
 #' @importFrom pbapply pblapply
 #' @importFrom parallel makeCluster
 #' @importFrom parallel stopCluster
@@ -23,7 +20,7 @@
 #' @export
 #' @rdname NeighborNetwork_InsillicoMutagenesis
 #' @name NeighborNetwork_InsillicoMutagenesis
-InSillicoMutagenesis <- function(peptideSet, union=T, coreN=NULL){
+InSillicoMutagenesis <- function(peptideSet, coreN=NULL){
   if(is.null(coreN)){
     cl <- NULL
   }else{
@@ -38,7 +35,7 @@ InSillicoMutagenesis <- function(peptideSet, union=T, coreN=NULL){
   )
   if(!is.null(coreN)) parallel::stopCluster(cl=cl)
   gc();gc()
-  if(union==T) mut <- unique(unlist(mut))
+  mut <- unique(unlist(mut))
   return(mut)
 }
 
@@ -67,7 +64,8 @@ InsillicoMutagenesis_GenerateIntermediates <- function(peptidePair){
   for(i in seq(1, minDist-1)){
     peptide.mut.list[[i+1]] <- Nth_Distant_Peptides(peptide.mut.list[[i]], peptide.goal, nth=minDist-i)
   }
-  return(unique(unlist(peptide.mut.list)))
+  mut <- unique(unlist(peptide.mut.list))
+  return(mut)
 }
 
 #' @export

@@ -2,21 +2,35 @@
 % Please edit documentation in R/NeighborNetwork_ImmuneEscapePotential.R
 \name{NeighborNetwork_ImmuneEscapePotential}
 \alias{NeighborNetwork_ImmuneEscapePotential}
-\alias{neighborNetwork_ClusterPlot}
+\alias{neighborNetwork_ConnectedSubGraph}
+\alias{NeighborNetwork_ImmuneEscapePotential}
+\alias{neighborNetwork_Cluster}
+\alias{NeighborNetwork_ImmuneEscapePotential}
+\alias{neighborNetwork_ImmuneEscapePotential}
 \title{Immune escape potentials derived from neighbor network clustering analysis.}
 \usage{
-neighborNetwork_ClusterPlot(peptide, neighborNetResult, metadataDF,
+neighborNetwork_ConnectedSubGraph(neighborNetResult, peptide)
+
+neighborNetwork_Cluster(peptide, graph, metadataDF, seed = 12345, plot = T)
+
+neighborNetwork_ImmuneEscapePotential(peptide, graph, metadataDF,
   seed = 12345)
 }
 \arguments{
+\item{neighborNetResult}{The result returned from \code{neighborNetwork}.}
+
 \item{peptide}{The target peptide sequence.}
 
-\item{neighborNetResult}{The result returned from \code{neighborNetwork}.}
+\item{graph}{A directed and weighted neighbor network of the target peptide.}
 
 \item{metadataDF}{A dataframe which has "Peptide", "Immunogenicity", and "ImmunogenicityScore" columns.}
 
 \item{seed}{A random seed.}
+
+\item{plot}{Logical. Whether the network cluster plot shuould be generated.}
 }
 \description{
-Immune escape potentials derived from neighbor network clustering analysis.
+\code{neighborNetwork_ConnectedSubGraph} extracts the minimum connected subgraph.\cr
+\code{neighborNetwork_Cluster} does network clustering using a walktrap algorithm.\cr
+\code{neighborNetwork_ImmuneEscapePotential} calculates the difference between the immunogenicity score of the target peptide and the average score of the peptides in the cluster to which the target peptide belongs.\cr
 }

@@ -1,9 +1,15 @@
 #' Immune escape potentials derived from neighbor network clustering analysis.
 #'
-#' @param peptide The target peptide sequence.
+#' \code{neighborNetwork_ConnectedSubGraph} extracts the minimum connected subgraph.\cr
+#' \code{neighborNetwork_Cluster} does network clustering using a walktrap algorithm.\cr
+#' \code{neighborNetwork_ImmuneEscapePotential} calculates the difference between the immunogenicity score of the target peptide and the average score of the peptides in the cluster to which the target peptide belongs.\cr
+#'
 #' @param neighborNetResult The result returned from \code{neighborNetwork}.
+#' @param peptide The target peptide sequence.
+#' @param graph A directed and weighted neighbor network of the target peptide.
 #' @param metadataDF A dataframe which has "Peptide", "Immunogenicity", and "ImmunogenicityScore" columns.
 #' @param seed A random seed.
+#' @param plot Logical. Whether the network cluster plot shuould be generated.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr filter
 #' @importFrom dplyr select
@@ -26,12 +32,12 @@
 #' @importFrom ggseqlogo geom_logo
 #' @importFrom ggseqlogo theme_logo
 #' @importFrom ggpubr rremove
+#' @importFrom ggsci pal_d3
 #' @import ggplot2
 #' @export
 #' @rdname NeighborNetwork_ImmuneEscapePotential
 #' @name NeighborNetwork_ImmuneEscapePotential
-neighborNetwork_ClusterPlot <- function(peptide, neighborNetResult, metadataDF, seed=12345){
-  ## Subgraph
+neighborNetwork_ConnectedSubGraph <- function(neighborNetResult, peptide){
   connectedPeptides <- c(
     peptide,
     dplyr::filter(neighborNetResult$"PairDF_DW", AASeq1==peptide)$"AASeq2",
@@ -41,34 +47,48 @@ neighborNetwork_ClusterPlot <- function(peptide, neighborNetResult, metadataDF, 
     neighborNetResult$"NeighborNetwork_DW",
     which(igraph::V(neighborNetResult$"NeighborNetwork_DW")$label %in% connectedPeptides)
   )
+  return(connectedSubgraph)
+}
+
+#' @export
+#' @rdname NeighborNetwork_ImmuneEscapePotential
+#' @name NeighborNetwork_ImmuneEscapePotential
+neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot=T){
+  ## Peptide labels
+  peptideLabels <- peptide
+  igraph::V(graph)$label[!peptideSet %in% peptideLabels] <- ""
 
   ## Metadata
-  peptideLabels <- peptide
-  peptideSet <- igraph::V(connectedSubgraph)$"name"
+  peptideSet <- igraph::V(graph)$"name"
   df_meta <- dplyr::filter(metadataDF, Peptide %in% peptideSet) %>%
     dplyr::select(Peptide, Immunogenicity, ImmunogenicityScore)
-  igraph::V(connectedSubgraph)$label[!peptideSet %in% peptideLabels] <- ""
-  igraph::V(connectedSubgraph)$Immunogenicity <- df_meta$Immunogenicity
-  igraph::V(connectedSubgraph)$ImmunogenicityScore <- df_meta$ImmunogenicityScore
-  igraph::E(connectedSubgraph)$weight[igraph::E(connectedSubgraph)$weight==0] <- 0.001
+  igraph::V(graph)$Immunogenicity <- df_meta$Immunogenicity
+  igraph::V(graph)$ImmunogenicityScore <- df_meta$ImmunogenicityScore
+  igraph::E(graph)$weight[igraph::E(graph)$weight==0] <- 0.001
+
+  ## Clusters
+  set.seed(seed)
+  df_meta <- dplyr::left_join(
+    dplyr::tibble("Peptide"=peptideSet,
+                  "Target"=dplyr::if_else(peptideSet==peptide, "Target", "Neighbor"),
+                  "ClusterID"=paste0("Cluster", igraph::cluster_walktrap(graph)$membership)),
+    df_meta,
+    by="Peptide"
+  )
+
+  ## No plot ver.
+  if(plot!=T) return(df_meta)
 
   ## Coordinates
   set.seed(seed)
-  l <- igraph::layout_nicely(connectedSubgraph)
+  l <- igraph::layout_nicely(graph)
   df_meta <- dplyr::left_join(
     magrittr::set_colnames(cbind(dplyr::tibble("Peptide"=peptideSet), as.data.frame(l)), c("Peptide","x","y")),
     df_meta,
     by="Peptide"
   )
 
-  ## Clusters
-  set.seed(seed)
-  df_meta <- dplyr::left_join(
-    dplyr::tibble("Peptide"=peptideSet,
-                  "ClusterID"=paste0("Cluster", igraph::cluster_walktrap(connectedSubgraph)$membership)),
-    df_meta,
-    by="Peptide"
-  )
+  ## Cluster seqlogo plot
   clusteredPeptides <- df_meta %>%
     dplyr::arrange(ClusterID) %>%
     dplyr::mutate(ClusterID=as.character(ClusterID)) %>%
@@ -137,15 +157,27 @@ neighborNetwork_ClusterPlot <- function(peptide, neighborNetResult, metadataDF, 
     return(recordPlot())
   }
   neighborPlot <- clusterGraphPlot(
-    g=connectedSubgraph,
+    g=graph,
     meta=df_meta,
     layout=l,
     seed=seed
   )
   return(list(
-    "NeighborNetwork"=connectedSubgraph,
     "SummaryDF"=df_meta,
     "NeighborPlot"=neighborPlot,
     "SeqLogoPlot"=seqLogoPlot
   ))
+}
+
+#' @export
+#' @rdname NeighborNetwork_ImmuneEscapePotential
+#' @name NeighborNetwork_ImmuneEscapePotential
+neighborNetwork_ImmuneEscapePotential <- function(peptide, graph, metadataDF, seed=12345){
+  df_meta <- neighborNetwork_Cluster(peptide, graph, metadataDF, seed, plot=F)
+  pos <- grep("Target", df_meta$"Target")
+  clust <- df_meta$"ClusterID"[[pos]]
+  score <- df_meta$"ImmunogenicityScore"[[pos]]
+  score_mean <- mean(dplyr::filter(df_meta, ClusterID==clust)$"ImmunogenicityScore")
+  esc <- score - score_mean
+  return(esc)
 }

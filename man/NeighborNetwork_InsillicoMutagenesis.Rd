@@ -9,7 +9,7 @@
 \alias{InsillicoMutagenesis_PairwiseNeighborNetwork}
 \title{In sillico mutagenesis analysis.}
 \usage{
-InSillicoMutagenesis(peptideSet, union = T, coreN = NULL)
+InSillicoMutagenesis(peptideSet, coreN = NULL)
 
 InsillicoMutagenesis_GenerateIntermediates(peptidePair)
 
@@ -17,8 +17,6 @@ InsillicoMutagenesis_PairwiseNeighborNetwork(peptidePairDF, coreN = NULL)
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}
-
-\item{union}{Logical. Whether the output list should be combined.}
 
 \item{coreN}{The number of threads.}
 
