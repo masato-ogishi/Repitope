@@ -30,6 +30,7 @@
 #' @importFrom igraph cluster_walktrap
 #' @importFrom scales alpha
 #' @importFrom scales rescale
+#' @importFrom seqinr consensus
 #' @importFrom ggseqlogo geom_logo
 #' @importFrom ggseqlogo theme_logo
 #' @importFrom ggpubr rremove
@@ -108,6 +109,14 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
     ggpubr::rremove("y.title") +
     theme(legend.position="right", legend.direction="vertical")
 
+  ## Consensus per cluster
+  consensusSequence <- function(sequenceSet){
+    s <- seqinr::consensus(t(as.matrix(as.data.frame(strsplit(sequenceSet, ""), fix.empty.names=F))), method="threshold", threshold=0.75)
+    s[is.na(s)] <- "X"
+    return(paste0(s, collapse=""))
+  }
+  clusterConsensusSeqs <- sapply(clusteredPeptides, consensusSequence)
+
   ## Graph plot
   clusterGraphPlot <- function(g, meta, layout, seed=12345){
     ### Colors
@@ -152,13 +161,14 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
       edge.arrow.width=0.1,
       edge.color=scales::alpha("gray50", 0.75)
     )
-    text(
-      clusterCentroids$x,
-      clusterCentroids$y,
-      clusterCentroids$ClusterID,
-      cex=1.25,
-      family="sans"
-    )
+    for(i in 1:length(clusterCentroids$ClusterID)){
+      text(
+        rep(clusterCentroids$x[[i]], 2),
+        clusterCentroids$y[[i]]+c(0, -0.1),
+        c(clusterCentroids$ClusterID[[i]], clusterConsensusSeqs[[i]]),
+        pos=3, cex=1.25, family="sans"
+      )
+    }
     return(recordPlot())
   }
   neighborPlot <- clusterGraphPlot(
