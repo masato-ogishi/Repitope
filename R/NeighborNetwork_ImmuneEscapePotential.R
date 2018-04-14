@@ -33,11 +33,7 @@
 #' @importFrom msa msa
 #' @importFrom msa msaConsensusSequence
 #' @importFrom stringr str_replace_all
-#' @importFrom ggseqlogo geom_logo
-#' @importFrom ggseqlogo theme_logo
-#' @importFrom ggpubr rremove
 #' @importFrom ggsci pal_d3
-#' @import ggplot2
 #' @importFrom pbapply pblapply
 #' @importFrom parallel makeCluster
 #' @importFrom parallel stopCluster
@@ -96,22 +92,13 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
     by="Peptide"
   )
 
-  ## Cluster seqlogo plot
+  ## Consensus per cluster
   clusteredPeptides <- df_meta %>%
     dplyr::arrange(ClusterID) %>%
     dplyr::mutate(ClusterID=as.character(ClusterID)) %>%
     data.table::as.data.table() %>%
     split(by="ClusterID") %>%
     lapply(function(d){d[["Peptide"]]})
-  seqLogoPlot <- ggplot() +
-    ggseqlogo::geom_logo(clusteredPeptides, seq_type="aa") +
-    facet_wrap(~seq_group, nrow=length(clusteredPeptides)) +
-    ggseqlogo::theme_logo() +
-    ggpubr::rremove("y.text") +
-    ggpubr::rremove("y.title") +
-    theme(legend.position="right", legend.direction="vertical")
-
-  ## Consensus per cluster
   consensusSequence <- function(sequenceSet){
     sink(tempfile())
     s <- stringr::str_replace_all(msa::msaConsensusSequence(msa::msa(sequenceSet, type="protein"), type="Biostrings"), "-", "X")
@@ -182,8 +169,7 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
   )
   return(list(
     "SummaryDF"=df_meta,
-    "NeighborPlot"=neighborPlot,
-    "SeqLogoPlot"=seqLogoPlot
+    "NeighborPlot"=neighborPlot
   ))
 }
 

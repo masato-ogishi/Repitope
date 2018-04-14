@@ -29,7 +29,6 @@ Imports:
     ggplot2 (>= 2.2.1),
     ggpubr (>= 0.1.6),
     ggsci (>= 2.8),
-    ggseqlogo (>= 0.1),
     ggthemes (>= 3.4.0),
     gtools (>= 3.5.0),
     igraph (>= 1.1.2),
