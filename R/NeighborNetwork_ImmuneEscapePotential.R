@@ -30,7 +30,9 @@
 #' @importFrom igraph cluster_walktrap
 #' @importFrom scales alpha
 #' @importFrom scales rescale
-#' @importFrom seqinr consensus
+#' @importFrom msa msa
+#' @importFrom msa msaConsensusSequence
+#' @importFrom stringr str_replace_all
 #' @importFrom ggseqlogo geom_logo
 #' @importFrom ggseqlogo theme_logo
 #' @importFrom ggpubr rremove
@@ -111,9 +113,10 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
 
   ## Consensus per cluster
   consensusSequence <- function(sequenceSet){
-    s <- seqinr::consensus(t(as.matrix(as.data.frame(strsplit(sequenceSet, ""), fix.empty.names=F))), method="threshold", threshold=0.75)
-    s[is.na(s)] <- "X"
-    return(paste0(s, collapse=""))
+    sink(tempfile())
+    s <- stringr::str_replace_all(msa::msaConsensusSequence(msa::msa(sequenceSet, type="protein"), type="Biostrings"), "-", "X")
+    sink()
+    return(s)
   }
   clusterConsensusSeqs <- sapply(clusteredPeptides, consensusSequence)
 
