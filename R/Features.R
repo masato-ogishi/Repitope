@@ -168,7 +168,7 @@ Features_CPP <- function(
   featureSet=NULL,
   seedSet=1:5,
   coreN=parallel::detectCores(),
-  tmpDir=tempdir()
+  tmpDir=file.path(tempdir(), "FeatureDF", format(Sys.time(), "%Y.%m.%d.%H.%M.%S"))
 ){
   # Temp directory check
   dir.create(tmpDir, showWarnings=F, recursive=T)
@@ -273,7 +273,7 @@ Features_CPP <- function(
   dt_cpp <- data.table::dcast.data.table(dt_cpp, Peptide+FragDepth+Library~Feature, value.var="Value", fun=mean)
   if(!is.null(featureSet)){
     featureSet <- intersect(colnames(dt_cpp), featureSet)
-    dt_cpp <- dt_cpp[, c("Peptide", featureSet), with=F]
+    dt_cpp <- dt_cpp[, c("Peptide", "FragDepth", "Library", featureSet), with=F]
   }
 
   # Finish the timer
@@ -301,7 +301,7 @@ Features <- function(
   featureSet=NULL,
   seedSet=1:5,
   coreN=parallel::detectCores(),
-  tmpDir=tempdir()
+  tmpDir=file.path(tempdir(), "FeatureDF", format(Sys.time(), "%Y.%m.%d.%H.%M.%S"))
 ){
   message("Peptide contact potential profiling analysis...")
   dt_cpp <- Features_CPP(peptideSet, fragLib, aaIndexIDSet, fragLenSet, fragDepthSet, fragLibTypeSet, featureSet, seedSet, coreN, tmpDir)
