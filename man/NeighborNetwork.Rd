@@ -14,7 +14,7 @@ distMat_Sbst(peptideSet)
 distMat_Indel(longerPeptideSet, shorterPeptideSet)
 
 neighborNetwork(peptideSet, numSet = NULL, directed = T, weighted = T,
-  forceMutType = T)
+  mutType = T)
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}
@@ -25,11 +25,11 @@ neighborNetwork(peptideSet, numSet = NULL, directed = T, weighted = T,
 
 \item{numSet}{An attribute for the vertices.}
 
-\item{directed}{Should the network be converted from undirected to directed? Directions are determined by the \code{numSet} provided.}
+\item{directed}{Should the network be converted from undirected to directed? Directions are determined using the \code{numSet} provided.}
 
-\item{weighted}{Should the network be converted to weihted? Edge weights are determined by the \code{numSet} provided.}
+\item{weighted}{Should the network be converted to weihted? Edge weights are determined using the \code{numSet} provided.}
 
-\item{forceMutType}{Should mutational types be annotated? A little bit time-consuming.}
+\item{mutType}{Should mutational types be annotated? A little bit time-consuming.}
 }
 \description{
 Neighbor network analysis.

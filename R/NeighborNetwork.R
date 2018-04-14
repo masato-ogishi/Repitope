@@ -4,9 +4,9 @@
 #' @param longerPeptideSet A set of peptide sequences. Should be one amino acid longer than \code{shorterPeptideSet}.
 #' @param shorterPeptideSet A set of peptide sequences. Should be one amino acid shorter than \code{longerPeptideSet}.
 #' @param numSet An attribute for the vertices.
-#' @param directed Should the network be converted from undirected to directed? Directions are determined by the \code{numSet} provided.
-#' @param weighted Should the network be converted to weihted? Edge weights are determined by the \code{numSet} provided.
-#' @param forceMutType Should mutational types be annotated? A little bit time-consuming.
+#' @param directed Should the network be converted from undirected to directed? Directions are determined using the \code{numSet} provided.
+#' @param weighted Should the network be converted to weihted? Edge weights are determined using the \code{numSet} provided.
+#' @param mutType Should mutational types be annotated? A little bit time-consuming.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr rename
 #' @importFrom dplyr filter
@@ -119,7 +119,7 @@ distMat_Indel <- function(longerPeptideSet, shorterPeptideSet){
 #' @export
 #' @rdname NeighborNetwork
 #' @name NeighborNetwork
-neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, forceMutType=T){
+neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, mutType=T){
   # Internally used workflows
   net_main <- function(peptideSet){
     ## Input check...
@@ -179,7 +179,7 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, for
       igraph::simplify()
     return(net)
   }
-  net_pairs_DF <- function(simpleSimNet, forceMutType=F){
+  net_pairs_DF <- function(simpleSimNet, mutType=F){
     ## Get peptide pairs
     df <- as.data.frame(igraph::as_edgelist(simpleSimNet, names=T))
     colnames(df) <- c("Node1","Node2")
@@ -221,12 +221,13 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, for
       if(nchar(pept1)<nchar(pept2)) return("Insertion")
       if(nchar(pept1)>nchar(pept2)) return("Deletion")
     }
-    message("Annotating mutational types and patterns...")
-    if(forceMutType==T|nrow(df)<=50000){
+    message("Annotating mutational types...")
+    if(mutType==T){
       df[["MutType"]] <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutType(df$"AASeq1"[[i]], df$"AASeq2"[[i]])})) ## a bit slow...
     }else{
       df[["MutType"]] <- NA
     }
+    message("Annotating mutational patterns...")
     df[["MutPattern"]] <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutPattern(df$"AASeq1"[[i]], df$"AASeq2"[[i]])}))
 
     ## Output
@@ -235,7 +236,7 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, for
 
   # A basic, non-directional, non-weighted network
   net <- net_main(peptideSet)
-  pairDF <- net_pairs_DF(net, forceMutType=forceMutType)
+  pairDF <- net_pairs_DF(net, mutType=mutType)
   if(is.null(numSet)) return(list("NeighborNetwork"=net, "PairDF"=pairDF))
 
   # A directional, weighted network
