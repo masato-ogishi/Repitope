@@ -6,7 +6,7 @@
 #' @param numSet An attribute for the vertices.
 #' @param directed Should the network be converted from undirected to directed? Directions are determined using the \code{numSet} provided.
 #' @param weighted Should the network be converted to weihted? Edge weights are determined using the \code{numSet} provided.
-#' @param mutType Should mutational types be annotated? A little bit time-consuming.
+#' @param annotateMutType Should mutational types be annotated? A little bit time-consuming.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr rename
 #' @importFrom dplyr filter
@@ -119,7 +119,7 @@ distMat_Indel <- function(longerPeptideSet, shorterPeptideSet){
 #' @export
 #' @rdname NeighborNetwork
 #' @name NeighborNetwork
-neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, mutType=T){
+neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, annotateMutType=T){
   # Internally used workflows
   net_main <- function(peptideSet){
     ## Input check...
@@ -179,7 +179,7 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, mut
       igraph::simplify()
     return(net)
   }
-  net_pairs_DF <- function(simpleSimNet, mutType=F){
+  net_pairs_DF <- function(simpleSimNet, annotateMutType=F){
     ## Get peptide pairs
     df <- as.data.frame(igraph::as_edgelist(simpleSimNet, names=T))
     colnames(df) <- c("Node1","Node2")
@@ -222,7 +222,7 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, mut
       if(nchar(pept1)>nchar(pept2)) return("Deletion")
     }
     message("Annotating mutational types...")
-    if(mutType==T){
+    if(annotateMutType){
       df[["MutType"]] <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutType(df$"AASeq1"[[i]], df$"AASeq2"[[i]])})) ## a bit slow...
     }else{
       df[["MutType"]] <- NA
@@ -236,7 +236,7 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, mut
 
   # A basic, non-directional, non-weighted network
   net <- net_main(peptideSet)
-  pairDF <- net_pairs_DF(net, mutType=mutType)
+  pairDF <- net_pairs_DF(net, annotateMutType=annotateMutType)
   if(is.null(numSet)) return(list("NeighborNetwork"=net, "PairDF"=pairDF))
 
   # A directional, weighted network
@@ -245,14 +245,14 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, mut
     dplyr::inner_join(df_num, by=c("AASeq1"="Peptide")) %>%
     dplyr::inner_join(df_num, by=c("AASeq2"="Peptide")) %>%
     dplyr::transmute(AASeq1, AASeq2, Score1=Score.x, Score2=Score.y, MutType, MutPattern)
-  mutType_Rev <- function(mutType){
-    paste0(rev(strsplit(mutType, "_", fixed=T)[[1]]), collapse="_")
+  reverseMutTypes <- function(mutTypes){
+    paste0(rev(strsplit(mutTypes, "_", fixed=T)[[1]]), collapse="_")
   }
   pairDF_DW <- dplyr::bind_rows(
     pairDF_DW,
     pairDF_DW %>%
       dplyr::rename(AASeq1=AASeq2, AASeq2=AASeq1, Score1=Score2, Score2=Score1) %>%
-      dplyr::mutate(MutType=sapply(MutType, mutType_Rev),
+      dplyr::mutate(MutType=sapply(MutType, reverseMutTypes),
                     MutPattern=dplyr::if_else(MutPattern=="Insertion", "Deletion", MutPattern))
   ) %>%
     dplyr::filter(Score1<=Score2) %>%
