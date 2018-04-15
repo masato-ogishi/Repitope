@@ -12,7 +12,7 @@
 #' @param fragLibTypeSet A set of strings indicating the types of fragment libraries to be used.
 #' @param featureSet A minimum set of features. Combinations of fragment lengths and AAIndex IDs are internally extracted for calculating CPPs.
 #' @param seedSet A set of random seeds.
-#' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to skip parallelization.
+#' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to disable parallelization.
 #' @param tmpDir Destination directory to save intermediate files.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr mutate
@@ -213,17 +213,24 @@ Features_CPP <- function(
     data.table::setorder(parameterDT)
   }
   message("Number of parameter combinations = ", nrow(parameterDT))
-  message("Launching parallel clusters...")
-  if(is.null(coreN)) coreN <- 1
-  cl <- parallel::makeCluster(coreN, type="SOCK")
-  parallel::clusterExport(
-    cl=cl,
-    list("parameterDT","AACPMatrixList","fragLib"),
-    envir=environment()
-  )
+  if(!is.null(coreN)){
+    message("Launching parallel clusters...")
+    cl <- parallel::makeCluster(coreN, type="SOCK")
+    parallel::clusterExport(
+      cl=cl,
+      list("parameterDT","AACPMatrixList","fragLib"),
+      envir=environment()
+    )
+  }else{
+    cl <- NULL
+  }
   message("Contact potential profiling...")
   cpp <- function(clusterObject, seedNumber=12345){
-    snow::clusterSetupRNGstream(clusterObject, seed=rep(seedNumber, 6))
+    if(is.null(clusterObject)){
+      set.seed(seedNumber)
+    }else{
+      snow::clusterSetupRNGstream(clusterObject, seed=rep(seedNumber, 6))
+    }
     dt <- pbapply::pblapply(
       1:nrow(parameterDT),
       function(i){
@@ -262,10 +269,10 @@ Features_CPP <- function(
   }
   for(s in seedSet){
     cat("Random seed = ", s, "\n", sep="")
-    cpp(cl, seedNumber=s)
+    cpp(clusterObject=cl, seedNumber=s)
     gc();gc()
   }
-  parallel::stopCluster(cl)
+  if(!is.null(cl)) parallel::stopCluster(cl)
   gc();gc()
 
   ## Final formatting
