@@ -225,7 +225,7 @@ Features_CPP <- function(
     cl <- NULL
   }
   message("Contact potential profiling...")
-  cpp <- function(clusterObject, seedNumber=12345){
+  cpp <- function(clusterObject=NULL, seedNumber=12345){
     if(is.null(clusterObject)){
       set.seed(seedNumber)
     }else{
@@ -255,8 +255,8 @@ Features_CPP <- function(
       data.table::as.data.table() %>%
       data.table::transpose()
     colnames(dt) <- c("Mean","SD","Med","TrM","MAD","Skew","Kurt","SE","IQR","Q10","Q90")
-    parameterDT[,"Seed":=seedNumber]
-    dt <- cbind(parameterDT, dt)
+    dt[,"Peptide":=parameterDT$Peptide][,"AAIndexID":=parameterDT$AAIndexID][,"FragLen":=parameterDT$FragLen][,"FragDepth":=parameterDT$FragDepth][,"Library":=parameterDT$Library][,"Seed":=seedNumber]
+    data.table::setcolorder(dt, c("Peptide","AAIndexID","FragLen","FragDepth","Library","Seed","Mean","SD","Med","TrM","MAD","Skew","Kurt","SE","IQR","Q10","Q90"))
     fst::write_fst(dt, file.path(tmpDir, paste0("dt_feature_cpp_seed", seedNumber, ".fst")))
     return(dt)
   }
