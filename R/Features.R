@@ -255,9 +255,12 @@ Features_CPP <- function(
     return(dt)
   }
   dt_cpp_filenames <- list.files(pattern="dt_feature_cpp_seed.+fst", path=tmpDir, full.names=F)
-  seedSet_done <- as.numeric(gsub("seed", "", gsub(".fst", "", t(as.data.frame(strsplit(dt_cpp_filenames, "_"), fix.empty.names=F))[,4], fixed=T)))
-  message(" - Skipping random seeds ", paste0(seedSet_done, collapse=", "))
-  for(s in setdiff(seedSet, seedSet_done)){
+  if(length(dt_cpp_filenames)>=1){
+    seedSet_done <- as.numeric(gsub("seed", "", gsub(".fst", "", t(as.data.frame(strsplit(dt_cpp_filenames, "_"), fix.empty.names=F))[,4], fixed=T)))
+    message(" - Skipping random seeds ", paste0(seedSet_done, collapse=", "))
+    seedSet <- setdiff(seedSet, seedSet_done)
+  }
+  for(s in seedSet){
     cat("Random seed = ", s, "\n", sep="")
     cpp(cl, seedNumber=s)
     gc();gc()
