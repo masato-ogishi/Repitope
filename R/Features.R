@@ -254,7 +254,10 @@ Features_CPP <- function(
     fst::write_fst(dt, file.path(tmpDir, paste0("dt_feature_cpp_seed", seedNumber, ".fst")))
     return(dt)
   }
-  for(s in seedSet){
+  dt_cpp_filenames <- list.files(pattern="dt_feature_cpp_seed.+fst", path=tmpDir, full.names=F)
+  seedSet_done <- as.numeric(gsub("seed", "", gsub(".fst", "", t(as.data.frame(strsplit(dt_cpp_filenames, "_"), fix.empty.names=F))[,4], fixed=T)))
+  message(" - Skipping random seeds ", paste0(seedSet_done, collapse=", "))
+  for(s in setdiff(seedSet, seedSet_done)){
     cat("Random seed = ", s, "\n", sep="")
     cpp(cl, seedNumber=s)
     gc();gc()
@@ -264,7 +267,8 @@ Features_CPP <- function(
 
   ## Final formatting
   message("Data formatting...")
-  dt_cpp <- data.table::rbindlist(lapply(list.files(pattern="dt_feature_cpp_seed.+fst", path=tmpDir, full.names=T), fst::read_fst, as.data.table=T))
+  dt_cpp_filenames <- list.files(pattern="dt_feature_cpp_seed.+fst", path=tmpDir, full.names=T)
+  dt_cpp <- data.table::rbindlist(lapply(dt_cpp_filenames, fst::read_fst, as.data.table=T))
   data.table::setorder(dt_cpp, Peptide, AAIndexID, FragLen, FragDepth, Library, Seed)
   col_id <- c("Peptide", "AAIndexID", "FragLen", "FragDepth", "Library", "Seed")
   col_val <- setdiff(colnames(dt_cpp), col_id)

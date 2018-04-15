@@ -4,13 +4,17 @@
 #' @param groupColumnName The column name for the grouping variables.
 #' @param valueColumnName The column name for values.
 #' @param descending Logical. Whether the dataframe should be reordered in a descending order.
+#' @param .predicate A predicate function to be applied to the rows or a logical vector.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr select
+#' @importFrom dplyr mutate
 #' @importFrom dplyr group_by
 #' @importFrom dplyr summarise
 #' @importFrom dplyr arrange
 #' @importFrom dplyr ungroup
 #' @importFrom dplyr left_join
+#' @importFrom rlang enquo
+#' @importFrom rlang eval_tidy
 #' @export
 #' @rdname Utility_DF
 #' @name Utility_DF
@@ -27,4 +31,14 @@ sortByMedian <- function(df, groupColumnName="FeatureID", valueColumnName="Impor
   res <- suppressMessages(dplyr::left_join(df.ord, df))
   if(descending==T) res <- res[nrow(res):1,]
   return(res)
+}
+
+#' @export
+#' @rdname Utility_DF
+#' @name Utility_DF
+mutate_if_byrow <- function(df, .predictate, ...) {
+  .predictate <- rlang::enquo(.predictate)
+  .predictate_lgl <- rlang::eval_tidy(.predictate, df)
+  df[.predictate_lgl, ] <- df[.predictate_lgl, ] %>% dplyr::mutate(...)
+  return(df)
 }

@@ -179,12 +179,12 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, ann
       igraph::simplify()
     return(net)
   }
-  net_pairs_DF <- function(simpleSimNet, annotateMutType=F){
+  net_pairs_DF <- function(net, annotateMutType=F){
     ## Get peptide pairs
-    df <- as.data.frame(igraph::as_edgelist(simpleSimNet, names=T))
+    df <- as.data.frame(igraph::as_edgelist(net, names=T))
     colnames(df) <- c("Node1","Node2")
-    df[["AASeq1"]] <- igraph::V(simpleSimNet)$label[df$"Node1"]
-    df[["AASeq2"]] <- igraph::V(simpleSimNet)$label[df$"Node2"]
+    df[["AASeq1"]] <- igraph::V(net)$label[df$"Node1"]
+    df[["AASeq2"]] <- igraph::V(net)$label[df$"Node2"]
     df <- dplyr::select(df, -Node1, -Node2)
 
     ## Annotate mutational types and patterns
@@ -225,7 +225,7 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, ann
     if(annotateMutType){
       df[["MutType"]] <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutType(df$"AASeq1"[[i]], df$"AASeq2"[[i]])})) ## a bit slow...
     }else{
-      df[["MutType"]] <- NA
+      df[["MutType"]] <- ""
     }
     message("Annotating mutational patterns...")
     df[["MutPattern"]] <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutPattern(df$"AASeq1"[[i]], df$"AASeq2"[[i]])}))
