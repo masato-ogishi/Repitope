@@ -252,7 +252,6 @@ Features_CPP <- function(
         stat <- psych::describe(al, trim=.1, interp=F, skew=T, type=3, ranges=T, IQR=T, quant=c(.10, .90))[statSet]
         return(as.numeric(stat))
       }, cl=clusterObject) %>%
-      as.data.frame() %>%
       data.table::as.data.table() %>%
       data.table::transpose()
     colnames(dt) <- c("Mean","SD","Med","TrM","MAD","Skew","Kurt","SE","IQR","Q10","Q90")
