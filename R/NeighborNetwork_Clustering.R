@@ -191,7 +191,7 @@ neighborNetwork_Cluster_Batch <- function(neighborNetResult, metadataDF, seed=12
     cl <- NULL
   }else{
     cl <- parallel::makeCluster(coreN, type="SOCK")
-    parallel::clusterExport(cl=cl, varlist=c("escapePotential_single","neighborNetResult","metadataDF"), envir=environment())
+    parallel::clusterExport(cl=cl, varlist=c("cluster_single","neighborNetResult","metadataDF"), envir=environment())
     snow::clusterSetupRNGstream(cl, seed=rep(seed, 6))
   }
   peptideSet <- igraph::V(neighborNetResult$"NeighborNetwork_DW")$"name"
