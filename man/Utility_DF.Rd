@@ -5,7 +5,7 @@
 \alias{sortByMedian}
 \alias{Utility_DF}
 \alias{mutate_if_byrow}
-\title{Utility functions for dataframe/datatables.}
+\title{Utility functions for dataframes.}
 \usage{
 sortByMedian(df, groupColumnName = "FeatureID",
   valueColumnName = "Importance", descending = F)
@@ -21,8 +21,8 @@ mutate_if_byrow(df, .predictate, ...)
 
 \item{descending}{Logical. Whether the dataframe should be reordered in a descending order.}
 
-\item{.predicate}{A predicate function to be applied to the rows or a logical vector.}
+\item{.predictate}{A predictate function to be applied to the rows or a logical vector. Note: columns to be mutated have to be created in advance.}
 }
 \description{
-Utility functions for dataframe/datatables.
+Utility functions for dataframes.
 }

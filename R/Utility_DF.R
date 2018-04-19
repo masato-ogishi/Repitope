@@ -1,10 +1,10 @@
-#' Utility functions for dataframe/datatables.
+#' Utility functions for dataframes.
 #'
 #' @param df Any dataframe.
 #' @param groupColumnName The column name for the grouping variables.
 #' @param valueColumnName The column name for values.
 #' @param descending Logical. Whether the dataframe should be reordered in a descending order.
-#' @param .predicate A predicate function to be applied to the rows or a logical vector.
+#' @param .predictate A predictate function to be applied to the rows or a logical vector. Note: columns to be mutated have to be created in advance.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr select
 #' @importFrom dplyr mutate
