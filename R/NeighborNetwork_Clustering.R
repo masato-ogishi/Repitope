@@ -6,7 +6,7 @@
 #' @param neighborNetResult The result returned from \code{neighborNetwork}.
 #' @param peptide The target peptide sequence.
 #' @param graph A directed and weighted neighbor network of the target peptide.
-#' @param metadataDF A dataframe which has "Peptide", "Immunogenicity", and "ImmunogenicityScore" columns.
+#' @param metadataDF A dataframe which has "Peptide" and "ImmunogenicityScore" columns. Optionally, an "Immunogenicity" column would be integrated if present.
 #' @param seed A random seed.
 #' @param plot Logical. Whether the network cluster plot shuould be generated.
 #' @param coreN The number of threads for parallelization.
@@ -64,8 +64,9 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
   igraph::V(graph)$label[!peptideSet %in% peptideLabels] <- ""
 
   ## Metadata
-  df_meta <- dplyr::filter(metadataDF, Peptide %in% peptideSet) %>%
-    dplyr::select(Peptide, Immunogenicity, ImmunogenicityScore)
+  metadataDF <- dplyr::filter(metadataDF, Peptide %in% peptideSet)
+  df_meta <- dplyr::select(metadataDF, Peptide, ImmunogenicityScore)
+  df_meta$Immunogenicity <- metadataDF$Immunogenicity  ## It returns NULL if the metadata doesn't contain Immunogenicity.
   igraph::V(graph)$Immunogenicity <- df_meta$Immunogenicity
   igraph::V(graph)$ImmunogenicityScore <- df_meta$ImmunogenicityScore
   igraph::E(graph)$weight[igraph::E(graph)$weight==0] <- 0.001
@@ -111,7 +112,7 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
 
   ## Graph plot
   clusterGraphPlot <- function(g, meta, layout, seed=12345){
-    ### Colors
+    ### Vertex annotations
     colPal <- function(x){
       pal <- colorRamp(append(ggsci::pal_d3()(2), "white", after=1), space="rgb")
       cols <- pal(x)
@@ -122,8 +123,14 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
       dplyr::summarise(ImmunogenicityColor=colPal(mean(ImmunogenicityScore)))
     clusterColors <- scales::alpha(clusterColors$"ImmunogenicityColor", alpha=0.75)
     vertexColors <- colPal(meta$"ImmunogenicityScore")
+    if(is.null(meta$"Immunogenicity")){
+      vertexShapes <- "circle"
+    }else{
+      vertexShapes <- dplyr::if_else(meta$"Immunogenicity"=="Positive", "circle", "square")
+    }
+    vertexLabels <- igraph::V(g)$"label"
 
-    ### Labels
+    ### Cluster labels
     clusterCentroids <- meta %>%
       dplyr::group_by(ClusterID) %>%
       dplyr::summarise(x=mean(x), y=mean(y))
@@ -140,8 +147,8 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
       mark.border="black",
       mark.col=clusterColors,
       vertex.size=3,
-      vertex.shape=dplyr::if_else(meta$Immunogenicity=="Positive", "circle", "square"),
-      vertex.label=igraph::V(g)$"label",
+      vertex.shape=vertexShapes,
+      vertex.label=vertexLabels,
       vertex.label.color="black",
       vertex.label.cex=1.0,
       vertex.label.dist=0.5,

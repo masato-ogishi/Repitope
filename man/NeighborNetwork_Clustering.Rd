@@ -23,7 +23,7 @@ neighborNetwork_Cluster_Batch(neighborNetResult, metadataDF, seed = 12345,
 
 \item{graph}{A directed and weighted neighbor network of the target peptide.}
 
-\item{metadataDF}{A dataframe which has "Peptide", "Immunogenicity", and "ImmunogenicityScore" columns.}
+\item{metadataDF}{A dataframe which has "Peptide" and "ImmunogenicityScore" columns. Optionally, an "Immunogenicity" column would be integrated if present.}
 
 \item{seed}{A random seed.}
 
