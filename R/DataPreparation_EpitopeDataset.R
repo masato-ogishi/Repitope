@@ -9,6 +9,7 @@
 #' \code{Epitope_Add_HLARestrictions} merges HLA serotypes and HLA supertypes.
 #'
 #' @param df An epitope dataframe.
+#' @param peptideLengthSet A set of peptide lengths to be incorporated.
 #' @param compressedColumnName A string indicating the names of the compressed column to be converted into a long format.
 #' @param IEDBAssayFileName A set of T cell assay results obtained from IEDB.
 #' @param OtherFileNames Other epitope source files. Must contain a "Dataset" column indicating the data source.
@@ -43,7 +44,7 @@
 #' @export
 #' @rdname DataPreparation_EpitopeDataset
 #' @name DataPreparation_EpitopeDataset
-Epitope_Import <- function(IEDBAssayFileName, OtherFileNames=NULL){
+Epitope_Import <- function(IEDBAssayFileName, OtherFileNames=NULL, peptideLengthSet=8:11){
   immEvi <- suppressMessages(readr::read_csv(system.file("IEDB_ImmunogenicityEvidenceTable.csv", package="Repitope"))[[1]])
   df <- suppressWarnings(suppressMessages(readr::read_csv(IEDBAssayFileName, skip=1))) %>%
     magrittr::set_colnames(stringr::str_replace_all(colnames(.), " ", "")) %>%
@@ -63,7 +64,7 @@ Epitope_Import <- function(IEDBAssayFileName, OtherFileNames=NULL){
     df <- dplyr::mutate(df, Immunogenicity=factor(Immunogenicity, levels=c("Positive", "Negative")))
   }
   df <- df %>%
-    dplyr::filter(nchar(Peptide) %in% 8:11) %>%         ## Length check.
+    dplyr::filter(nchar(Peptide) %in% peptideLengthSet) %>%         ## Length check.
     dplyr::filter(Peptide %in% sequenceFilter(Peptide)) ## Sequences with non-standard characters were discarded.
 
   df <- df %>%
@@ -163,7 +164,7 @@ compressedToDummyDF <- function(df, compressedColumnName){
 #' @export
 #' @rdname DataPreparation_EpitopeDataset
 #' @name DataPreparation_EpitopeDataset
-Epitope_Add_HLASerotypes <- function(df, IEDBEpitopeFileNames=system.file("IEDB_Epitope_Serotype_HLA-A01.csv.gz", package="Repitope")){
+Epitope_Add_HLASerotypes <- function(df, IEDBEpitopeFileNames=system.file("IEDB_Epitope_Serotype_HLA-A01.csv.gz", package="Repitope"), peptideLengthSet=8:11){
   hlaSerotypeDF <- function(IEDBEpitopeFileName){
     df.meta <- suppressWarnings(suppressMessages(readr::read_csv(IEDBEpitopeFileName, skip=1)))
     pept.meta <- df.meta$Description
@@ -175,7 +176,7 @@ Epitope_Add_HLASerotypes <- function(df, IEDBEpitopeFileNames=system.file("IEDB_
   df.meta <- dplyr::bind_rows(lapply(IEDBEpitopeFileNames, hlaSerotypeDF)) %>%
     dplyr::group_by(Peptide) %>%
     dplyr::summarise(HLASerotype=paste0(sort(unique(HLASerotype)), collapse="|")) %>%
-    dplyr::filter(nchar(Peptide) %in% 8:11) %>%
+    dplyr::filter(nchar(Peptide) %in% peptideLengthSet) %>%
     dplyr::filter(Peptide %in% sequenceFilter(Peptide))
   df <- dplyr::left_join(df, df.meta, by="Peptide")
   return(df)

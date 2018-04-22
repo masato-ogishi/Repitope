@@ -7,6 +7,7 @@
 #' @param directed Should the network be converted from undirected to directed? Directions are determined using the \code{numSet} provided.
 #' @param weighted Should the network be converted to weihted? Edge weights are determined using the \code{numSet} provided.
 #' @param annotateMutType Should mutational types be annotated? A little bit time-consuming.
+#' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to disable.
 #' @importFrom dplyr %>%
 #' @importFrom dplyr rename
 #' @importFrom dplyr filter
@@ -31,6 +32,11 @@
 #' @importFrom igraph graph_from_data_frame
 #' @importFrom igraph simplify
 #' @importFrom igraph as_edgelist
+#' @importFrom parallel detectCores
+#' @importFrom parallel makeCluster
+#' @importFrom parallel clusterEvalQ
+#' @importFrom parallel clusterExport
+#' @importFrom parallel stopCluster
 #' @importFrom pbapply timerProgressBar
 #' @importFrom pbapply setTimerProgressBar
 #' @importFrom pbapply pblapply
@@ -119,7 +125,7 @@ distMat_Indel <- function(longerPeptideSet, shorterPeptideSet){
 #' @export
 #' @rdname NeighborNetwork
 #' @name NeighborNetwork
-neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, annotateMutType=T){
+neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, annotateMutType=T, coreN=parallel::detectCores()){
   # Internally used workflows
   net_main <- function(peptideSet){
     ## Input check...
@@ -179,7 +185,7 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, ann
       igraph::simplify()
     return(net)
   }
-  net_pairs_DF <- function(net, annotateMutType=F){
+  net_pairs_DF <- function(net, annotateMutType=F, coreN=NULL){
     ## Get peptide pairs
     df <- as.data.frame(igraph::as_edgelist(net, names=T))
     colnames(df) <- c("Node1","Node2")
@@ -216,27 +222,44 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, ann
         return(sbst)
       }
     }
+    peptSet1 <- df$"AASeq1"
+    peptSet2 <- df$"AASeq2"
+    if(!is.null(coreN)){
+      cl <- parallel::makeCluster(coreN, type='SOCK')
+      parallel::clusterExport(
+        cl,
+        list("peptSet1", "peptSet2", "mutType"),
+        envir=environment()
+      )
+    }else{
+      cl <- NULL
+    }
+
+    message("Annotating mutational types...")
+    if(annotateMutType){
+      df$"MutType" <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutType(peptSet1[[i]], peptSet2[[i]])}, cl=cl)) ## a bit slow...
+    }else{
+      df$"MutType" <- ""
+    }
+
+    message("Annotating mutational patterns...")
     mutPattern <- function(pept1, pept2){
       if(nchar(pept1)==nchar(pept2)) return("Substitution")
       if(nchar(pept1)<nchar(pept2)) return("Insertion")
       if(nchar(pept1)>nchar(pept2)) return("Deletion")
     }
-    message("Annotating mutational types...")
-    if(annotateMutType){
-      df[["MutType"]] <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutType(df$"AASeq1"[[i]], df$"AASeq2"[[i]])})) ## a bit slow...
-    }else{
-      df[["MutType"]] <- ""
-    }
-    message("Annotating mutational patterns...")
-    df[["MutPattern"]] <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutPattern(df$"AASeq1"[[i]], df$"AASeq2"[[i]])}))
+    df$"MutPattern" <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutPattern(peptSet1[[i]], peptSet2[[i]])}, cl=NULL)) ## parallelization makes calculation slower
+
+    if(!is.null(coreN)) parallel::stopCluster(cl)
 
     ## Output
+    gc();gc()
     return(df)
   }
 
   # A basic, non-directional, non-weighted network
   net <- net_main(peptideSet)
-  pairDF <- net_pairs_DF(net, annotateMutType=annotateMutType)
+  pairDF <- net_pairs_DF(net, annotateMutType=annotateMutType, coreN=coreN)
   if(is.null(numSet)) return(list("NeighborNetwork"=net, "PairDF"=pairDF))
 
   # A directional, weighted network
@@ -256,10 +279,10 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, ann
                     MutPattern=dplyr::if_else(MutPattern=="Insertion", "Deletion", MutPattern))
   ) %>%
     dplyr::filter(Score1<=Score2) %>%
-    dplyr::transmute(AASeq1, AASeq2, Score1, Score2, DeltaScore=Score2-Score1, MutType, MutPattern)
+    dplyr::transmute(AASeq1, AASeq2, Score1, Score2, ScoreRatio=Score2/Score1, MutType, MutPattern)
   net_DW <- igraph::graph_from_data_frame(pairDF_DW, directed=directed)
   net_DW <- igraph::set_vertex_attr(net_DW, name="label", value=igraph::V(net_DW)$name)
-  if(weighted==T) igraph::E(net_DW)$weight <- igraph::E(net_DW)$DeltaScore
+  if(weighted==T) igraph::E(net_DW)$weight <- igraph::E(net_DW)$ScoreRatio
   return(list("NeighborNetwork"=net, "PairDF"=pairDF,
               "NeighborNetwork_DW"=net_DW, "PairDF_DW"=pairDF_DW))
 }

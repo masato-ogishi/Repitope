@@ -25,7 +25,6 @@
 #' @importFrom data.table copy
 #' @importFrom stringr str_split
 #' @importFrom stringr fixed
-#' @importFrom parallel detectCores
 #' @importFrom parallel splitIndices
 #' @importFrom parallel detectCores
 #' @importFrom parallel makeCluster

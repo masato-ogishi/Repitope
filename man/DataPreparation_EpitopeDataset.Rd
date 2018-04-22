@@ -17,7 +17,8 @@
 \alias{Epitope_Add_HLARestrictions}
 \title{Compile epitope datasets retrieved from IEDB and other sources.}
 \usage{
-Epitope_Import(IEDBAssayFileName, OtherFileNames = NULL)
+Epitope_Import(IEDBAssayFileName, OtherFileNames = NULL,
+  peptideLengthSet = 8:11)
 
 Epitope_Add_Disease(df,
   IEDBEpitopeFileName = system.file("IEDB_Epitope_Healthy.csv.gz", package =
@@ -29,7 +30,7 @@ compressedToDummyDF(df, compressedColumnName)
 
 Epitope_Add_HLASerotypes(df,
   IEDBEpitopeFileNames = system.file("IEDB_Epitope_Serotype_HLA-A01.csv.gz",
-  package = "Repitope"))
+  package = "Repitope"), peptideLengthSet = 8:11)
 
 Epitope_Convert_HLASupertypes(df, compressedColumnName = "MHC")
 
@@ -39,6 +40,8 @@ Epitope_Add_HLARestrictions(df)
 \item{IEDBAssayFileName}{A set of T cell assay results obtained from IEDB.}
 
 \item{OtherFileNames}{Other epitope source files. Must contain a "Dataset" column indicating the data source.}
+
+\item{peptideLengthSet}{A set of peptide lengths to be incorporated.}
 
 \item{df}{An epitope dataframe.}
 

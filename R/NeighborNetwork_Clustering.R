@@ -69,7 +69,6 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
   df_meta$Immunogenicity <- metadataDF$Immunogenicity  ## It returns NULL if the metadata doesn't contain Immunogenicity.
   igraph::V(graph)$Immunogenicity <- df_meta$Immunogenicity
   igraph::V(graph)$ImmunogenicityScore <- df_meta$ImmunogenicityScore
-  igraph::E(graph)$weight[igraph::E(graph)$weight==0] <- 0.001
 
   ## Clusters
   set.seed(seed)

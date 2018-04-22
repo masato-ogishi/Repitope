@@ -14,7 +14,7 @@ distMat_Sbst(peptideSet)
 distMat_Indel(longerPeptideSet, shorterPeptideSet)
 
 neighborNetwork(peptideSet, numSet = NULL, directed = T, weighted = T,
-  annotateMutType = T)
+  annotateMutType = T, coreN = parallel::detectCores())
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}
@@ -30,6 +30,8 @@ neighborNetwork(peptideSet, numSet = NULL, directed = T, weighted = T,
 \item{weighted}{Should the network be converted to weihted? Edge weights are determined using the \code{numSet} provided.}
 
 \item{annotateMutType}{Should mutational types be annotated? A little bit time-consuming.}
+
+\item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to disable.}
 }
 \description{
 Neighbor network analysis.
