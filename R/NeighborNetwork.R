@@ -224,20 +224,21 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, ann
     }
     peptSet1 <- df$"AASeq1"
     peptSet2 <- df$"AASeq2"
-    if(!is.null(coreN)){
-      cl <- parallel::makeCluster(coreN, type='SOCK')
-      parallel::clusterExport(
-        cl,
-        list("peptSet1", "peptSet2", "mutType"),
-        envir=environment()
-      )
-    }else{
-      cl <- NULL
-    }
 
     message("Annotating mutational types...")
     if(annotateMutType){
+      if(!is.null(coreN)){
+        cl <- parallel::makeCluster(coreN, type='SOCK')
+        parallel::clusterExport(
+          cl,
+          list("peptSet1", "peptSet2", "mutType"),
+          envir=environment()
+        )
+      }else{
+        cl <- NULL
+      }
       df$"MutType" <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutType(peptSet1[[i]], peptSet2[[i]])}, cl=cl)) ## a bit slow...
+      parallel::stopCluster(cl)
     }else{
       df$"MutType" <- ""
     }
@@ -249,8 +250,6 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, ann
       if(nchar(pept1)>nchar(pept2)) return("Deletion")
     }
     df$"MutPattern" <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutPattern(peptSet1[[i]], peptSet2[[i]])}, cl=NULL)) ## parallelization makes calculation slower
-
-    if(!is.null(coreN)) parallel::stopCluster(cl)
 
     ## Output
     gc();gc()
