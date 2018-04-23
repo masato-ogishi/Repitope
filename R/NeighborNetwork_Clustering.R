@@ -66,8 +66,10 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
   ## Metadata
   metadataDF <- dplyr::filter(metadataDF, Peptide %in% peptideSet)
   df_meta <- dplyr::select(metadataDF, Peptide, ImmunogenicityScore)
-  df_meta$Immunogenicity <- metadataDF$Immunogenicity  ## It returns NULL if the metadata doesn't contain Immunogenicity.
-  igraph::V(graph)$Immunogenicity <- df_meta$Immunogenicity
+  if("Immunogenicity" %in% colnames(metadataDF)){
+    df_meta$Immunogenicity <- metadataDF$Immunogenicity
+    igraph::V(graph)$Immunogenicity <- df_meta$Immunogenicity
+  }
   igraph::V(graph)$ImmunogenicityScore <- df_meta$ImmunogenicityScore
 
   ## Clusters
@@ -193,22 +195,27 @@ neighborNetwork_Cluster_Batch <- function(neighborNetResult, metadataDF, seed=12
     score <- df_meta$"ImmunogenicityScore"[[pos]]
     return(list("Peptide"=peptide, "Score"=score, "ClusterID"=clust, "SummaryDF"=df_meta))
   }
-  if(is.null(coreN)){
-    cl <- NULL
-  }else{
-    cl <- parallel::makeCluster(coreN, type="SOCK")
-    parallel::clusterExport(cl=cl, varlist=c("cluster_single","neighborNetResult","metadataDF"), envir=environment())
-    snow::clusterSetupRNGstream(cl, seed=rep(seed, 6))
-  }
   peptideSet <- igraph::V(neighborNetResult$"NeighborNetwork_DW")$"name"
-  res <- pbapply::pblapply(
-    peptideSet,
-    function(pept){
-      cluster_single(pept, neighborNetResult=neighborNetResult, metadataDF=metadataDF, seed=seed)
-    },
-    cl=cl
-  )
-  if(!is.null(coreN)) parallel::stopCluster(cl=cl)
+  if(!is.null(coreN)){
+    cl <- parallel::makeCluster(coreN, type="SOCK")
+    parallel::clusterExport(cl=cl, varlist=c("cluster_single","neighborNetResult","peptideSet","metadataDF"), envir=environment())
+    snow::clusterSetupRNGstream(cl, seed=rep(seed, 6))
+    res <- pbapply::pblapply(
+      1:length(peptideSet),
+      function(i){
+        cluster_single(peptide=peptideSet[[i]], neighborNetResult=neighborNetResult, metadataDF=metadataDF, seed=seed)
+      },
+      cl=cl
+    )
+    parallel::stopCluster(cl)
+  }else{
+    res <- pbapply::pblapply(
+      1:length(peptideSet),
+      function(i){
+        cluster_single(peptide=peptideSet[[i]], neighborNetResult=neighborNetResult, metadataDF=metadataDF, seed=seed)
+      }
+    )
+  }
   gc();gc()
   return(res)
 }
