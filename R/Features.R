@@ -95,52 +95,52 @@ Features_PeptDesc <- function(
   peptideDescriptor.FragStat.Single <- function(peptide, fragLen){
     f <- sapply(1:(max(nchar(peptide))-fragLen+1), function(i){stringr::str_sub(peptide, i, i+fragLen-1)})
     d <- sapply(f[nchar(f)==fragLen], function(s){peptideDescriptor.Batch(s)})
-    data.frame("Peptide"=peptide,
-               "FragLen"=fragLen,
-               "AADescriptor"=peptideDescriptor.NameSet,
-               "Min"=matrixStats::rowMins(d),
-               "Max"=matrixStats::rowMaxs(d),
-               "Mean"=matrixStats::rowMeans2(d),
-               "Median"=matrixStats::rowMedians(d))
+    data.table::data.table(
+      "Peptide"=peptide,
+      "FragLen"=fragLen,
+      "AADescriptor"=peptideDescriptor.NameSet,
+      "Min"=matrixStats::rowMins(d),
+      "Max"=matrixStats::rowMaxs(d),
+      "Mean"=matrixStats::rowMeans2(d),
+      "Median"=matrixStats::rowMedians(d)
+    )
   }
 
   # Parallelized calculation of descriptive statistics
-  parameterDF <- tidyr::crossing(peptideSet, fragLenSet)
+  parameterDT <- data.table::CJ(peptideSet, fragLenSet) %>%
+    magrittr::set_colnames(c("Peptide", "FragLen"))
   cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
   parallel::clusterExport(
     cl=cl,
-    list("parameterDF", "peptideDescriptor.FragStat.Single", "peptideDescriptor.Batch", "peptideDescriptor.NameSet"),
+    list("parameterDT", "peptideDescriptor.FragStat.Single", "peptideDescriptor.Batch", "peptideDescriptor.NameSet"),
     envir=environment()
   )
-  df_feature <- pbapply::pbapply(
-    parameterDF, 1,
-    function(v){peptideDescriptor.FragStat.Single(v[1], as.numeric(v[2]))},
+  dt_peptdesc <- pbapply::pblapply(
+    1:nrow(parameterDT),
+    function(i){peptideDescriptor.FragStat.Single(parameterDT$"Peptide"[[i]], parameterDT$"FragLen"[[i]])},
     cl=cl
-  )
+  ) %>% data.table::rbindlist()
   parallel::stopCluster(cl)
-  gc();gc();
+  gc();gc()
 
   # Formatting
-  df_feature <- data.table::rbindlist(df_feature) %>%
-    tidyr::gather(Stat, Value, -Peptide, -FragLen, -AADescriptor) %>%
-    tidyr::unite(Feature, AADescriptor, Stat, FragLen, sep="_") %>%
-    tidyr::spread(Feature, Value)
-  colnames(df_feature) <- paste0("PeptDesc_", colnames(df_feature))
-  colnames(df_feature)[1] <- "Peptide"
+  col_id <- c("Peptide", "AADescriptor", "FragLen")
+  col_val <- setdiff(colnames(dt_peptdesc), col_id)
+  dt_peptdesc <- data.table::melt.data.table(dt_peptdesc, id=col_id, measure=col_val, variable.name="Stat", value.name="Value")
+  dt_peptdesc[,"Feature":=paste0("PeptDesc_", AADescriptor, "_", Stat, "_", FragLen)][,"AADescriptor":=NULL][,"FragLen":=NULL][,"Stat":=NULL]
+  dt_peptdesc <- data.table::dcast.data.table(dt_peptdesc, Peptide~Feature, value.var="Value")
 
   # Basic peptide information
-  df_basic <- data.frame("Peptide"=peptideSet, "Peptide_Length"=nchar(peptideSet))
+  dt_basic <- data.table::data.table("Peptide"=peptideSet, "Peptide_Length"=nchar(peptideSet))
   for(aa in Biostrings::AA_STANDARD){
-    df_basic[[paste0("Peptide_Contain", aa)]] <- as.numeric(stringr::str_detect(peptideSet, aa))
+    dt_basic[,paste0("Peptide_Contain", aa):=as.numeric(stringr::str_detect(peptideSet, aa))]
   }
-  df_feature <- suppressWarnings(dplyr::left_join(df_basic, df_feature, by="Peptide"))
-  rownames(df_feature) <- 1:nrow(df_feature)
-  dt_pept <- data.table::as.data.table(df_feature)
+  dt_peptdesc <- merge(dt_basic, dt_peptdesc, by="Peptide")
 
   # Minimum set of features (optional)
   if(!is.null(featureSet)){
-    featureSet <- intersect(colnames(dt_pept), featureSet)
-    dt_pept <- dt_pept[, c("Peptide", featureSet), with=F]
+    featureSet <- intersect(colnames(dt_peptdesc), featureSet)
+    dt_peptdesc <- dt_peptdesc[, c("Peptide", featureSet), with=F]
   }
 
   # Finish the timer
@@ -148,11 +148,11 @@ Features_PeptDesc <- function(
   message("Overall time required = ", format((time.end-time.start)[3], nsmall=2), "[sec]")
 
   # Clear logs
-  rm(list=setdiff(ls(), c("dt_pept")))
+  rm(list=setdiff(ls(), c("dt_peptdesc")))
   gc();gc()
 
   # Output
-  return(dt_pept)
+  return(dt_peptdesc)
 }
 
 #' @export
@@ -278,7 +278,6 @@ Features_CPP <- function(
   message("Data formatting...")
   dt_cpp_filenames <- list.files(pattern="dt_feature_cpp_seed.+fst", path=tmpDir, full.names=T)
   dt_cpp <- data.table::rbindlist(lapply(dt_cpp_filenames, fst::read_fst, as.data.table=T))
-  data.table::setorder(dt_cpp, Peptide, AAIndexID, FragLen, FragDepth, Library, Seed)
   col_id <- c("Peptide", "AAIndexID", "FragLen", "FragDepth", "Library", "Seed")
   col_val <- setdiff(colnames(dt_cpp), col_id)
   dt_cpp <- data.table::melt.data.table(dt_cpp, id=col_id, measure=col_val, variable.name="Stat", value.name="Value")
@@ -319,9 +318,10 @@ Features <- function(
   message("Peptide contact potential profiling analysis...")
   dt_cpp <- Features_CPP(peptideSet, fragLib, aaIndexIDSet, fragLenSet, fragDepthSet, fragLibTypeSet, featureSet, seedSet, coreN, tmpDir)
   message("Peptide descriptor analysis...")
-  dt_pept <- Features_PeptDesc(peptideSet, fragLenSet, featureSet)
+  dt_peptdesc <- Features_PeptDesc(peptideSet, fragLenSet, featureSet)
   message("Merging...")
-  dt <- merge(dt_pept, dt_cpp, by="Peptide")
+  dt <- merge(dt_peptdesc, dt_cpp, by="Peptide")
+  data.table::setorder(dt, Peptide, FragDepth, Library)
   dt[,"FragDepth":=format(FragDepth, trim=T, scientific=F)]
   return(split(dt, by=c("Library", "FragDepth"), keep.by=F))
 }

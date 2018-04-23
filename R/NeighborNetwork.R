@@ -281,7 +281,7 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, ann
     dplyr::transmute(AASeq1, AASeq2, Score1, Score2, ScoreRatio=Score2/Score1, MutType, MutPattern)
   net_DW <- igraph::graph_from_data_frame(pairDF_DW, directed=directed)
   net_DW <- igraph::set_vertex_attr(net_DW, name="label", value=igraph::V(net_DW)$name)
-  if(weighted==T) igraph::E(net_DW)$weight <- igraph::E(net_DW)$ScoreRatio
+  if(weighted==T) igraph::E(net_DW)$weight <- 1/igraph::E(net_DW)$ScoreRatio ## inverse to transform ratios (distances) into edge weights
   return(list("NeighborNetwork"=net, "PairDF"=pairDF,
               "NeighborNetwork_DW"=net_DW, "PairDF_DW"=pairDF_DW))
 }
