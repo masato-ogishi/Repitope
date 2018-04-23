@@ -1,7 +1,7 @@
 #' MiXCR workflow.
 #'
-#' \code{MiXCRScript} generates MiXCR script.\cr
-#' \code{MiXCRClonotypeCombine} reads and combines MiXCR-derived clonotypes. Note: Only TCR beta chains are retained.\cr
+#' \code{MiXCR_Script} generates MiXCR script.\cr
+#' \code{MiXCR_CombineClonotypes} reads and combines MiXCR-derived clonotypes. Note: Only TCR beta chains are retained.\cr
 #'
 #' @param dir A directory in which FASTQ files are stored.
 #' @param mixcrPath A path to MiXCR JAR file.
@@ -31,7 +31,7 @@
 #' @export
 #' @rdname DataPreparation_TCR_MiXCR
 #' @name DataPreparation_TCR_MiXCR
-MiXCRScript <- function(dir="C:/SRA/output", mixcrPath="C:/MiXCR/", javaMaxMemory="6G"){
+MiXCR_Script <- function(dir="C:/SRA/output", mixcrPath="C:/MiXCR/", javaMaxMemory="6G"){
   # MiXCR script template [type 1: single-end, type 2: paired-end]
   mixcrJarPath <- normalizePath(file.path(mixcrPath, "mixcr.jar"))
   template <- function(accessionNumber, type){
@@ -86,7 +86,7 @@ MiXCRScript <- function(dir="C:/SRA/output", mixcrPath="C:/MiXCR/", javaMaxMemor
 #' @export
 #' @rdname DataPreparation_TCR_MiXCR
 #' @name DataPreparation_TCR_MiXCR
-MiXCRClonotypeCombine <- function(dirClones=NULL, clonesFileNames=NULL, countSummarise=F, rdsFileName=NULL){
+MiXCR_CombineClonotypes <- function(dirClones=NULL, clonesFileNames=NULL, countSummarise=F, rdsFileName=NULL){
   TRBClonotypeTableImport <- function(FILEPATH){
     DT <- suppressWarnings(data.table::fread(FILEPATH, sep="\t", data.table=T))
     DT <- subset(DT, stringr::str_detect(allVHitsWithScore, "TRB"))[,list(aaSeqCDR3),]

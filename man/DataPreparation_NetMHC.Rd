@@ -5,22 +5,28 @@
 \alias{NetMHC_PeptideExport}
 \alias{DataPreparation_NetMHC}
 \alias{NetMHC_Import}
-\title{Utilities for NetMHC.}
+\alias{DataPreparation_NetMHC}
+\alias{NetMHC_Script}
+\title{Utility functions for NetMHC.}
 \usage{
 NetMHC_PeptideExport(peptideSet, outDir = "./NetMHC/")
 
-NetMHC_Import(netMHCFileNames, hlaSuperTypeSet = c("A01", "A02", "A03", "A24",
-  "A26", "B07", "B08", "B27", "B39", "B44", "B58", "B62"))
+NetMHC_Import(netMHCOutputFileNames)
+
+NetMHC_Script(netMHCFastaFileNames, outDir = "./NetMHC/",
+  outFileName = "NetMHC_Script.txt")
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}
 
 \item{outDir}{A path to the output directory.}
 
-\item{netMHCFileNames}{A set of tab-delimited NetMHC result files.}
+\item{netMHCOutputFileNames}{A set of tab-delimited NetMHC result files.}
 
-\item{hlaSuperTypeSet}{A set of HLA supertypes for which binding was predicted.}
+\item{netMHCFastaFileNames}{A set of FASTA files for NetMHC analysis.}
+
+\item{outFileName}{A file name for an output.}
 }
 \description{
-Utilities for NetMHC.
+Utility functions for NetMHC.
 }

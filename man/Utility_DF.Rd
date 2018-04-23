@@ -22,6 +22,8 @@ mutate_if_byrow(df, .predictate, ...)
 \item{descending}{Logical. Whether the dataframe should be reordered in a descending order.}
 
 \item{.predictate}{A predictate function to be applied to the rows or a logical vector. Note: columns to be mutated have to be created in advance.}
+
+\item{...}{Other parameters passed to \code{dplyr::mutate}.}
 }
 \description{
 Utility functions for dataframes.

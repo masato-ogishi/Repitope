@@ -1,6 +1,6 @@
 #' Downloading fastQ files from NCBI Sequence Read Archive (SRA).
 #'
-#' \code{fastqDumpScript} generates fustq-dump script.
+#' \code{FastQDump_Script} generates fustq-dump script.
 #'
 #' @param accessionSet A set of SRA Run Accession numbers.
 #' @param outDir A directory for outputs.
@@ -10,7 +10,7 @@
 #' @importFrom purrr is_empty
 #' @export
 #' @rdname DataPreparation_TCR_FastQDump
-fastqDumpScript <- function(accessionSet, outDir="C:/SRA/output"){
+FastQDump_Script <- function(accessionSet, outDir="C:/SRA/output"){
   dir.create(outDir, showWarnings=F, recursive=T)
   fastq.dump.script <- paste0(
     sapply(sort(accessionSet), function(a){paste0("C:\\SRA\\sratoolkit.2.8.1-3-win64\\bin\\fastq-dump.exe --outdir ", normalizePath(outDir), " --gzip --skip-technical  --readids --read-filter pass --dumpbase --split-files --clip --accession ", a)}),

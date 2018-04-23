@@ -2,15 +2,15 @@
 % Please edit documentation in R/DataPreparation_TCR_MiXCR.R
 \name{DataPreparation_TCR_MiXCR}
 \alias{DataPreparation_TCR_MiXCR}
-\alias{MiXCRScript}
+\alias{MiXCR_Script}
 \alias{DataPreparation_TCR_MiXCR}
-\alias{MiXCRClonotypeCombine}
+\alias{MiXCR_CombineClonotypes}
 \title{MiXCR workflow.}
 \usage{
-MiXCRScript(dir = "C:/SRA/output", mixcrPath = "C:/MiXCR/",
+MiXCR_Script(dir = "C:/SRA/output", mixcrPath = "C:/MiXCR/",
   javaMaxMemory = "6G")
 
-MiXCRClonotypeCombine(dirClones = NULL, clonesFileNames = NULL,
+MiXCR_CombineClonotypes(dirClones = NULL, clonesFileNames = NULL,
   countSummarise = F, rdsFileName = NULL)
 }
 \arguments{
@@ -29,6 +29,6 @@ MiXCRClonotypeCombine(dirClones = NULL, clonesFileNames = NULL,
 \item{rdsFileName}{(Optional) A filename to which the clonotype summary table is saved as an RDS file.}
 }
 \description{
-\code{MiXCRScript} generates MiXCR script.\cr
-\code{MiXCRClonotypeCombine} reads and combines MiXCR-derived clonotypes. Note: Only TCR beta chains are retained.\cr
+\code{MiXCR_Script} generates MiXCR script.\cr
+\code{MiXCR_CombineClonotypes} reads and combines MiXCR-derived clonotypes. Note: Only TCR beta chains are retained.\cr
 }
