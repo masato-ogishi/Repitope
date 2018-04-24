@@ -33,6 +33,7 @@
 #' @importFrom msa msaConsensusSequence
 #' @importFrom stringr str_replace_all
 #' @importFrom stringr fixed
+#' @importFrom stringr str_locate
 #' @importFrom ggsci pal_d3
 #' @importFrom pbapply pblapply
 #' @importFrom parallel makeCluster
@@ -102,14 +103,13 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
     split(by="ClusterID") %>%
     lapply(function(d){d[["Peptide"]]})
   consensusSequence <- function(sequenceSet){
+    if(length(sequenceSet)==1) return(sequenceSet)
     sink(tempfile())
-    s <- msa::msaConsensusSequence(msa::msaClustalW(sequenceSet, type="protein"), type="Biostrings")
+    s <- msa::msaConsensusSequence(msa::msaClustalW(sequenceSet, type="protein"), type="Biostrings", ambiguityMap="X")
     sink()
     return(s)
   }
   clusterConsensusSeqs <- sapply(clusteredPeptides, consensusSequence)
-  clusterConsensusSeqs <- stringr::str_replace_all(clusterConsensusSeqs, stringr::fixed("-"), "X")
-  clusterConsensusSeqs <- stringr::str_replace_all(clusterConsensusSeqs, stringr::fixed("?"), "X")
 
   ## Graph plot
   clusterGraphPlot <- function(g, meta, layout, seed=12345){
