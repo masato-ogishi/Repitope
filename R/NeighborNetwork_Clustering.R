@@ -110,6 +110,7 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
     return(s)
   }
   clusterConsensusSeqs <- sapply(clusteredPeptides, consensusSequence)
+  clusterConsensusSeqs <- stringr::str_replace_all(clusterConsensusSeqs, stringr::fixed("-"), "X")
 
   ## Graph plot
   clusterGraphPlot <- function(g, meta, layout, seed=12345){
