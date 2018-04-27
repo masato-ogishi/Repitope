@@ -225,11 +225,11 @@ Features_CPP <- function(
     cl <- NULL
   }
   message("Contact potential profiling...")
-  cpp <- function(clusterObject=NULL, seedNumber=12345){
-    if(is.null(clusterObject)){
+  cpp <- function(seedNumber=12345){
+    if(is.null(cl)){
       set.seed(seedNumber)
     }else{
-      snow::clusterSetupRNGstream(clusterObject, seed=rep(seedNumber, 6))
+      snow::clusterSetupRNGstream(cl, seed=rep(seedNumber, 6))
     }
     dt <- pbapply::pblapply(
       1:nrow(parameterDT),
@@ -251,7 +251,7 @@ Features_CPP <- function(
         statSet <- c("mean","sd","median","trimmed","mad","skew","kurtosis","se","IQR","Q0.1","Q0.9")
         stat <- psych::describe(al, trim=.1, interp=F, skew=T, type=3, ranges=T, IQR=T, quant=c(.10, .90))[statSet]
         return(as.numeric(stat))
-      }, cl=clusterObject) %>%
+      }, cl=cl) %>%
       data.table::as.data.table() %>%
       data.table::transpose()
     colnames(dt) <- c("Mean","SD","Med","TrM","MAD","Skew","Kurt","SE","IQR","Q10","Q90")
@@ -268,7 +268,7 @@ Features_CPP <- function(
   }
   for(s in seedSet){
     cat("Random seed = ", s, "\n", sep="")
-    cpp(clusterObject=cl, seedNumber=s)
+    cpp(seedNumber=s)
     gc();gc()
   }
   if(!is.null(cl)) parallel::stopCluster(cl)
