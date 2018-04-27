@@ -23,7 +23,6 @@
 #' @importFrom dplyr summarise
 #' @importFrom dplyr distinct
 #' @importFrom purrr flatten
-#' @importFrom purrr flatten_dfr
 #' @importFrom data.table :=
 #' @importFrom data.table rbindlist
 #' @importFrom data.table as.data.table
@@ -72,7 +71,7 @@ Immunogenicity_TrainModels <- function(
     )
     mat_test <- as.matrix(dt_test[, featureSet, with=F])
     predDT <- data.table::data.table("Peptide"=dt_test$"Peptide")
-    predDT[,"ImmunogenicityScore":=predict(ert, mat_test, probability=T)[,"Positive"]]
+    predDT[,ImmunogenicityScore:=predict(ert, mat_test, probability=T)[,"Positive"]]
     return(list(
       "pp_train"=pp_train, "ert"=ert, "predDT"=predDT
     ))
@@ -91,8 +90,9 @@ Immunogenicity_SummarizeInternalScores <- function(trainModelResults){
   dt_score <- lapply(trainModelResults$"TrainModelResults", function(res){lapply(res, function(r){r$"predDT"})}) %>%
     purrr::flatten() %>%
     data.table::rbindlist()
-  dt_score <- dt_score[, mean(ImmunogenicityScore), by="Peptide"][, sd(ImmunogenicityScore), by="Peptide"]
-  colnames(dt_score) <- c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.sd")
+  dt_score <- dt_score[, list(ImmunogenicityScore.ave=mean(ImmunogenicityScore), ImmunogenicityScore.sd=sd(ImmunogenicityScore)), by=Peptide]
+  dt_score <- dt_score[, ImmunogenicityScore:=ImmunogenicityScore.ave]
+  dt_score <- dt_score[, c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.sd"), with=F]
   return(dt_score)
 }
 
@@ -136,8 +136,9 @@ Immunogenicity_Score_Cluster <- function(
     return(dt_score)
   }) %>%
     data.table::rbindlist()
-  dt_score <- dt_score[, mean(ImmunogenicityScore), by="Peptide"][, sd(ImmunogenicityScore), by="Peptide"]
-  colnames(dt_score) <- c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.sd")
+  dt_score <- dt_score[, list(ImmunogenicityScore.ave=mean(ImmunogenicityScore), ImmunogenicityScore.sd=sd(ImmunogenicityScore)), by=Peptide]
+  dt_score <- dt_score[, ImmunogenicityScore:=ImmunogenicityScore.ave]
+  dt_score <- dt_score[, c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.sd"), with=F]
   return(dt_score)
 }
 
@@ -158,12 +159,13 @@ Immunogenicity_Predict <- function(externalFeatureDFList, trainModelResults){
     dt_score <- pbapply::pblapply(1:length(pp_list), function(j){
       mat <- as.matrix(predict(pp_list[[j]], dt[, featureSet, with=F]))
       predDT <- data.table::data.table("Peptide"=dt$"Peptide")
-      predDT[,"ImmunogenicityScore":=predict(ert, mat_test, probability=T)[,"Positive"]]
+      predDT[,ImmunogenicityScore:=predict(ert, mat, probability=T)[,"Positive"]]
       return(predDT)
     }) %>%
       data.table::rbindlist()
-    dt_score <- dt_score[, mean(ImmunogenicityScore), by="Peptide"][, sd(ImmunogenicityScore), by="Peptide"]
-    colnames(dt_score) <- c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.sd")
+    dt_score <- dt_score[, list(ImmunogenicityScore.ave=mean(ImmunogenicityScore), ImmunogenicityScore.sd=sd(ImmunogenicityScore)), by=Peptide]
+    dt_score <- dt_score[, ImmunogenicityScore:=ImmunogenicityScore.ave]
+    dt_score <- dt_score[, c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.sd"), with=F]
     return(dt_score)
   }
   return(scoreDT_list)
