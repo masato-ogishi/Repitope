@@ -92,7 +92,8 @@ Immunogenicity_SummarizeInternalScores <- function(trainModelResults){
     data.table::rbindlist()
   dt_score <- dt_score[, list(ImmunogenicityScore.ave=mean(ImmunogenicityScore), ImmunogenicityScore.sd=sd(ImmunogenicityScore)), by=Peptide]
   dt_score <- dt_score[, ImmunogenicityScore:=ImmunogenicityScore.ave]
-  dt_score <- dt_score[, c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.sd"), with=F]
+  dt_score <- dt_score[, ImmunogenicityScore.cv:=ImmunogenicityScore.sd/ImmunogenicityScore.ave]
+  dt_score <- dt_score[, c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.cv"), with=F]
   return(dt_score)
 }
 
@@ -138,7 +139,8 @@ Immunogenicity_Score_Cluster <- function(
     data.table::rbindlist()
   dt_score <- dt_score[, list(ImmunogenicityScore.ave=mean(ImmunogenicityScore), ImmunogenicityScore.sd=sd(ImmunogenicityScore)), by=Peptide]
   dt_score <- dt_score[, ImmunogenicityScore:=ImmunogenicityScore.ave]
-  dt_score <- dt_score[, c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.sd"), with=F]
+  dt_score <- dt_score[, ImmunogenicityScore.cv:=ImmunogenicityScore.sd/ImmunogenicityScore.ave]
+  dt_score <- dt_score[, c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.cv"), with=F]
   return(dt_score)
 }
 
@@ -165,7 +167,8 @@ Immunogenicity_Predict <- function(externalFeatureDFList, trainModelResults){
       data.table::rbindlist()
     dt_score <- dt_score[, list(ImmunogenicityScore.ave=mean(ImmunogenicityScore), ImmunogenicityScore.sd=sd(ImmunogenicityScore)), by=Peptide]
     dt_score <- dt_score[, ImmunogenicityScore:=ImmunogenicityScore.ave]
-    dt_score <- dt_score[, c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.sd"), with=F]
+    dt_score <- dt_score[, ImmunogenicityScore.cv:=ImmunogenicityScore.sd/ImmunogenicityScore.ave]
+    dt_score <- dt_score[, c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.cv"), with=F]
     return(dt_score)
   }
   return(scoreDT_list)
