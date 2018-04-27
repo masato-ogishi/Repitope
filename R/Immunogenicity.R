@@ -64,19 +64,15 @@ Immunogenicity_TrainModels <- function(
     trgt <- dt_train$"Immunogenicity"
     tab <- as.numeric(table(trgt))
     w <- 1/tab[trgt]
-    mat_train <- as.matrix(as.data.frame(dt_train[, featureSet, with=F]))
+    mat_train <- as.matrix(dt_train[, featureSet, with=F])
     ert <- extraTrees::extraTrees(
       x=mat_train, y=trgt,
       mtry=35, numRandomCuts=2, weights=w,
       numThreads=ifelse(is.null(coreN), 1, coreN)
     )
-    mat_test <- as.matrix(as.data.frame(dt_test[, featureSet, with=F]))
-    predDT <- data.table::as.data.table(
-      dplyr::transmute(
-        as.data.frame(predict(ert, mat_test, probability=T)),
-        "Peptide"=dt_test$"Peptide",
-        "ImmunogenicityScore"=Positive
-      ))
+    mat_test <- as.matrix(dt_test[, featureSet, with=F])
+    predDT <- data.table::data.table("Peptide"=dt_test$"Peptide")
+    predDT[,"ImmunogenicityScore":=predict(ert, mat_test, probability=T)[,"Positive"]]
     return(list(
       "pp_train"=pp_train, "ert"=ert, "predDT"=predDT
     ))
@@ -92,11 +88,11 @@ Immunogenicity_TrainModels <- function(
 #' @rdname Immunogenicity
 #' @name Immunogenicity
 Immunogenicity_SummarizeInternalScores <- function(trainModelResults){
-  dt_score <- data.table::as.data.table(purrr::flatten_dfr(
-    lapply(trainModelResults$"TrainModelResults", function(res){lapply(res, function(r){r$"predDT"})})
-  ))
-  dt_score <- dt_score[, mean(ImmunogenicityScore), by="Peptide"]
-  colnames(dt_score) <- c("Peptide", "ImmunogenicityScore")
+  dt_score <- lapply(trainModelResults$"TrainModelResults", function(res){lapply(res, function(r){r$"predDT"})}) %>%
+    purrr::flatten() %>%
+    data.table::rbindlist()
+  dt_score <- dt_score[, mean(ImmunogenicityScore), by="Peptide"][, sd(ImmunogenicityScore), by="Peptide"]
+  colnames(dt_score) <- c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.sd")
   return(dt_score)
 }
 
@@ -130,19 +126,18 @@ Immunogenicity_Score_Cluster <- function(
     set.seed(s)
     peptideSet <- clusterDF[sample(1:nrow(clusterDF)),] %>% dplyr::distinct(Cluster, .keep_all=T)
     peptideSet <- peptideSet[["Peptide"]]
-    scoreDF <- Immunogenicity_Score(
+    dt_score <- Immunogenicity_Score(
       featureDF=dplyr::filter(featureDF, Peptide %in% peptideSet),
       metadataDF=dplyr::filter(metadataDF, Peptide %in% peptideSet),
       featureSet=featureSet,
       seedSet=s,
       coreN=coreN
     )
-    return(scoreDF)
+    return(dt_score)
   }) %>%
-    data.table::rbindlist() %>%
-    dplyr::group_by(Peptide) %>%
-    dplyr::summarise(ImmunogenicityScore=mean(ImmunogenicityScore)) %>%
-    data.table::as.data.table()
+    data.table::rbindlist()
+  dt_score <- dt_score[, mean(ImmunogenicityScore), by="Peptide"][, sd(ImmunogenicityScore), by="Peptide"]
+  colnames(dt_score) <- c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.sd")
   return(dt_score)
 }
 
@@ -159,19 +154,16 @@ Immunogenicity_Predict <- function(externalFeatureDFList, trainModelResults){
   )
   scoreDT_list <- foreach::foreach(i=1:length(externalFeatureDFList))%do%{
     cat("Data set #", i, "\n", sep="")
-    df <- externalFeatureDFList[[i]]
-    dt_score <- data.table::rbindlist(pbapply::pblapply(1:length(pp_list), function(j){
-      mat <- as.matrix(as.data.frame(predict(pp_list[[j]], dplyr::select(df, featureSet))))
-      predDT <- data.table::as.data.table(
-        dplyr::transmute(
-          as.data.frame(predict(ert_list[[j]], mat, probability=T)),
-          "Peptide"=df$"Peptide",
-          "ImmunogenicityScore"=Positive
-        ))
+    dt <- data.table::as.data.table(externalFeatureDFList[[i]])
+    dt_score <- pbapply::pblapply(1:length(pp_list), function(j){
+      mat <- as.matrix(predict(pp_list[[j]], dt[, featureSet, with=F]))
+      predDT <- data.table::data.table("Peptide"=dt$"Peptide")
+      predDT[,"ImmunogenicityScore":=predict(ert, mat_test, probability=T)[,"Positive"]]
       return(predDT)
-    }))
-    dt_score <- dt_score[, mean(ImmunogenicityScore), by="Peptide"]
-    colnames(dt_score) <- c("Peptide", "ImmunogenicityScore")
+    }) %>%
+      data.table::rbindlist()
+    dt_score <- dt_score[, mean(ImmunogenicityScore), by="Peptide"][, sd(ImmunogenicityScore), by="Peptide"]
+    colnames(dt_score) <- c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.sd")
     return(dt_score)
   }
   return(scoreDT_list)
