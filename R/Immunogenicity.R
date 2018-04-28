@@ -161,7 +161,7 @@ Immunogenicity_Predict <- function(externalFeatureDFList, trainModelResults){
     dt_score <- pbapply::pblapply(1:length(pp_list), function(j){
       mat <- as.matrix(predict(pp_list[[j]], dt[, featureSet, with=F]))
       predDT <- data.table::data.table("Peptide"=dt$"Peptide")
-      predDT[,ImmunogenicityScore:=predict(ert, mat, probability=T)[,"Positive"]]
+      predDT[,ImmunogenicityScore:=predict(ert_list[[j]], mat, probability=T)[,"Positive"]]
       return(predDT)
     }) %>%
       data.table::rbindlist()
