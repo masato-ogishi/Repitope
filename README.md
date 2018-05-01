@@ -21,17 +21,12 @@ Loading
 ------------------
 
 ``` r
+options(java.parameters="-Xmx60G")  ## allow the JAVA session to use larger memory space
 library(tidyverse)
 library(Repitope)
-```
-
-Usage
------------------------------------
-``` r
-## Under construction...
 ```
 
 Reference
 ------------------------
 
-Ogishi, M and Yotsuyanagi, H. (2018) "Quantifiable formularization of MHC-I epitope immunogenicity from interresidue contact potential profiling." (Manuscript in preparation)
+Ogishi, M and Yotsuyanagi, H. (2018) "Immunogenicity landscape of cytotoxic T lymphocyte epitopes in sequence space." (Manuscript in preparation)
