@@ -29,4 +29,4 @@ library(Repitope)
 Reference
 ------------------------
 
-Ogishi, M and Yotsuyanagi, H. (2018) "Immunogenicity landscape of cytotoxic T lymphocyte epitopes in sequence space." (Manuscript in preparation)
+Ogishi, M and Yotsuyanagi, H. (2018) "Immunogenicity landscape of cytotoxic T lymphocyte epitopes in sequence space." bioRxiv. doi: https://doi.org/10.1101/155317
