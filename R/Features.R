@@ -57,6 +57,7 @@
 #' @importFrom parallel stopCluster
 #' @importFrom pbapply pbapply
 #' @importFrom pbapply pblapply
+#' @importFrom BBmisc chunk
 #' @importFrom snow clusterSetupRNGstream
 #' @import Peptides
 #' @export
@@ -280,9 +281,17 @@ Features_CPP <- function(
   dt_cpp <- data.table::rbindlist(lapply(dt_cpp_filenames, fst::read_fst, as.data.table=T))
   col_id <- c("Peptide", "AAIndexID", "FragLen", "FragDepth", "Library", "Seed")
   col_val <- setdiff(colnames(dt_cpp), col_id)
-  dt_cpp <- data.table::melt.data.table(dt_cpp, id=col_id, measure=col_val, variable.name="Stat", value.name="Value")
-  dt_cpp[,"Feature":=paste0("CPP_", AAIndexID, "_", Stat, "_", FragLen)][,"AAIndexID":=NULL][,"FragLen":=NULL][,"Stat":=NULL]
-  dt_cpp <- data.table::dcast.data.table(dt_cpp, Peptide+FragDepth+Library~Feature, value.var="Value", fun=mean)
+  peptideSetList <- BBmisc::chunk(peptideSet, chunk.size=5000)
+  aggregateMean <- function(dt){
+    dt <- data.table::melt.data.table(dt, id=col_id, measure=col_val, variable.name="Stat", value.name="Value")
+    dt[,"Feature":=paste0("CPP_", AAIndexID, "_", Stat, "_", FragLen)][,"AAIndexID":=NULL][,"FragLen":=NULL][,"Stat":=NULL]
+    dt <- data.table::dcast.data.table(dt, Peptide+FragDepth+Library~Feature, value.var="Value", fun=mean)
+    gc();gc()
+    return(dt)
+  }
+  dt_cpp <- data.table::rbindlist(
+    pbapply::pblapply(1:length(peptideSetList), function(i){aggregateMean(dt_cpp[Peptide %in% peptideSetList[[i]]])})
+  )
   if(!is.null(featureSet)){
     featureSet <- intersect(colnames(dt_cpp), featureSet)
     dt_cpp <- dt_cpp[, c("Peptide", "FragDepth", "Library", featureSet), with=F]
