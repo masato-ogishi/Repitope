@@ -28,7 +28,7 @@ rocPlot <- function(trueClass, predProb, groups=NA, colors=NA){
     plt <- ggplot(roc_dt, aes(x=x, y=y)) +
       geom_line(size=1.5) +
       geom_abline(slope=1, intercept=0, linetype="dotted") +
-      annotate("text", x=62.5, y=37.5, label=auc_dt$AUC, parse=F, size=7)
+      annotate("text", x=62.5, y=37.5, label=auc_dt$AUC, parse=F, size=4.5)
   }else{
     if(identical(colors, NA)) colors <- ggsci::pal_d3()(dplyr::n_distinct(groups))
     plt <- ggplot(roc_dt, aes(x=x, y=y)) +
