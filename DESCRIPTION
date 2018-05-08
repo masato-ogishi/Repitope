@@ -1,13 +1,13 @@
 Package: Repitope
 Type: Package
 Title: Epitope immunogenicity prediction via TCR-peptide interresidue contact potential profiling
-Version: 0.8.6
+Version: 0.9.0
 Author: Masato Ogishi
 Maintainer: Masato Ogishi <oogishi-tky@umin.ac.jp>
 Description: Quantification of the immunogenicity of MHC-loaded peptides in silico is a critical component of precision immunotherapy.
     Although various sequence-based prediction models have been proposed, none of them has achieved clinically meaningful accuracy and robustness.
     Here, we developped a framework that enables accurate classification between epitopes (immunogenic MHC-loaded peptides) and MHC ligands (non-immunogenic MHC-loaded peptides).
-Depends: R (>= 3.4.4) 
+Depends: R (>= 3.5.0) 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

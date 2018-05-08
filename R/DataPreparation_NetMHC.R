@@ -14,9 +14,9 @@ NetMHC_PeptideExport <- function(peptideSet, outDir="./NetMHC/"){
   lengList <- names(peptList)
   nchunkList <- sapply(peptList, length)
   peptList <- purrr::flatten(peptList)
-  names(peptList) <- unlist(mapply(function(x, y){paste0(x, "mer_", 1:y)}, lengList, nchunkList, SIMPLIFY=F))
+  names(peptList) <- unlist(mapply(function(x, y){paste0("Peptides_", x, "mer_", 1:y, ".fasta")}, lengList, nchunkList, SIMPLIFY=F))
   invisible(mapply(
-    function(peptSeq, name){seqinr::write.fasta(as.list(peptSeq), peptSeq, paste0(outDir, name, ".fasta"))},
+    function(peptSeq, name){seqinr::write.fasta(as.list(peptSeq), peptSeq, file.path(outDir, name))},
     peptList, names(peptList), SIMPLIFY=F
   ))
 }

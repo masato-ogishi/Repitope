@@ -89,9 +89,9 @@ Epitope_Import <- function(IEDBAssayFileName=NULL, OtherFileNames=NULL, peptideL
         MHC,
         MHCEvidence,
         Host,
+        Organism,
         Dataset
       ) %>%
-      dplyr::filter(Immunogenicity %in% c("Positive", "Negative")) %>%
       dplyr::mutate(Immunogenicity=factor(Immunogenicity, levels=c("Positive", "Negative")))
 
     imm <- table(df$"Immunogenicity")
