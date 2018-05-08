@@ -36,7 +36,7 @@ rocPlot <- function(trueClass, predProb, groups=NA, colors=NA){
       geom_abline(slope=1, intercept=0, linetype="dotted") +
       scale_color_manual(values=colors, guide=F)
     cols <- matrix(rep.int(colors, times=2), nrow=nrow(auc_dt), ncol=2)
-    tt <- gridExtra::ttheme_minimal(base_size=20,
+    tt <- gridExtra::ttheme_minimal(base_size=12,
                                     core=list(fg_params=list(col=cols), bg_params=list(col=NA)),
                                     rowhead=list(bg_params=list(col=NA)),
                                     colhead=list(bg_params=list(col=NA)))
@@ -45,8 +45,8 @@ rocPlot <- function(trueClass, predProb, groups=NA, colors=NA){
                         xmin=50, xmax=80, ymin=10, ymax=40)
   }
   plt <- plt +
-    scale_x_continuous(name="FPR(%)", limits=c(0, 100), expand=c(0, 0.3)) +
-    scale_y_continuous(name="TPR(%)", limits=c(0, 100), expand=c(0, 0.3)) +
+    scale_x_continuous(name="FPR(%)", limits=c(0, 100)) +
+    scale_y_continuous(name="TPR(%)", limits=c(0, 100)) +
     ggtitle("ROC") + ggpubr::theme_pubr(base_size=16)
   return(plt)
 }
@@ -77,8 +77,8 @@ prcPlot <- function(trueClass, predProb, groups=NA, colors=NA){
       scale_color_manual(values=colors)
   }
   plt <- plt +
-    scale_x_continuous(name="Recall(%)", limits=c(0, 100), expand=c(0, 0.3)) +
-    scale_y_continuous(name="Precision(%)", limits=c(0, 100), expand=c(0, 0.3)) +
+    scale_x_continuous(name="Recall(%)", limits=c(0, 100)) +
+    scale_y_continuous(name="Precision(%)", limits=c(0, 100)) +
     ggtitle("Precision-Recall") + ggpubr::theme_pubr(base_size=16) + theme(legend.justification=c(0, 0), legend.position=c(0, 0))
   return(plt)
 }
@@ -147,12 +147,12 @@ liftPlot <- function(trueClass, predProb, groups=NA, colors=NA){
     if(identical(colors, NA)) colors <- ggsci::pal_d3()(dplyr::n_distinct(groups))
     plt <- ggplot(lift_dt, aes(x=CumTestedPct, y=CumEventPct)) +
       geom_line(aes(color=Group), size=1.5) +
-      geom_abline(slope=-1, intercept=100, linetype="dotted") +
+      geom_abline(slope=1, intercept=0, linetype="dotted") +
       scale_color_manual(values=colors, guide=F)
   }
   plt <- plt +
-    scale_x_continuous(name="% samples tested", limits=c(0,100), expand=c(0, 0.3)) +
-    scale_y_continuous(name="% samples found", limits=c(0,100), expand=c(0, 0.3)) +
+    scale_x_continuous(name="% samples tested", limits=c(0,100)) +
+    scale_y_continuous(name="% samples found", limits=c(0,100)) +
     ggtitle("Lift") + ggpubr::theme_pubr(base_size=16) + theme(legend.justification=c(1, 0), legend.position=c(1, 0))
   return(plt)
 }
