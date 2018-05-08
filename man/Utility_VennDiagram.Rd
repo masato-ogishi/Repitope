@@ -3,7 +3,7 @@
 \name{Utility_VennDiagram}
 \alias{Utility_VennDiagram}
 \alias{vennDiagram}
-\title{A utility function for creating a Venn diagram of 1,2,3,4,5 items.}
+\title{A utility function for creating a Venn diagram.}
 \usage{
 vennDiagram(x, show_category_names = T)
 }
@@ -13,5 +13,5 @@ vennDiagram(x, show_category_names = T)
 \item{show_category_names}{Logical. Whether the names of \code{x} should be printed?}
 }
 \description{
-A utility function for creating a Venn diagram of 1,2,3,4,5 items.
+A utility function for creating a Venn diagram.
 }

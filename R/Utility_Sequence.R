@@ -5,13 +5,6 @@
 #'
 #' @param sequenceSet A set of amino acid sequences.
 #' @param windowSize A size of the sliding window.
-#' @importFrom Biostrings AA_STANDARD
-#' @importFrom stringr str_sub
-#' @importFrom stringr str_split
-#' @importFrom stringr str_detect
-#' @importFrom stringr fixed
-#' @importFrom stringr str_replace
-#' @importFrom stringr str_replace_all
 #' @export
 #' @rdname Utility_Sequence
 #' @name Utility_Sequence

@@ -1,9 +1,7 @@
-#' A utility function for creating a Venn diagram of 1,2,3,4,5 items.
+#' A utility function for creating a Venn diagram.
 #'
 #' @param x A list of vectors (e.g., integers, chars), with each component corresponding to a separate circle in the Venn diagram. The length should fall into the range between 1 and 5.
 #' @param show_category_names Logical. Whether the names of \code{x} should be printed?
-#' @importFrom VennDiagram venn.diagram
-#' @importFrom ggsci pal_d3
 #' @export
 #' @rdname Utility_VennDiagram
 #' @name Utility_VennDiagram

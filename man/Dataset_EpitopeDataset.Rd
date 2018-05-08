@@ -3,13 +3,30 @@
 \docType{data}
 \name{Dataset_EpitopeDataset}
 \alias{Dataset_EpitopeDataset}
-\alias{EpitopeDataset}
-\title{A compiled dataset of human MHC class I epitopes and ligands.}
-\format{A tibble with 21146 rows and 11 variables}
+\alias{MHCI_Human}
+\alias{Dataset_EpitopeDataset}
+\alias{MHCI_Rodents}
+\alias{Dataset_EpitopeDataset}
+\alias{MHCI_Primates}
+\alias{Dataset_EpitopeDataset}
+\alias{MHCII_Human}
+\alias{Dataset_EpitopeDataset}
+\alias{MHCII_Rodents}
+\alias{Dataset_EpitopeDataset}
+\alias{MHCII_Primates}
+\title{Compiled datasets of MHC class I and class II epitopes and ligands.}
+\format{data.table}
 \usage{
-EpitopeDataset
-}
-\description{
-A compiled dataset of human MHC class I epitopes and ligands.
+MHCI_Human
+
+MHCI_Rodents
+
+MHCI_Primates
+
+MHCII_Human
+
+MHCII_Rodents
+
+MHCII_Primates
 }
 \keyword{datasets}

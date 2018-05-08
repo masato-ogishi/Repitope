@@ -1,251 +1,251 @@
-Peptide,Immunogenicity,ImmunogenicityEvidence,MHC,MHCEvidence,Dataset
-GELDRWEKI,Positive,Cited reference,B*4002,Cited reference,HIV
-KIRLRPGGK,Positive,Cited reference,A*0301,Cited reference,HIV
-IRLRPGGKK,Positive,Cited reference,B*2705,Cited reference,HIV
-RLRPGGKKK,Positive,Cited reference,A*0301,Cited reference,HIV
-RLRPGGKKKY,Positive,Cited reference,A*0301,Cited reference,HIV
-RPGGKKKYKL,Positive,Cited reference,B*5101,Cited reference,HIV
-GGKKKYKLK,Positive,Cited reference,B*0801,Cited reference,HIV
-KYKLKHIVW,Positive,Cited reference,A*2402,Cited reference,HIV
-HLVWASREL,Positive,Cited reference,Cw*0804,Cited reference,HIV
-LVWASRELERF,Positive,Cited reference,A30,Cited reference,HIV
-WASRELERF,Positive,Cited reference,B*3501,Cited reference,HIV
-ELRSLYNTV,Positive,Cited reference,B*0801,Cited reference,HIV
-RSLYNTVATLY,Positive,Cited reference,"A*3002, B58, B63",Cited reference,HIV
-SLYNTVATL,Positive,Cited reference,"A*0201, A*0202, A*0205",Cited reference,HIV
-SLYNTVATLY,Positive,Cited reference,A*0201,Cited reference,HIV
-LYNTVATL,Positive,Cited reference,Cw14,Cited reference,HIV
-LYNTVATLY,Positive,Cited reference,"A*2902, B*4403",Cited reference,HIV
-TLYCVHQK,Positive,Cited reference,A*1101,Cited reference,HIV
-IEIKDTKEAL,Positive,Cited reference,B*4001,Cited reference,HIV
-NSSKVSQNY,Positive,Cited reference,B*3501,Cited reference,HIV
-VQNLQGQMV,Positive,Cited reference,B13,Cited reference,HIV
-HQAISPRTL,Positive,Cited reference,B*1510,Cited reference,HIV
-QAISPRTLNAW,Positive,Cited reference,A*2501,Cited reference,HIV
-ISPRTLNAW,Positive,Cited reference,"B*5701, B63",Cited reference,HIV
-SPRTLNAWV,Positive,Cited reference,B*0702,Cited reference,HIV
-VKVIEEKAF,Positive,Cited reference,B*1503,Cited reference,HIV
-EEKAFSPEV,Positive,Cited reference,B*4415,Cited reference,HIV
-KAFSPEVI,Positive,Cited reference,B*5703,Cited reference,HIV
-KAFSPEVIPMF,Positive,Cited reference,"B*5701, B*5703, B63",Cited reference,HIV
-FSPEVIPMF,Positive,Cited reference,B57,Cited reference,HIV
-EVIPMFSAL,Positive,Cited reference,"A*2601, A*2602, A*2603",Cited reference,HIV
-VIPMFSAL,Positive,Cited reference,Cw*0102,Cited reference,HIV
-SEGATPQDL,Positive,Cited reference,B*4001,Cited reference,HIV
-TPQDLNTML,Positive,Cited reference,"B*0702, B*3910, B*4201, B*8101, Cw*0802",Cited reference,HIV
-TPQDLNMML,Positive,Cited reference,B53,Cited reference,HIV
-TPYDINQML,Positive,Cited reference,B*5301,Cited reference,HIV
-GHQAAMQML,Positive,Cited reference,"B*1510, B*3901",Cited reference,HIV
-KETINEEAA,Positive,Cited reference,B*4002,Cited reference,HIV
-ETINEEAAEW,Positive,Cited reference,A*2501,Cited reference,HIV
-AEWDRVHPV,Positive,Cited reference,B*4002,Cited reference,HIV
-HPVHAGPIA,Positive,Cited reference,"B*3501, B7",Cited reference,HIV
-GQMREPRGSDI,Positive,Cited reference,B13,Cited reference,HIV
-TSTLQEQIGW,Positive,Cited reference,"B*5701, B*5801",Cited reference,HIV
-NPPIPVGDIY,Positive,Cited reference,B*3501,Cited reference,HIV
-PPIPVGDIY,Positive,Cited reference,B*3501,Cited reference,HIV
-EIYKRWII,Positive,Cited reference,B*0801,Cited reference,HIV
-RRWIQLGLQK,Positive,Cited reference,B*2703,Cited reference,HIV
-KRWIILGLNK,Positive,Cited reference,B*2705,Cited reference,HIV
-GLNKIVRMY,Positive,Cited reference,"B*1501, B62",Cited reference,HIV
-VRMYSPVSI,Positive,Cited reference,Cw18,Cited reference,HIV
-RMYSPTSI,Positive,Cited reference,B*5201,Cited reference,HIV
-YSPVSILDI,Positive,Cited reference,Cw*0102,Cited reference,HIV
-FRDYVDRFF,Positive,Cited reference,Cw18,Cited reference,HIV
-FRDYVDRFYK,Positive,Cited reference,B*1801,Cited reference,HIV
-RDYVDRFFKTL,Positive,Cited reference,A*2402,Cited reference,HIV
-RDYVDRFYKTL,Positive,Cited reference,B*4402,Cited reference,HIV
-YVDRFYKTL,Positive,Cited reference,A*0207,Cited reference,HIV
-YVDRFFKTL,Positive,Cited reference,"B*1503, Cw*0303, Cw*0304",Cited reference,HIV
-DRFYKTLRA,Positive,Cited reference,B*1402,Cited reference,HIV
-AEQASQDVKNW,Positive,Cited reference,B*4402,Cited reference,HIV
-AEQASQEVKNWM,Positive,Cited reference,Cw5,Cited reference,HIV
-QASQEVKNW,Positive,Cited reference,"B*5301, B*5701, B*5801",Cited reference,HIV
-VKNWMTETL,Positive,Cited reference,B*4801,Cited reference,HIV
-DCKTILKAL,Positive,Cited reference,B*0801,Cited reference,HIV
-ACQGVGGPGHK,Positive,Cited reference,A*1101,Cited reference,HIV
-GPGHKARVL,Positive,Cited reference,B*0702,Cited reference,HIV
-AEAMSQVTNS,Positive,Cited reference,B*4501,Cited reference,HIV
-CRAPRKKGC,Positive,Cited reference,B14,Cited reference,HIV
-TERQANFL,Positive,Cited reference,B*4002,Cited reference,HIV
-RQANFLGKI,Positive,Cited reference,"B*4801, B13",Cited reference,HIV
-FLGKIWPSYK,Positive,Cited reference,A*0201,Cited reference,HIV
-KELYPLTSL,Positive,Cited reference,B*4001,Cited reference,HIV
-NSPTRREL,Positive,Cited reference,Cw*0102,Cited reference,HIV
-ITLWQRPLV,Positive,Cited reference,"A*6802, A*7401",Cited reference,HIV
-DTVLEEWNL,Positive,Cited reference,A*6802,Cited reference,HIV
-EEMNLPGRW,Positive,Cited reference,B44,Cited reference,HIV
-RQYDQILIEI,Positive,Cited reference,B13,Cited reference,HIV
-GKKAIGTVL,Positive,Cited reference,B*1503,Cited reference,HIV
-KAIGTVLV,Positive,Cited reference,B57,Cited reference,HIV
-LVGPTPVNI,Positive,Cited reference,A*0201,Cited reference,HIV
-TPVNIIGRNML,Positive,Cited reference,B81,Cited reference,HIV
-FPISPIETV,Positive,Cited reference,B*5401,Cited reference,HIV
-IETVPVKL,Positive,Cited reference,B*4001,Cited reference,HIV
-GPKVKQWPL,Positive,Cited reference,B*0801,Cited reference,HIV
-ALVEICTEM,Positive,Cited reference,A*0201,Cited reference,HIV
-ALVEICTEMEK,Positive,Cited reference,A*0301,Cited reference,HIV
-KLVDFRELNK,Positive,Cited reference,A*0301,Cited reference,HIV
-GIPHPAGLK,Positive,Cited reference,A*0301,Cited reference,HIV
-TVLDVGDAY,Positive,Cited reference,B*3501,Cited reference,HIV
-VPLDEDFRKY,Positive,Cited reference,B*3501,Cited reference,HIV
-YTAFTIPSV,Positive,Cited reference,A2,Cited reference,HIV
-TAFTIPSI,Positive,Cited reference,B*5101,Cited reference,HIV
-NETPGIRYQY,Positive,Cited reference,B18,Cited reference,HIV
-IRYQYNVL,Positive,Cited reference,B*1401,Cited reference,HIV
-LPQGWKGSPA,Positive,Cited reference,B*5401,Cited reference,HIV
-SPAIFQSSM,Positive,Cited reference,B7,Cited reference,HIV
-AIFQSSMTK,Positive,Cited reference,"A*0301, A*1101",Cited reference,HIV
-KQNPDIVIY,Positive,Cited reference,"A*3002, Cw*1202",Cited reference,HIV
-NPEIVIYQY,Positive,Cited reference,B18,Cited reference,HIV
-HPDIVIYQY,Positive,Cited reference,B*3501,Cited reference,HIV
-VIYQYMDDL,Positive,Cited reference,A*0201,Cited reference,HIV
-IEELRQHLL,Positive,Cited reference,B*4001,Cited reference,HIV
-IVLPEKDSW,Positive,Cited reference,B*5701,Cited reference,HIV
-LVGKLNWASQIY,Positive,Cited reference,B*1501,Cited reference,HIV
-KLNWASQIY,Positive,Cited reference,A*3002,Cited reference,HIV
-QIYPGIKVR,Positive,Cited reference,A*0301,Cited reference,HIV
-YPGIKVRQL,Positive,Cited reference,B*4201,Cited reference,HIV
-IPLTEEAEL,Positive,Cited reference,"B*3501, B*5101",Cited reference,HIV
-ILKEPVHGV,Positive,Cited reference,A*0201,Cited reference,HIV
-ILKEPVHGVY,Positive,Cited reference,"B*1501, Cw*1202",Cited reference,HIV
-GQGQWTYQI,Positive,Cited reference,B13,Cited reference,HIV
-IYQEPFKNLK,Positive,Cited reference,A*1101,Cited reference,HIV
-RMRGAHTNDV,Positive,Cited reference,A*3002,Cited reference,HIV
-RMRGAHTNDVK,Positive,Cited reference,A*0301,Cited reference,HIV
-IAMESIVIW,Positive,Cited reference,B*5801,Cited reference,HIV
-PIQKETWETW,Positive,Cited reference,A*3201,Cited reference,HIV
-GAETFYVDGA,Positive,Cited reference,A*6802,Cited reference,HIV
-ETFYVDGAANR,Positive,Cited reference,A66,Cited reference,HIV
-ETKLGKAGY,Positive,Cited reference,A*2601,Cited reference,HIV
-IVTDSQYAL,Positive,Cited reference,Cw*0802,Cited reference,HIV
-VTDSQYALGI,Positive,Cited reference,B*1503,Cited reference,HIV
-QIIEQLIKK,Positive,Cited reference,A*1101,Cited reference,HIV
-LFLDGIDKA,Positive,Cited reference,B81,Cited reference,HIV
-LPPIVAKEI,Positive,Cited reference,B*4201,Cited reference,HIV
-THLEGKIIL,Positive,Cited reference,B*1510,Cited reference,HIV
-HVASGYIEA,Positive,Cited reference,B*5401,Cited reference,HIV
-IEAEVIPAET,Positive,Cited reference,B*4002,Cited reference,HIV
-HTDNGSNF,Positive,Cited reference,Cw5,Cited reference,HIV
-STTVKAACWW,Positive,Cited reference,B57,Cited reference,HIV
-IQQEFGIPY,Positive,Cited reference,B*1503,Cited reference,HIV
-VRDQAEHL,Positive,Cited reference,Cw18,Cited reference,HIV
-KTAVQMAVF,Positive,Cited reference,B*5701,Cited reference,HIV
-AVFIHNFKRK,Positive,Cited reference,"A*0301, A*1101",Cited reference,HIV
-FKRKGGIGGY,Positive,Cited reference,B*1503,Cited reference,HIV
-KRKGGIGGY,Positive,Cited reference,B*2705,Cited reference,HIV
-GERIVDII,Positive,Cited reference,B*4002,Cited reference,HIV
-IIATDIQTK,Positive,Cited reference,A11,Cited reference,HIV
-KIQNFRVYY,Positive,Cited reference,A*3002,Cited reference,HIV
-VPRRKAKII,Positive,Cited reference,B42,Cited reference,HIV
-RKAKIIRDY,Positive,Cited reference,B*1503,Cited reference,HIV
-RIRTWKSLVK,Positive,Cited reference,A*0301,Cited reference,HIV
-HMYISKKAK,Positive,Cited reference,A*0301,Cited reference,HIV
-ISKKAKGWF,Positive,Cited reference,B*5701,Cited reference,HIV
-HPRVSSEVHI,Positive,Cited reference,B*0702,Cited reference,HIV
-IPLGDAKLII,Positive,Cited reference,B51,Cited reference,HIV
-WHLGHGVSI,Positive,Cited reference,B*1510,Cited reference,HIV
-WHLGQGVSI,Positive,Cited reference,B*3801,Cited reference,HIV
-LGHGVSIEW,Positive,Cited reference,B*5703,Cited reference,HIV
-LADQLIHLHY,Positive,Cited reference,B*1801,Cited reference,HIV
-KTKPPLPSVKK,Positive,Cited reference,A*0301,Cited reference,HIV
-EAVRHFPRI,Positive,Cited reference,B51,Cited reference,HIV
-AVRHFPRIW,Positive,Cited reference,B*5701,Cited reference,HIV
-VRHFPRIWL,Positive,Cited reference,B27,Cited reference,HIV
-FPRIWLHGL,Positive,Cited reference,"B*0702, B*8101",Cited reference,HIV
-ETYGDTWTGV,Positive,Cited reference,A*6802,Cited reference,HIV
-DTWAGVEAIIR,Positive,Cited reference,A*6801,Cited reference,HIV
-AIIRILQQL,Positive,Cited reference,A*0201,Cited reference,HIV
-CCFHCQVC,Positive,Cited reference,Cw12,Cited reference,HIV
-FQTKGLGISY,Positive,Cited reference,B*1503,Cited reference,HIV
-ITKGLGISYGR,Positive,Cited reference,A*6801,Cited reference,HIV
-KAVRLIKFLY,Positive,Cited reference,"B*5701, B*5801, B63",Cited reference,HIV
-QAVRIIKILY,Positive,Cited reference,B*5703,Cited reference,HIV
-ERILSTYLGR,Positive,Cited reference,A*0301,Cited reference,HIV
-RPAEPVPLQL,Positive,Cited reference,B7,Cited reference,HIV
-SAEPVPLQL,Positive,Cited reference,Cw*0501,Cited reference,HIV
-YRLGVGALI,Positive,Cited reference,Cw18,Cited reference,HIV
-EYRKILRQR,Positive,Cited reference,A*3303,Cited reference,HIV
-RVKEKYQHL,Positive,Cited reference,B*0801,Cited reference,HIV
-AENLWVTVY,Positive,Cited reference,"B*1801, B44",Cited reference,HIV
-AENLWVTVYY,Positive,Cited reference,B*4402,Cited reference,HIV
-TVYYGVPVWK,Positive,Cited reference,A*0301,Cited reference,HIV
-VPVWKEATTT,Positive,Cited reference,B*5501,Cited reference,HIV
-VPVWKEATTTL,Positive,Cited reference,B*3501,Cited reference,HIV
-LFCASDAKAY,Positive,Cited reference,A*2402,Cited reference,HIV
-KAYETEVHNVW,Positive,Cited reference,B58,Cited reference,HIV
-YETEVHNVW,Positive,Cited reference,B*1801,Cited reference,HIV
-DPNPQEVVL,Positive,Cited reference,B*3501,Cited reference,HIV
-MHEDIISLW,Positive,Cited reference,B*3801,Cited reference,HIV
-SVITQACPK,Positive,Cited reference,A*1101,Cited reference,HIV
-SFEPIPIHY,Positive,Cited reference,A*2902,Cited reference,HIV
-CAPAGFAIL,Positive,Cited reference,Cw1,Cited reference,HIV
-RPNNNTRKSI,Positive,Cited reference,B*0702,Cited reference,HIV
-HIGPGRAFY,Positive,Cited reference,A*3002,Cited reference,HIV
-RGPGRAFVTI,Positive,Cited reference,A*0201,Cited reference,HIV
-EIIGDIRQAY,Positive,Cited reference,A*2501,Cited reference,HIV
-SFNCGGEFF,Positive,Cited reference,"B*1516, Cw*0401",Cited reference,HIV
-LPCRIKQII,Positive,Cited reference,B*5101,Cited reference,HIV
-RIKQIINMW,Positive,Cited reference,A*3201,Cited reference,HIV
-RAIEAQQHL,Positive,Cited reference,"Cw*0304, Cw15",Cited reference,HIV
-RAIEAQQHM,Positive,Cited reference,Cw8,Cited reference,HIV
-QTRVLAIERYL,Positive,Cited reference,B*5802,Cited reference,HIV
-ERYLKDQQL,Positive,Cited reference,B*1402,Cited reference,HIV
-RYLKDQQLL,Positive,Cited reference,"A*2402, A23",Cited reference,HIV
-YLKDQQLL,Positive,Cited reference,B*0801,Cited reference,HIV
-TAVPWNASW,Positive,Cited reference,B*3501,Cited reference,HIV
-VFAVLSIVNR,Positive,Cited reference,A*3303,Cited reference,HIV
-IVNRNRQGY,Positive,Cited reference,A*3002,Cited reference,HIV
-RLRDLLLIVTR,Positive,Cited reference,"A*0301, A*3101",Cited reference,HIV
-IVTRIVELL,Positive,Cited reference,A*6802,Cited reference,HIV
-GRRGWEALKY,Positive,Cited reference,B*2705,Cited reference,HIV
-RRGWEVLKY,Positive,Cited reference,A*0101,Cited reference,HIV
-KYCWNLLQY,Positive,Cited reference,A*3002,Cited reference,HIV
-QELKNSAVSL,Positive,Cited reference,B*4001,Cited reference,HIV
-SLLNATDIAV,Positive,Cited reference,A*0201,Cited reference,HIV
-LLNATDIAV,Positive,Cited reference,A*0201,Cited reference,HIV
-EVAQRAYR,Positive,Cited reference,A*3303,Cited reference,HIV
-IPRRIRQGL,Positive,Cited reference,B*0702,Cited reference,HIV
-RIRQGLERA,Positive,Cited reference,A*0205,Cited reference,HIV
-RQGLERALL,Positive,Cited reference,B8,Cited reference,HIV
-WPTVRERM,Positive,Cited reference,B*0801,Cited reference,HIV
-RMRRAEPAA,Positive,Cited reference,B62,Cited reference,HIV
-LEKHGAITS,Positive,Cited reference,"B*4001, B50",Cited reference,HIV
-FPVTPQVPL,Positive,Cited reference,B*0702,Cited reference,HIV
-FPVTPQVPLR,Positive,Cited reference,B*0702,Cited reference,HIV
-TPQVPLRPM,Positive,Cited reference,B*0702,Cited reference,HIV
-RPQVPLRPM,Positive,Cited reference,"B*4201, B*4202",Cited reference,HIV
-RPQVPLRPMTY,Positive,Cited reference,B35,Cited reference,HIV
-QVPLRPMTYK,Positive,Cited reference,"A*0301, A*1101",Cited reference,HIV
-VPLRPMTY,Positive,Cited reference,B*3501,Cited reference,HIV
-PLRPMTYK,Positive,Cited reference,A*1101,Cited reference,HIV
-LRPMTYKAA,Positive,Cited reference,B*2703,Cited reference,HIV
-RPMTYKAAL,Positive,Cited reference,B*0702,Cited reference,HIV
-KAAFDLSFF,Positive,Cited reference,"B*5703, B*5801",Cited reference,HIV
-KAAVDLSHFL,Positive,Cited reference,Cw8,Cited reference,HIV
-GAFDLSFFL,Positive,Cited reference,A*0205,Cited reference,HIV
-AAFDLSFFL,Positive,Cited reference,B*5703,Cited reference,HIV
-AAVDLSHFL,Positive,Cited reference,Cw*0802,Cited reference,HIV
-AALDLSHFL,Positive,Cited reference,Cw3,Cited reference,HIV
-AVDLSHFLK,Positive,Cited reference,"A*0301, A*1101",Cited reference,HIV
-FLKEKGGL,Positive,Cited reference,B*0801,Cited reference,HIV
-KEKGGLEGL,Positive,Cited reference,"B*4001, B*4002",Cited reference,HIV
-RRQDILDLWI,Positive,Cited reference,B*2705,Cited reference,HIV
-RRQDILDLWVY,Positive,Cited reference,B18,Cited reference,HIV
-KRQEILDLWVY,Positive,Cited reference,Cw7,Cited reference,HIV
-RQDILDLWI,Positive,Cited reference,B13,Cited reference,HIV
-RQDILDLWV,Positive,Cited reference,B*1302,Cited reference,HIV
-HTQGYFPDW,Positive,Cited reference,"B*5703, B*5801, B57",Cited reference,HIV
-TQGYFPDWQNY,Positive,Cited reference,B*1501,Cited reference,HIV
-YFPDWQNYT,Positive,Cited reference,"A29, B*3501, Cw6",Cited reference,HIV
-FPDWQNYTP,Positive,Cited reference,B*5401,Cited reference,HIV
-YTPGPGIRY,Positive,Cited reference,"B57, B63",Cited reference,HIV
-TPGPGVRYPL,Positive,Cited reference,"B*0702, B*4201, B*4202",Cited reference,HIV
-TRYPLTFGW,Positive,Cited reference,A33,Cited reference,HIV
-RYPLTFGW,Positive,Cited reference,A*2402,Cited reference,HIV
-YPLTFGWCY,Positive,Cited reference,"B*1801, B*5301",Cited reference,HIV
-YPLTFGWCF,Positive,Cited reference,B53,Cited reference,HIV
-PLTFGWCYKL,Positive,Cited reference,A*0201,Cited reference,HIV
-LTFGWCFKL,Positive,Cited reference,"B57, B63",Cited reference,HIV
-VLEWRFDSRL,Positive,Cited reference,A*0201,Cited reference,HIV
-WRFDSRLAF,Positive,Cited reference,B*1503,Cited reference,HIV
+Peptide,Immunogenicity,MHC,Dataset
+GELDRWEKI,Positive,B*4002,HIV
+KIRLRPGGK,Positive,A*0301,HIV
+IRLRPGGKK,Positive,B*2705,HIV
+RLRPGGKKK,Positive,A*0301,HIV
+RLRPGGKKKY,Positive,A*0301,HIV
+RPGGKKKYKL,Positive,B*5101,HIV
+GGKKKYKLK,Positive,B*0801,HIV
+KYKLKHIVW,Positive,A*2402,HIV
+HLVWASREL,Positive,Cw*0804,HIV
+LVWASRELERF,Positive,A30,HIV
+WASRELERF,Positive,B*3501,HIV
+ELRSLYNTV,Positive,B*0801,HIV
+RSLYNTVATLY,Positive,"A*3002, B58, B63",HIV
+SLYNTVATL,Positive,"A*0201, A*0202, A*0205",HIV
+SLYNTVATLY,Positive,A*0201,HIV
+LYNTVATL,Positive,Cw14,HIV
+LYNTVATLY,Positive,"A*2902, B*4403",HIV
+TLYCVHQK,Positive,A*1101,HIV
+IEIKDTKEAL,Positive,B*4001,HIV
+NSSKVSQNY,Positive,B*3501,HIV
+VQNLQGQMV,Positive,B13,HIV
+HQAISPRTL,Positive,B*1510,HIV
+QAISPRTLNAW,Positive,A*2501,HIV
+ISPRTLNAW,Positive,"B*5701, B63",HIV
+SPRTLNAWV,Positive,B*0702,HIV
+VKVIEEKAF,Positive,B*1503,HIV
+EEKAFSPEV,Positive,B*4415,HIV
+KAFSPEVI,Positive,B*5703,HIV
+KAFSPEVIPMF,Positive,"B*5701, B*5703, B63",HIV
+FSPEVIPMF,Positive,B57,HIV
+EVIPMFSAL,Positive,"A*2601, A*2602, A*2603",HIV
+VIPMFSAL,Positive,Cw*0102,HIV
+SEGATPQDL,Positive,B*4001,HIV
+TPQDLNTML,Positive,"B*0702, B*3910, B*4201, B*8101, Cw*0802",HIV
+TPQDLNMML,Positive,B53,HIV
+TPYDINQML,Positive,B*5301,HIV
+GHQAAMQML,Positive,"B*1510, B*3901",HIV
+KETINEEAA,Positive,B*4002,HIV
+ETINEEAAEW,Positive,A*2501,HIV
+AEWDRVHPV,Positive,B*4002,HIV
+HPVHAGPIA,Positive,"B*3501, B7",HIV
+GQMREPRGSDI,Positive,B13,HIV
+TSTLQEQIGW,Positive,"B*5701, B*5801",HIV
+NPPIPVGDIY,Positive,B*3501,HIV
+PPIPVGDIY,Positive,B*3501,HIV
+EIYKRWII,Positive,B*0801,HIV
+RRWIQLGLQK,Positive,B*2703,HIV
+KRWIILGLNK,Positive,B*2705,HIV
+GLNKIVRMY,Positive,"B*1501, B62",HIV
+VRMYSPVSI,Positive,Cw18,HIV
+RMYSPTSI,Positive,B*5201,HIV
+YSPVSILDI,Positive,Cw*0102,HIV
+FRDYVDRFF,Positive,Cw18,HIV
+FRDYVDRFYK,Positive,B*1801,HIV
+RDYVDRFFKTL,Positive,A*2402,HIV
+RDYVDRFYKTL,Positive,B*4402,HIV
+YVDRFYKTL,Positive,A*0207,HIV
+YVDRFFKTL,Positive,"B*1503, Cw*0303, Cw*0304",HIV
+DRFYKTLRA,Positive,B*1402,HIV
+AEQASQDVKNW,Positive,B*4402,HIV
+AEQASQEVKNWM,Positive,Cw5,HIV
+QASQEVKNW,Positive,"B*5301, B*5701, B*5801",HIV
+VKNWMTETL,Positive,B*4801,HIV
+DCKTILKAL,Positive,B*0801,HIV
+ACQGVGGPGHK,Positive,A*1101,HIV
+GPGHKARVL,Positive,B*0702,HIV
+AEAMSQVTNS,Positive,B*4501,HIV
+CRAPRKKGC,Positive,B14,HIV
+TERQANFL,Positive,B*4002,HIV
+RQANFLGKI,Positive,"B*4801, B13",HIV
+FLGKIWPSYK,Positive,A*0201,HIV
+KELYPLTSL,Positive,B*4001,HIV
+NSPTRREL,Positive,Cw*0102,HIV
+ITLWQRPLV,Positive,"A*6802, A*7401",HIV
+DTVLEEWNL,Positive,A*6802,HIV
+EEMNLPGRW,Positive,B44,HIV
+RQYDQILIEI,Positive,B13,HIV
+GKKAIGTVL,Positive,B*1503,HIV
+KAIGTVLV,Positive,B57,HIV
+LVGPTPVNI,Positive,A*0201,HIV
+TPVNIIGRNML,Positive,B81,HIV
+FPISPIETV,Positive,B*5401,HIV
+IETVPVKL,Positive,B*4001,HIV
+GPKVKQWPL,Positive,B*0801,HIV
+ALVEICTEM,Positive,A*0201,HIV
+ALVEICTEMEK,Positive,A*0301,HIV
+KLVDFRELNK,Positive,A*0301,HIV
+GIPHPAGLK,Positive,A*0301,HIV
+TVLDVGDAY,Positive,B*3501,HIV
+VPLDEDFRKY,Positive,B*3501,HIV
+YTAFTIPSV,Positive,A2,HIV
+TAFTIPSI,Positive,B*5101,HIV
+NETPGIRYQY,Positive,B18,HIV
+IRYQYNVL,Positive,B*1401,HIV
+LPQGWKGSPA,Positive,B*5401,HIV
+SPAIFQSSM,Positive,B7,HIV
+AIFQSSMTK,Positive,"A*0301, A*1101",HIV
+KQNPDIVIY,Positive,"A*3002, Cw*1202",HIV
+NPEIVIYQY,Positive,B18,HIV
+HPDIVIYQY,Positive,B*3501,HIV
+VIYQYMDDL,Positive,A*0201,HIV
+IEELRQHLL,Positive,B*4001,HIV
+IVLPEKDSW,Positive,B*5701,HIV
+LVGKLNWASQIY,Positive,B*1501,HIV
+KLNWASQIY,Positive,A*3002,HIV
+QIYPGIKVR,Positive,A*0301,HIV
+YPGIKVRQL,Positive,B*4201,HIV
+IPLTEEAEL,Positive,"B*3501, B*5101",HIV
+ILKEPVHGV,Positive,A*0201,HIV
+ILKEPVHGVY,Positive,"B*1501, Cw*1202",HIV
+GQGQWTYQI,Positive,B13,HIV
+IYQEPFKNLK,Positive,A*1101,HIV
+RMRGAHTNDV,Positive,A*3002,HIV
+RMRGAHTNDVK,Positive,A*0301,HIV
+IAMESIVIW,Positive,B*5801,HIV
+PIQKETWETW,Positive,A*3201,HIV
+GAETFYVDGA,Positive,A*6802,HIV
+ETFYVDGAANR,Positive,A66,HIV
+ETKLGKAGY,Positive,A*2601,HIV
+IVTDSQYAL,Positive,Cw*0802,HIV
+VTDSQYALGI,Positive,B*1503,HIV
+QIIEQLIKK,Positive,A*1101,HIV
+LFLDGIDKA,Positive,B81,HIV
+LPPIVAKEI,Positive,B*4201,HIV
+THLEGKIIL,Positive,B*1510,HIV
+HVASGYIEA,Positive,B*5401,HIV
+IEAEVIPAET,Positive,B*4002,HIV
+HTDNGSNF,Positive,Cw5,HIV
+STTVKAACWW,Positive,B57,HIV
+IQQEFGIPY,Positive,B*1503,HIV
+VRDQAEHL,Positive,Cw18,HIV
+KTAVQMAVF,Positive,B*5701,HIV
+AVFIHNFKRK,Positive,"A*0301, A*1101",HIV
+FKRKGGIGGY,Positive,B*1503,HIV
+KRKGGIGGY,Positive,B*2705,HIV
+GERIVDII,Positive,B*4002,HIV
+IIATDIQTK,Positive,A11,HIV
+KIQNFRVYY,Positive,A*3002,HIV
+VPRRKAKII,Positive,B42,HIV
+RKAKIIRDY,Positive,B*1503,HIV
+RIRTWKSLVK,Positive,A*0301,HIV
+HMYISKKAK,Positive,A*0301,HIV
+ISKKAKGWF,Positive,B*5701,HIV
+HPRVSSEVHI,Positive,B*0702,HIV
+IPLGDAKLII,Positive,B51,HIV
+WHLGHGVSI,Positive,B*1510,HIV
+WHLGQGVSI,Positive,B*3801,HIV
+LGHGVSIEW,Positive,B*5703,HIV
+LADQLIHLHY,Positive,B*1801,HIV
+KTKPPLPSVKK,Positive,A*0301,HIV
+EAVRHFPRI,Positive,B51,HIV
+AVRHFPRIW,Positive,B*5701,HIV
+VRHFPRIWL,Positive,B27,HIV
+FPRIWLHGL,Positive,"B*0702, B*8101",HIV
+ETYGDTWTGV,Positive,A*6802,HIV
+DTWAGVEAIIR,Positive,A*6801,HIV
+AIIRILQQL,Positive,A*0201,HIV
+CCFHCQVC,Positive,Cw12,HIV
+FQTKGLGISY,Positive,B*1503,HIV
+ITKGLGISYGR,Positive,A*6801,HIV
+KAVRLIKFLY,Positive,"B*5701, B*5801, B63",HIV
+QAVRIIKILY,Positive,B*5703,HIV
+ERILSTYLGR,Positive,A*0301,HIV
+RPAEPVPLQL,Positive,B7,HIV
+SAEPVPLQL,Positive,Cw*0501,HIV
+YRLGVGALI,Positive,Cw18,HIV
+EYRKILRQR,Positive,A*3303,HIV
+RVKEKYQHL,Positive,B*0801,HIV
+AENLWVTVY,Positive,"B*1801, B44",HIV
+AENLWVTVYY,Positive,B*4402,HIV
+TVYYGVPVWK,Positive,A*0301,HIV
+VPVWKEATTT,Positive,B*5501,HIV
+VPVWKEATTTL,Positive,B*3501,HIV
+LFCASDAKAY,Positive,A*2402,HIV
+KAYETEVHNVW,Positive,B58,HIV
+YETEVHNVW,Positive,B*1801,HIV
+DPNPQEVVL,Positive,B*3501,HIV
+MHEDIISLW,Positive,B*3801,HIV
+SVITQACPK,Positive,A*1101,HIV
+SFEPIPIHY,Positive,A*2902,HIV
+CAPAGFAIL,Positive,Cw1,HIV
+RPNNNTRKSI,Positive,B*0702,HIV
+HIGPGRAFY,Positive,A*3002,HIV
+RGPGRAFVTI,Positive,A*0201,HIV
+EIIGDIRQAY,Positive,A*2501,HIV
+SFNCGGEFF,Positive,"B*1516, Cw*0401",HIV
+LPCRIKQII,Positive,B*5101,HIV
+RIKQIINMW,Positive,A*3201,HIV
+RAIEAQQHL,Positive,"Cw*0304, Cw15",HIV
+RAIEAQQHM,Positive,Cw8,HIV
+QTRVLAIERYL,Positive,B*5802,HIV
+ERYLKDQQL,Positive,B*1402,HIV
+RYLKDQQLL,Positive,"A*2402, A23",HIV
+YLKDQQLL,Positive,B*0801,HIV
+TAVPWNASW,Positive,B*3501,HIV
+VFAVLSIVNR,Positive,A*3303,HIV
+IVNRNRQGY,Positive,A*3002,HIV
+RLRDLLLIVTR,Positive,"A*0301, A*3101",HIV
+IVTRIVELL,Positive,A*6802,HIV
+GRRGWEALKY,Positive,B*2705,HIV
+RRGWEVLKY,Positive,A*0101,HIV
+KYCWNLLQY,Positive,A*3002,HIV
+QELKNSAVSL,Positive,B*4001,HIV
+SLLNATDIAV,Positive,A*0201,HIV
+LLNATDIAV,Positive,A*0201,HIV
+EVAQRAYR,Positive,A*3303,HIV
+IPRRIRQGL,Positive,B*0702,HIV
+RIRQGLERA,Positive,A*0205,HIV
+RQGLERALL,Positive,B8,HIV
+WPTVRERM,Positive,B*0801,HIV
+RMRRAEPAA,Positive,B62,HIV
+LEKHGAITS,Positive,"B*4001, B50",HIV
+FPVTPQVPL,Positive,B*0702,HIV
+FPVTPQVPLR,Positive,B*0702,HIV
+TPQVPLRPM,Positive,B*0702,HIV
+RPQVPLRPM,Positive,"B*4201, B*4202",HIV
+RPQVPLRPMTY,Positive,B35,HIV
+QVPLRPMTYK,Positive,"A*0301, A*1101",HIV
+VPLRPMTY,Positive,B*3501,HIV
+PLRPMTYK,Positive,A*1101,HIV
+LRPMTYKAA,Positive,B*2703,HIV
+RPMTYKAAL,Positive,B*0702,HIV
+KAAFDLSFF,Positive,"B*5703, B*5801",HIV
+KAAVDLSHFL,Positive,Cw8,HIV
+GAFDLSFFL,Positive,A*0205,HIV
+AAFDLSFFL,Positive,B*5703,HIV
+AAVDLSHFL,Positive,Cw*0802,HIV
+AALDLSHFL,Positive,Cw3,HIV
+AVDLSHFLK,Positive,"A*0301, A*1101",HIV
+FLKEKGGL,Positive,B*0801,HIV
+KEKGGLEGL,Positive,"B*4001, B*4002",HIV
+RRQDILDLWI,Positive,B*2705,HIV
+RRQDILDLWVY,Positive,B18,HIV
+KRQEILDLWVY,Positive,Cw7,HIV
+RQDILDLWI,Positive,B13,HIV
+RQDILDLWV,Positive,B*1302,HIV
+HTQGYFPDW,Positive,"B*5703, B*5801, B57",HIV
+TQGYFPDWQNY,Positive,B*1501,HIV
+YFPDWQNYT,Positive,"A29, B*3501, Cw6",HIV
+FPDWQNYTP,Positive,B*5401,HIV
+YTPGPGIRY,Positive,"B57, B63",HIV
+TPGPGVRYPL,Positive,"B*0702, B*4201, B*4202",HIV
+TRYPLTFGW,Positive,A33,HIV
+RYPLTFGW,Positive,A*2402,HIV
+YPLTFGWCY,Positive,"B*1801, B*5301",HIV
+YPLTFGWCF,Positive,B53,HIV
+PLTFGWCYKL,Positive,A*0201,HIV
+LTFGWCFKL,Positive,"B57, B63",HIV
+VLEWRFDSRL,Positive,A*0201,HIV
+WRFDSRLAF,Positive,B*1503,HIV

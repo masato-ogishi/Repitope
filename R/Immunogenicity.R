@@ -1,6 +1,6 @@
 #' Immunogenicity score.
 #'
-#' \code{Immunogenicity_TrainModels} trains extremely randomized tree models, and internally predicts immunogenicity scores on the entire dataset provided.\cr
+#' \code{Immunogenicity_TrainModels} performes preprocessing, trains extremely randomized tree models, and internally predicts immunogenicity scores on the entire dataset provided.\cr
 #' \code{Immunogenicity_SummarizeInternalScores} summarizes internally calculated immunogenicity scores.\cr
 #' \code{Immunogenicity_Score} is a wrapper function of \code{Immunogenicity_TrainModels} and \code{Immunogenicity_SummarizeInternalScores}.\cr
 #' \code{Immunogenicity_Score_Cluster} is similar to \code{Immunogenicity_Score}, but takes \code{clusterDF} to filter peptides based on their similarities.\cr

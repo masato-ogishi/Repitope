@@ -3,14 +3,6 @@
 #' @param mat A matrix. A data.frame or a data.table is internally converted into a matrix.
 #' @param coreN The number of threads for parallelization. Disable by setting \code{NULL}.
 #' @param verbose Logical. Whether the progress should be printed in the colsole?
-#' @importFrom parallel detectCores
-#' @importFrom parallel makeCluster
-#' @importFrom parallel clusterExport
-#' @importFrom parallel stopCluster
-#' @importFrom pbapply pblapply
-#' @importFrom Matrix forceSymmetric
-#' @importFrom bigmemory as.big.matrix
-#' @importFrom bigmemory attach.big.matrix
 #' @export
 #' @rdname Utility_ParCor
 #' @name Utility_ParCor

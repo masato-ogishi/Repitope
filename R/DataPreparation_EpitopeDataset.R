@@ -1,73 +1,56 @@
 #' Compile epitope datasets retrieved from IEDB and other sources.
 #'
-#' \code{Epitope_Import} imports IEDB and other epitope files. Contradicting immunogenicity annotations are internally resolved. \cr
-#' \code{Epitope_Add_Disease} adds metadata of being related to diseases or not obtained from the IEDB database.\cr
+#' \code{Epitope_Import} imports IEDB and other epitope files. Contradicting annotations on immunogenicity are internally resolved. \cr
 #' \code{compressedToLongFormat} converts a compresed column into a long-format column. The compressed strings should be separated by "|".\cr
 #' \code{compressedToDummyDF} converts a compresed column into a dummy variable dataframe. The compressed strings should be separated by "|".\cr
-#' \code{Epitope_Add_HLASerotypes} adds HLA serotype metadata obtained from the IEDB database.\cr
-#' \code{Epitope_Convert_HLASupertypes} converts the compressed HLA genotype information into HLA supertypes. The definition of HLA supertypes is derived from the Additional File 1 of Sidney et al., 2008.\cr
-#' \code{Epitope_Add_HLARestrictions} merges HLA serotypes and HLA supertypes.
 #'
-#' @param df An epitope dataframe.
-#' @param peptideLengthSet A set of peptide lengths to be incorporated.
-#' @param compressedColumnName A string indicating the names of the compressed column to be converted into a long format.
 #' @param IEDBAssayFileName A set of T cell assay results obtained from IEDB.
 #' @param OtherFileNames Other epitope source files. Must contain a "Dataset" column indicating the data source.
-#' @param IEDBEpitopeFileName A set of epitopes obtained from IEDB.
-#' @param IEDBEpitopeFileNames A set of epitope files from IEDB.
+#' @param peptideLengthSet A set of peptide lengths to be incorporated.
+#' @param df A dataframe/datatable of epitope dataset.
+#' @param compressedColumnName A string indicating the names of the compressed column to be converted into a long format.
 #' @importFrom dplyr %>%
-#' @importFrom dplyr left_join
-#' @importFrom dplyr bind_rows
-#' @importFrom dplyr bind_cols
-#' @importFrom dplyr filter
-#' @importFrom dplyr select
-#' @importFrom dplyr mutate
-#' @importFrom dplyr transmute
-#' @importFrom dplyr group_by
-#' @importFrom dplyr summarise
-#' @importFrom dplyr ungroup
-#' @importFrom dplyr first
-#' @importFrom dplyr last
-#' @importFrom tidyr drop_na
-#' @importFrom tidyr spread
-#' @importFrom purrr flatten_chr
-#' @importFrom purrr flatten_dfr
-#' @importFrom readr read_csv
-#' @importFrom magrittr set_colnames
-#' @importFrom stringr str_replace
-#' @importFrom stringr str_replace_all
-#' @importFrom stringr str_detect
-#' @importFrom stringr str_split
-#' @importFrom stringr fixed
-#' @importFrom scales percent
-#' @importFrom zoo coredata
 #' @export
 #' @rdname DataPreparation_EpitopeDataset
 #' @name DataPreparation_EpitopeDataset
-Epitope_Import <- function(IEDBAssayFileName, OtherFileNames=NULL, peptideLengthSet=8:11){
-  immEvi <- suppressMessages(readr::read_csv(system.file("IEDB_ImmunogenicityEvidenceTable.csv", package="Repitope"))[[1]])
-  df <- suppressWarnings(suppressMessages(readr::read_csv(IEDBAssayFileName, skip=1))) %>%
-    magrittr::set_colnames(stringr::str_replace_all(colnames(.), " ", "")) %>%
-    dplyr::transmute(
-      Peptide=Description,
-      Immunogenicity=factor(ifelse(stringr::str_detect(QualitativeMeasure, "Positive"), "Positive", "Negative"), levels=c("Positive", "Negative")),
-      ImmunogenicityEvidence=AssayGroup,
-      MHC=AlleleName,
-      MHCEvidence=AlleleEvidenceCode,
-      Host=Name,
-      Dataset="IEDB"
-    ) %>%
-    dplyr::filter(ImmunogenicityEvidence %in% immEvi)
-  if(!is.null(OtherFileNames)){
-    df.others <- dplyr::bind_rows(lapply(OtherFileNames, function(f){suppressWarnings(suppressMessages(readr::read_csv(f)))}))
-    df <- suppressWarnings(suppressMessages(dplyr::bind_rows(df, df.others)))
-    df <- dplyr::mutate(df, Immunogenicity=factor(Immunogenicity, levels=c("Positive", "Negative")))
+Epitope_Import <- function(IEDBAssayFileName=NULL, OtherFileNames=NULL, peptideLengthSet=8:11){
+  if(!is.null(IEDBAssayFileName)){
+    immEvi <- suppressMessages(readr::read_csv(system.file("IEDB_ImmunogenicityEvidenceTable.csv", package="Repitope"))[[1]])
+    df <- suppressWarnings(suppressMessages(readr::read_csv(IEDBAssayFileName, skip=1))) %>%
+      magrittr::set_colnames(stringr::str_replace_all(colnames(.), " ", "")) %>%
+      dplyr::transmute(
+        Peptide=Description,
+        Immunogenicity=factor(ifelse(stringr::str_detect(QualitativeMeasure, "Positive"), "Positive", "Negative"), levels=c("Positive", "Negative")),
+        ImmunogenicityEvidence=AssayGroup,
+        MHC=AlleleName,
+        MHCEvidence=AlleleEvidenceCode,
+        Host=Name,
+        Organism=ImmunogenOrganismSpecies,
+        Dataset="IEDB"
+      ) %>%
+      dplyr::filter(ImmunogenicityEvidence %in% immEvi)
+  }else{
+    df <- NULL
   }
-  df <- df %>%
-    dplyr::filter(nchar(Peptide) %in% peptideLengthSet) %>%         ## Length check.
-    dplyr::filter(Peptide %in% sequenceFilter(Peptide)) ## Sequences with non-standard characters were discarded.
-
-  df <- df %>%
+  if(!is.null(OtherFileNames)){
+    df.others <- dplyr::bind_rows(lapply(OtherFileNames, function(f){suppressWarnings(suppressMessages(readr::read_csv(f)))})) %>%
+      dplyr::transmute(
+        Peptide,
+        Immunogenicity,
+        ImmunogenicityEvidence=NA,
+        MHC,
+        MHCEvidence=NA,
+        Host=NA,
+        Organism=NA,
+        Dataset
+      )
+  }else{
+    df.others <- NULL
+  }
+  df <- suppressWarnings(suppressMessages(dplyr::bind_rows(df, df.others))) %>%
+    dplyr::filter(nchar(Peptide) %in% peptideLengthSet) %>%   ## Length check.
+    dplyr::filter(Peptide %in% sequenceFilter(Peptide)) %>%   ## Sequences with non-standard characters were discarded.
+    dplyr::mutate(Immunogenicity=factor(Immunogenicity, levels=c("Positive", "Negative"))) %>%
     dplyr::group_by(Peptide) %>%
     dplyr::summarise(
       Immunogenicity=paste0(sort(Immunogenicity), collapse="|"),
@@ -75,6 +58,7 @@ Epitope_Import <- function(IEDBAssayFileName, OtherFileNames=NULL, peptideLength
       MHC=stringr::str_replace_all(paste0(sort(unique(MHC)), collapse="|"), ", ", "|"),
       MHCEvidence=paste0(sort(unique(MHCEvidence)), collapse="|"),
       Host=paste0(sort(unique(Host)), collapse="|"),
+      Organism=paste0(sort(unique(Organism)), collapse="|"),
       Dataset=paste0(sort(unique(Dataset)), collapse="|")
     )
 
@@ -94,8 +78,8 @@ Epitope_Import <- function(IEDBAssayFileName, OtherFileNames=NULL, peptideLength
     df <- df %>%
       dplyr::mutate(
         #Immunogenicity_Definitive=sapply(Immunogenicity, chooseOneImmunogenicity_Definitive)
-        Immunogenicity_Loose=ifelse(stringr::str_detect(Immunogenicity, "Positive"), "Positive", "Negative")
-        #Immunogenicity_Strict=ifelse(stringr::str_detect(Immunogenicity, "Negative"), "Negative", "Positive")
+        Immunogenicity_Loose=dplyr::if_else(stringr::str_detect(Immunogenicity, "Positive"), "Positive", "Negative")
+        #Immunogenicity_Strict=dplyr::if_else(stringr::str_detect(Immunogenicity, "Negative"), "Negative", "Positive")
         #Immunogenicity_Consensus=sapply(Immunogenicity, chooseOneImmunogenicity_Consensus)
       ) %>%
       dplyr::transmute(
@@ -117,18 +101,7 @@ Epitope_Import <- function(IEDBAssayFileName, OtherFileNames=NULL, peptideLength
   }
   df <- resolveImmunogenicityContradiction(df)
 
-  return(df)
-}
-
-#' @export
-#' @rdname DataPreparation_EpitopeDataset
-#' @name DataPreparation_EpitopeDataset
-Epitope_Add_Disease <- function(df, IEDBEpitopeFileName=system.file("IEDB_Epitope_Healthy.csv.gz", package="Repitope")){
-  df.meta <- suppressWarnings(suppressMessages(readr::read_csv(IEDBEpitopeFileName, skip=1)))
-  pept.meta <- df.meta$Description
-  df$"Disease" <- "Disease"
-  df$"Disease"[which(df$"Peptide" %in% pept.meta)] <- "Healthy"
-  return(df)
+  return(data.table::as.data.table(df))
 }
 
 #' @export
@@ -140,7 +113,7 @@ compressedToLongFormat <- function(df, compressedColumnName){
   df_long <- lapply(1:nrow(df), function(i){replicate(l[i], zoo::coredata(df[i,]), simplify=F)})
   df_long <- purrr::flatten_dfr(df_long)
   df_long[[compressedColumnName]] <- unlist(cmp)
-  return(df_long)
+  return(data.table::as.data.table(df_long))
 }
 
 #' @export
@@ -158,95 +131,6 @@ compressedToDummyDF <- function(df, compressedColumnName){
     return(z)
   }
   df_dummy <- left_join_0(df, df_dummy, fill=0)
-  return(df_dummy)
+  return(data.table::as.data.table(df_dummy))
 }
 
-#' @export
-#' @rdname DataPreparation_EpitopeDataset
-#' @name DataPreparation_EpitopeDataset
-Epitope_Add_HLASerotypes <- function(df, IEDBEpitopeFileNames=system.file("IEDB_Epitope_Serotype_HLA-A01.csv.gz", package="Repitope"), peptideLengthSet=8:11){
-  hlaSerotypeDF <- function(IEDBEpitopeFileName){
-    df.meta <- suppressWarnings(suppressMessages(readr::read_csv(IEDBEpitopeFileName, skip=1)))
-    pept.meta <- df.meta$Description
-    sero <- grep("HLA-", strsplit(basename(IEDBEpitopeFileName), "_")[[1]], value=T)
-    sero <- stringr::str_replace(strsplit(sero, ".", fixed=T)[[1]][[1]], "HLA-", "")
-    df.meta <- data.frame("Peptide"=pept.meta, "HLASerotype"=sero, stringsAsFactors=F)
-    return(df.meta)
-  }
-  df.meta <- dplyr::bind_rows(lapply(IEDBEpitopeFileNames, hlaSerotypeDF)) %>%
-    dplyr::group_by(Peptide) %>%
-    dplyr::summarise(HLASerotype=paste0(sort(unique(HLASerotype)), collapse="|")) %>%
-    dplyr::filter(nchar(Peptide) %in% peptideLengthSet) %>%
-    dplyr::filter(Peptide %in% sequenceFilter(Peptide))
-  df <- dplyr::left_join(df, df.meta, by="Peptide")
-  return(df)
-}
-
-#' @export
-#' @rdname DataPreparation_EpitopeDataset
-#' @name DataPreparation_EpitopeDataset
-Epitope_Convert_HLASupertypes <- function(df, compressedColumnName="MHC"){
-  # Stanadrdize HLA strings
-  HLAStrings <- df[[compressedColumnName]]
-  hla <- HLAStrings %>%
-    stringr::str_replace_all("HLA-", "") %>%
-    stringr::str_replace_all("HLA ", "") %>%
-    stringr::str_replace_all(":", "") %>%
-    stringr::str_split(stringr::fixed("|"))
-  hlaStandardize <- function(HLAStrings){
-    hla.a <- stringr::str_detect(HLAStrings, "^A.+")
-    hla.b <- stringr::str_detect(HLAStrings, "^B.+")
-    hla <- hla.a | hla.b
-    HLAStrings[which(hla==F)] <- NA
-    HLAStrings <- unique(unlist(lapply(stringr::str_split(HLAStrings, " "), dplyr::first)))
-    HLAStrings <- stringr::str_replace(HLAStrings, stringr::fixed("*"), "")
-    HLAStrings <- stringr::str_replace(HLAStrings, "^A1$", "A01")
-    HLAStrings <- stringr::str_replace(HLAStrings, "^A2$", "A02")
-    HLAStrings <- stringr::str_replace(HLAStrings, "^A3$", "A03")
-    HLAStrings <- stringr::str_replace(HLAStrings, "^B7$", "B07")
-    HLAStrings <- stringr::str_replace(HLAStrings, "^B8$", "B08")
-    return(HLAStrings)
-  }
-  cat("Standardizing HLA genotype strings...\n")
-  hla <- pbapply::pblapply(hla, hlaStandardize)
-
-  # Match supertypes
-  HLA_ST <- suppressMessages(readr::read_csv(system.file("HLASupertypeConversion.csv", package="Repitope")))  ## Sidney et al., 2008. Additional File 1.
-  HLA_ST <- HLA_ST[1:2]
-  colnames(HLA_ST) <- c("Allele", "Supertype")
-  HLA_ST$Supertype[which(HLA_ST$Supertype=="Unclassified")] <- NA
-  HLA_ST$Supertype <- stringr::str_replace_all(HLA_ST$Supertype, " ", "|")
-  HLA_ST$Allele <- stringr::str_replace_all(HLA_ST$Allele, stringr::fixed("*"), "")
-  hlaSupertype_CompleteMatch <- function(HLAStrings){
-    s <- paste0(paste0("^", HLAStrings, "$"), collapse="|")
-    s <- dplyr::filter(HLA_ST, stringr::str_detect(Allele, s))$Supertype
-    s <- sort(unique(unlist(stringr::str_split(s, stringr::fixed("|")))))
-    return(s)
-  }
-  hlaSupertype_TwoDigitMatch <- function(HLAStrings){
-    s <- paste0(paste0("^", HLAStrings, ".+"), collapse="|")
-    s <- dplyr::filter(HLA_ST, stringr::str_detect(Allele, s))$Supertype
-    s <- unlist(stringr::str_split(s, stringr::fixed("|")))
-    s <- dplyr::last(names(sort(table(s))))
-    return(s)
-  }
-  cat("Matching HLA genotypes to supertypes...\n")
-  hla_comp <- pbapply::pblapply(hla, hlaSupertype_CompleteMatch)
-  hla_tg <- pbapply::pblapply(hla, hlaSupertype_TwoDigitMatch)
-  hla <- mapply(c, hla_comp, hla_tg, SIMPLIFY=F)
-  hla <- lapply(hla, unique)
-  hla[which(sapply(hla, length)==0)] <- NA
-  hla <- unlist(lapply(hla, paste0, collapse="|"))
-  hla[hla=="NA"] <- NA
-  return(dplyr::mutate(df, HLASupertype=hla))
-}
-
-#' @export
-#' @rdname DataPreparation_EpitopeDataset
-#' @name DataPreparation_EpitopeDataset
-Epitope_Add_HLARestrictions <- function(df){
-  hla <- mapply(function(x, y){paste0(sort(unique(unlist(list(strsplit(x, "|", fixed=T), strsplit(y, "|", fixed=T))))), collapse="|")}, df$"HLASerotype", df$"HLASupertype", SIMPLIFY=T)
-  hla[hla==""] <- NA
-  df$"HLARestriction" <- hla
-  return(df)
-}

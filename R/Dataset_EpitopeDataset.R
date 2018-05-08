@@ -1,8 +1,28 @@
-#' A compiled dataset of human MHC class I epitopes and ligands.
-#'
-#' @format A tibble with 21146 rows and 11 variables
+#' @title Compiled datasets of MHC class I and class II epitopes and ligands.
+#' @format data.table
 #' @docType data
 #' @keywords datasets
+
 #' @name Dataset_EpitopeDataset
 #' @rdname Dataset_EpitopeDataset
-"EpitopeDataset"
+"MHCI_Human"
+
+#' @name Dataset_EpitopeDataset
+#' @rdname Dataset_EpitopeDataset
+"MHCI_Rodents"
+
+#' @name Dataset_EpitopeDataset
+#' @rdname Dataset_EpitopeDataset
+"MHCI_Primates"
+
+#' @name Dataset_EpitopeDataset
+#' @rdname Dataset_EpitopeDataset
+"MHCII_Human"
+
+#' @name Dataset_EpitopeDataset
+#' @rdname Dataset_EpitopeDataset
+"MHCII_Rodents"
+
+#' @name Dataset_EpitopeDataset
+#' @rdname Dataset_EpitopeDataset
+"MHCII_Primates"

@@ -7,15 +7,6 @@
 #' @param .predictate A predictate function to be applied to the rows or a logical vector. Note: columns to be mutated have to be created in advance.
 #' @param ... Other parameters passed to \code{dplyr::mutate}.
 #' @importFrom dplyr %>%
-#' @importFrom dplyr select
-#' @importFrom dplyr mutate
-#' @importFrom dplyr group_by
-#' @importFrom dplyr summarise
-#' @importFrom dplyr arrange
-#' @importFrom dplyr ungroup
-#' @importFrom dplyr left_join
-#' @importFrom rlang enquo
-#' @importFrom rlang eval_tidy
 #' @export
 #' @rdname Utility_DF
 #' @name Utility_DF
