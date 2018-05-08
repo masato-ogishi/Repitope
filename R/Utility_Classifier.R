@@ -24,13 +24,13 @@ rocPlot <- function(trueClass, predProb, groups=NA, colors=NA){
     aucSet <- cvAUC::ci.cvAUC(predictions=d$"Probability", labels=d$"Truth")
     data.table::data.table(Group=unique(d$"Group"), AUC=paste0("AUC: ", format(aucSet$cvAUC*100, digits=3), "% [", format(aucSet$ci[1]*100, digits=3), "%-", format(aucSet$ci[2]*100, digits=3),"%]"))
   }))
-  if(is.na(groups)){
+  if(identical(groups, NA)){
     plt <- ggplot(roc_dt, aes(x=x, y=y)) +
       geom_line(size=1.5) +
       geom_abline(slope=1, intercept=0, linetype="dotted") +
       annotate("text", x=62.5, y=37.5, label=auc_dt$AUC, parse=F, size=7)
   }else{
-    if(is.na(colors)) colors <- ggsci::pal_d3()(dplyr::n_distinct(groups))
+    if(identical(colors, NA)) colors <- ggsci::pal_d3()(dplyr::n_distinct(groups))
     plt <- ggplot(roc_dt, aes(x=x, y=y)) +
       geom_line(aes(color=Group), size=1.5) +
       geom_abline(slope=1, intercept=0, linetype="dotted") +
@@ -65,12 +65,12 @@ prcPlot <- function(trueClass, predProb, groups=NA, colors=NA){
     pr_obj <- autoplot(pr_obj, "PRC")
     data.table::as.data.table(pr_obj$data)[,x:=x*100][,y:=y*100][,"Group":=unique(d$"Group")]
   }))
-  if(is.na(groups)){
+  if(identical(groups, NA)){
     plt <- ggplot(prc_dt, aes(x=x, y=y)) +
       geom_line(size=1.5) +
       geom_abline(slope=-1, intercept=100, linetype="dotted")
   }else{
-    if(is.na(colors)) colors <- ggsci::pal_d3()(dplyr::n_distinct(groups))
+    if(identical(colors, NA)) colors <- ggsci::pal_d3()(dplyr::n_distinct(groups))
     plt <- ggplot(prc_dt, aes(x=x, y=y)) +
       geom_line(aes(color=Group), size=1.5) +
       geom_abline(slope=-1, intercept=100, linetype="dotted") +
@@ -105,13 +105,13 @@ calibPlot <- function(trueClass, predProb, groups=NA, colors=NA){
     return(calib_dt)
   }
   calib_dt <- data.table::rbindlist(lapply(split(dt, by="Group"), function(d){format_calib_dt(d$"Truth", d$"Probability")[,"Group":=unique(d$"Group")]}))
-  if(is.na(groups)){
+  if(identical(groups, NA)){
     plt <- ggplot(calib_dt, aes(x=percentage, y=y)) +
       geom_ribbon(aes(ymin=llb, ymax=uub), alpha=0.2) +
       geom_ribbon(aes(ymin=lb, ymax=ub), alpha=0.4) +
       geom_abline(slope=1, intercept=0, linetype="dotted")
   }else{
-    if(is.na(colors)) colors <- ggsci::pal_d3()(dplyr::n_distinct(groups))
+    if(identical(colors, NA)) colors <- ggsci::pal_d3()(dplyr::n_distinct(groups))
     plt <- ggplot(calib_dt, aes(x=percentage, y=y)) +
       geom_ribbon(aes(ymin=llb, ymax=uub, fill=Group), alpha=0.2) +
       geom_ribbon(aes(ymin=lb, ymax=ub, fill=Group), alpha=0.4) +
@@ -139,12 +139,12 @@ liftPlot <- function(trueClass, predProb, groups=NA, colors=NA){
     lift_obj <- caret::lift(Truth~Probability, data=d)
     data.table::as.data.table(lift_obj$data)[,"Group":=unique(d$"Group")]
   }))
-  if(is.na(groups)){
+  if(identical(groups, NA)){
     plt <- ggplot(lift_dt, aes(x=CumTestedPct, y=CumEventPct)) +
       geom_line(size=1.5) +
       geom_abline(slope=1, intercept=0, linetype="dotted")
   }else{
-    if(is.na(colors)) colors <- ggsci::pal_d3()(dplyr::n_distinct(groups))
+    if(identical(colors, NA)) colors <- ggsci::pal_d3()(dplyr::n_distinct(groups))
     plt <- ggplot(lift_dt, aes(x=CumTestedPct, y=CumEventPct)) +
       geom_line(aes(color=Group), size=1.5) +
       geom_abline(slope=-1, intercept=100, linetype="dotted") +
