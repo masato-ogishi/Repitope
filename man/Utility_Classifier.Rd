@@ -8,7 +8,7 @@
 \alias{Utility_Classifier}
 \alias{calibPlot}
 \alias{Utility_Classifier}
-\alias{liftPlot}
+\alias{cumGainPlot}
 \alias{Utility_Classifier}
 \alias{classifierDiagnosticPlots}
 \title{Utility functions for creating diagnostic plots for binary classifiers.}
@@ -19,10 +19,10 @@ prcPlot(trueClass, predProb, groups = NA, colors = NA)
 
 calibPlot(trueClass, predProb, groups = NA, colors = NA)
 
-liftPlot(trueClass, predProb, groups = NA, colors = NA)
+cumGainPlot(trueClass, predProb, groups = NA, colors = NA)
 
 classifierDiagnosticPlots(trueClass, predProb, groups = NA, colors = NA,
-  plotTypes = c("ROC", "PRC", "Calibration", "Lift"))
+  plotTypes = c("ROC", "PRC", "Calibration", "CumGain"))
 }
 \arguments{
 \item{trueClass}{A factor of true class labels.}

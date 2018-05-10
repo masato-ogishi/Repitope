@@ -28,7 +28,7 @@ rocPlot <- function(trueClass, predProb, groups=NA, colors=NA){
     plt <- ggplot(roc_dt, aes(x=x, y=y)) +
       geom_line(size=1.5) +
       geom_abline(slope=1, intercept=0, linetype="dotted") +
-      annotate("text", x=62.5, y=37.5, label=auc_dt$AUC, parse=F, size=4.5)
+      annotate("text", x=60, y=25, label=auc_dt$AUC, parse=F, size=4.5)
   }else{
     if(identical(colors, NA)) colors <- ggsci::pal_d3()(dplyr::n_distinct(groups))
     plt <- ggplot(roc_dt, aes(x=x, y=y)) +
@@ -42,11 +42,11 @@ rocPlot <- function(trueClass, predProb, groups=NA, colors=NA){
                                     colhead=list(bg_params=list(col=NA)))
     plt <- plt +
       annotation_custom(gridExtra::tableGrob(auc_dt, rows=NULL, cols=NULL, theme=tt),
-                        xmin=50, xmax=80, ymin=10, ymax=40)
+                        xmin=50, xmax=80, ymin=5, ymax=30)
   }
   plt <- plt +
-    scale_x_continuous(name="FPR(%)", limits=c(0, 102), expand=c(0, 0)) +
-    scale_y_continuous(name="TPR(%)", limits=c(0, 102), expand=c(0, 0)) +
+    scale_x_continuous(name="FPR(%)", breaks=seq(0, 100, 20), limits=c(0, 102), expand=c(0, 0)) +
+    scale_y_continuous(name="TPR(%)", breaks=seq(0, 100, 20), limits=c(0, 102), expand=c(0, 0)) +
     ggtitle("ROC") + ggpubr::theme_pubr(base_size=16)
   return(plt)
 }
@@ -77,9 +77,10 @@ prcPlot <- function(trueClass, predProb, groups=NA, colors=NA){
       scale_color_manual(values=colors)
   }
   plt <- plt +
-    scale_x_continuous(name="Recall(%)", limits=c(0, 102), expand=c(0, 0)) +
-    scale_y_continuous(name="Precision(%)", limits=c(0, 102), expand=c(0, 0)) +
-    ggtitle("Precision-Recall") + ggpubr::theme_pubr(base_size=16) + theme(legend.justification=c(0, 0), legend.position=c(0, 0))
+    scale_x_continuous(name="Recall(%)", breaks=seq(0, 100, 20), limits=c(0, 102), expand=c(0, 0)) +
+    scale_y_continuous(name="Precision(%)", breaks=seq(0, 100, 20), limits=c(0, 102), expand=c(0, 0)) +
+    ggtitle("Precision-Recall") + ggpubr::theme_pubr(base_size=16) +
+    theme(legend.justification=c(0, 0), legend.position=c(0.1, 0.1), legend.title=element_blank())
   return(plt)
 }
 
@@ -119,41 +120,67 @@ calibPlot <- function(trueClass, predProb, groups=NA, colors=NA){
       scale_fill_manual(values=colors)
   }
   plt <- plt +
-    scale_x_continuous(name="Predicted probability (%)", limits=c(0, 102), breaks=seq(5, 95, 10), expand=c(0, 0)) +
-    scale_y_continuous(name="Smoothed true probability (%)", limits=c(0, 102), expand=c(0, 0)) +
-    ggtitle("Calibration") + ggpubr::theme_pubr(base_size=16) + theme(legend.justification=c(1, 0), legend.position=c(1, 0))
+    scale_x_continuous(name="Predicted probability (%)", breaks=seq(0, 100, 20), limits=c(0, 102), expand=c(0, 0)) +
+    scale_y_continuous(name="Smoothed true probability (%)", breaks=seq(0, 100, 20), limits=c(0, 102), expand=c(0, 0)) +
+    ggtitle("Calibration") + ggpubr::theme_pubr(base_size=16) +
+    theme(legend.justification=c(1, 0), legend.position=c(0.9, 0.1), legend.title=element_blank())
   return(plt)
 }
 
 #' @export
 #' @rdname Utility_Classifier
 #' @name Utility_Classifier
-liftPlot <- function(trueClass, predProb, groups=NA, colors=NA){
+cumGainPlot <- function(trueClass, predProb, groups=NA, colors=NA){
   ## Data
   dt <- data.table::data.table("Truth"=trueClass, "Probability"=predProb, "Group"=groups)
   lev <- levels(trueClass) ## c("Negative","Positive")
   dt$Truth <- factor(dt$Truth, levels=rev(lev)) ## necessary for caret::lift
 
-  ## Lift chart
-  lift_dt <- data.table::rbindlist(lapply(split(dt, by="Group"), function(d){
-    lift_obj <- caret::lift(Truth~Probability, data=d)
-    data.table::as.data.table(lift_obj$data)[,"Group":=unique(d$"Group")]
+  ## Cumulative gain chart
+  gain_dt <- data.table::rbindlist(lapply(split(dt, by="Group"), function(d){
+    gain_obj <- caret::lift(Truth~Probability, data=d)
+    data.table::as.data.table(gain_obj$data)[,"Group":=unique(d$"Group")]
+  }))
+  xyline_dt <- data.table::rbindlist(lapply(split(gain_dt, by="Group"), function(d){
+    v <- 80
+    window <- 5
+    x <- d$CumTestedPct
+    y <- d$CumEventPct
+    res <- data.table::data.table(CumEventPct=v, CumTestedPct=NA, Group=unique(d$Group))
+    for(i in seq(along=v)){
+      nearest <- which.min((y - v[i])^2)
+      index <- max(1, nearest - window):min(length(y), nearest + window)
+      res$CumTestedPct[i] <-
+        if(length(index) > 2){
+          approx(y[index], x[index], xout=v[i])$y
+        }else{
+          NA
+        }
+    }
+    return(res)
   }))
   if(identical(groups, NA)){
-    plt <- ggplot(lift_dt, aes(x=CumTestedPct, y=CumEventPct)) +
+    plt <- ggplot(gain_dt, aes(x=CumTestedPct, y=CumEventPct)) +
       geom_line(size=1.5) +
       geom_abline(slope=1, intercept=0, linetype="dotted")
+    plt <- plt +
+      geom_segment(data=xyline_dt, aes(x=CumTestedPct, y=CumEventPct, xend=CumTestedPct, yend=0)) +
+      geom_segment(data=xyline_dt, aes(x=CumTestedPct, y=CumEventPct, xend=0, yend=CumEventPct))
   }else{
     if(identical(colors, NA)) colors <- ggsci::pal_d3()(dplyr::n_distinct(groups))
-    plt <- ggplot(lift_dt, aes(x=CumTestedPct, y=CumEventPct)) +
+    plt <- ggplot(gain_dt, aes(x=CumTestedPct, y=CumEventPct)) +
       geom_line(aes(color=Group), size=1.5) +
       geom_abline(slope=1, intercept=0, linetype="dotted") +
-      scale_color_manual(values=colors, guide=F)
+      scale_color_manual(values=colors)
+    plt <- plt +
+      geom_segment(data=xyline_dt, aes(x=CumTestedPct, y=CumEventPct, xend=CumTestedPct, yend=0, color=Group)) +
+      geom_segment(data=xyline_dt, aes(x=CumTestedPct, y=CumEventPct, xend=0, yend=CumEventPct, color=Group))
   }
   plt <- plt +
-    scale_x_continuous(name="% samples tested", limits=c(0, 102), expand=c(0, 0)) +
-    scale_y_continuous(name="% samples found", limits=c(0, 102), expand=c(0, 0)) +
-    ggtitle("Lift") + ggpubr::theme_pubr(base_size=16) + theme(legend.justification=c(1, 0), legend.position=c(1, 0))
+    scale_x_continuous(name="% of data examined", breaks=seq(0, 100, 20), limits=c(0, 102), expand=c(0, 0)) +
+    scale_y_continuous(name="% of targets found", breaks=seq(0, 100, 20), limits=c(0, 102), expand=c(0, 0)) +
+    ggtitle("Cumulative Gain") + ggpubr::theme_pubr(base_size=16) +
+    theme(legend.justification=c(1, 0), legend.position=c(0.9, 0.1), legend.title=element_blank())
   return(plt)
 }
 
@@ -161,11 +188,11 @@ liftPlot <- function(trueClass, predProb, groups=NA, colors=NA){
 #' @rdname Utility_Classifier
 #' @name Utility_Classifier
 classifierDiagnosticPlots <- function(trueClass, predProb, groups=NA, colors=NA,
-                                      plotTypes=c("ROC","PRC","Calibration","Lift")){
+                                      plotTypes=c("ROC","PRC","Calibration","CumGain")){
   plotList <- list()
   if("ROC" %in% plotTypes) plotList$"ROC" <- rocPlot(trueClass, predProb, groups, colors)
   if("PRC" %in% plotTypes) plotList$"PRC" <- prcPlot(trueClass, predProb, groups, colors)
   if("Calibration" %in% plotTypes) plotList$"Calibration" <- calibPlot(trueClass, predProb, groups, colors)
-  if("Lift" %in% plotTypes) plotList$"Lift" <- liftPlot(trueClass, predProb, groups, colors)
+  if("CumGain" %in% plotTypes) plotList$"CumGain" <- cumGainPlot(trueClass, predProb, groups, colors)
   return(plotList)
 }
