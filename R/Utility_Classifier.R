@@ -45,8 +45,8 @@ rocPlot <- function(trueClass, predProb, groups=NA, colors=NA){
                         xmin=50, xmax=80, ymin=10, ymax=40)
   }
   plt <- plt +
-    scale_x_continuous(name="FPR(%)", limits=c(0, 100)) +
-    scale_y_continuous(name="TPR(%)", limits=c(0, 100)) +
+    scale_x_continuous(name="FPR(%)", limits=c(0, 102), expand=c(0, 0)) +
+    scale_y_continuous(name="TPR(%)", limits=c(0, 102), expand=c(0, 0)) +
     ggtitle("ROC") + ggpubr::theme_pubr(base_size=16)
   return(plt)
 }
@@ -77,8 +77,8 @@ prcPlot <- function(trueClass, predProb, groups=NA, colors=NA){
       scale_color_manual(values=colors)
   }
   plt <- plt +
-    scale_x_continuous(name="Recall(%)", limits=c(0, 100)) +
-    scale_y_continuous(name="Precision(%)", limits=c(0, 100)) +
+    scale_x_continuous(name="Recall(%)", limits=c(0, 102), expand=c(0, 0)) +
+    scale_y_continuous(name="Precision(%)", limits=c(0, 102), expand=c(0, 0)) +
     ggtitle("Precision-Recall") + ggpubr::theme_pubr(base_size=16) + theme(legend.justification=c(0, 0), legend.position=c(0, 0))
   return(plt)
 }
@@ -119,8 +119,8 @@ calibPlot <- function(trueClass, predProb, groups=NA, colors=NA){
       scale_fill_manual(values=colors)
   }
   plt <- plt +
-    scale_x_continuous(name="Predicted probability (%)", limits=c(0,100), breaks=seq(5, 95, 10)) +
-    scale_y_continuous(name="Smoothed true probability (%)", limits=c(0,100)) +
+    scale_x_continuous(name="Predicted probability (%)", limits=c(0, 102), breaks=seq(5, 95, 10), expand=c(0, 0)) +
+    scale_y_continuous(name="Smoothed true probability (%)", limits=c(0, 102), expand=c(0, 0)) +
     ggtitle("Calibration") + ggpubr::theme_pubr(base_size=16) + theme(legend.justification=c(1, 0), legend.position=c(1, 0))
   return(plt)
 }
@@ -151,8 +151,8 @@ liftPlot <- function(trueClass, predProb, groups=NA, colors=NA){
       scale_color_manual(values=colors, guide=F)
   }
   plt <- plt +
-    scale_x_continuous(name="% samples tested", limits=c(0,100)) +
-    scale_y_continuous(name="% samples found", limits=c(0,100)) +
+    scale_x_continuous(name="% samples tested", limits=c(0, 102), expand=c(0, 0)) +
+    scale_y_continuous(name="% samples found", limits=c(0, 102), expand=c(0, 0)) +
     ggtitle("Lift") + ggpubr::theme_pubr(base_size=16) + theme(legend.justification=c(1, 0), legend.position=c(1, 0))
   return(plt)
 }
