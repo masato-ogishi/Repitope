@@ -29,4 +29,7 @@ MHCII_Rodents
 
 MHCII_Primates
 }
+\description{
+Datasets were compiled from source files attached in the package using \code{Epitope_Import}.
+}
 \keyword{datasets}

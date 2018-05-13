@@ -1,4 +1,7 @@
-#' @title Compiled datasets of MHC class I and class II epitopes and ligands.
+#' Compiled datasets of MHC class I and class II epitopes and ligands.
+#'
+#' Datasets were compiled from source files attached in the package using \code{Epitope_Import}.
+#'
 #' @format data.table
 #' @docType data
 #' @keywords datasets
