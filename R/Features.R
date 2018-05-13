@@ -14,52 +14,6 @@
 #' @param seedSet A set of random seeds.
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to disable parallelization.
 #' @param tmpDir Destination directory to save intermediate files.
-#' @importFrom dplyr %>%
-#' @importFrom dplyr mutate
-#' @importFrom dplyr select
-#' @importFrom dplyr filter
-#' @importFrom dplyr left_join
-#' @importFrom tidyr gather
-#' @importFrom tidyr spread
-#' @importFrom tidyr unite
-#' @importFrom tidyr crossing
-#' @importFrom data.table :=
-#' @importFrom data.table CJ
-#' @importFrom data.table as.data.table
-#' @importFrom data.table transpose
-#' @importFrom data.table rbindlist
-#' @importFrom data.table setorder
-#' @importFrom data.table setcolorder
-#' @importFrom data.table melt.data.table
-#' @importFrom data.table dcast.data.table
-#' @importFrom fst read_fst
-#' @importFrom fst write_fst
-#' @importFrom magrittr set_names
-#' @importFrom magrittr set_colnames
-#' @importFrom Biostrings reverse
-#' @importFrom Biostrings pairwiseAlignment
-#' @importFrom Biostrings AA_STANDARD
-#' @importFrom stringr str_sub
-#' @importFrom stringr str_replace_all
-#' @importFrom stringr str_split
-#' @importFrom stringr str_detect
-#' @importFrom stringr fixed
-#' @importFrom psych describe
-#' @importFrom matrixStats rowMins
-#' @importFrom matrixStats rowMaxs
-#' @importFrom matrixStats rowMeans2
-#' @importFrom matrixStats rowMedians
-#' @importFrom parallel detectCores
-#' @importFrom parallel detectCores
-#' @importFrom parallel makeCluster
-#' @importFrom parallel clusterEvalQ
-#' @importFrom parallel clusterExport
-#' @importFrom parallel stopCluster
-#' @importFrom pbapply pbapply
-#' @importFrom pbapply pblapply
-#' @importFrom BBmisc chunk
-#' @importFrom snow clusterSetupRNGstream
-#' @import Peptides
 #' @export
 #' @rdname Features
 #' @name Features_PeptDesc

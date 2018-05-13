@@ -9,7 +9,6 @@
 #' @param peptideLengthSet A set of peptide lengths to be incorporated.
 #' @param df A dataframe/datatable of epitope dataset.
 #' @param compressedColumnName A string indicating the names of the compressed column to be converted into a long format.
-#' @importFrom dplyr %>%
 #' @export
 #' @rdname DataPreparation_EpitopeDataset
 #' @name DataPreparation_EpitopeDataset

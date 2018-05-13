@@ -4,10 +4,6 @@
 #'
 #' @param accessionSet A set of SRA Run Accession numbers.
 #' @param outDir A directory for outputs.
-#' @importFrom stringr str_split
-#' @importFrom dplyr group_by
-#' @importFrom dplyr distinct
-#' @importFrom purrr is_empty
 #' @export
 #' @rdname DataPreparation_TCR_FastQDump
 FastQDump_Script <- function(accessionSet, outDir="C:/SRA/output"){

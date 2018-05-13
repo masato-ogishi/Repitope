@@ -1,14 +1,19 @@
 #' A utility function for creating a Venn diagram.
 #'
 #' @param x A list of vectors (e.g., integers, chars), with each component corresponding to a separate circle in the Venn diagram. The length should fall into the range between 1 and 5.
+#' @param colors A set of colors for the venn diagram.
 #' @param show_category_names Logical. Whether the names of \code{x} should be printed?
 #' @export
 #' @rdname Utility_VennDiagram
 #' @name Utility_VennDiagram
-vennDiagram <- function(x, show_category_names=T){
+vennDiagram <- function(x, colors=ggsci::pal_d3()(length(x)), show_category_names=T){
   try(dev.off(), silent=T) ## remove previous plots if any
   if(show_category_names==T){
-    catNames <- names(x)
+    if(identical(names(x), NULL)){
+      catNames <- 1:length(x)
+    }else{
+      catNames <- names(x)
+    }
   }else{
     catNames <- rep("", length(x))
   }
@@ -22,10 +27,10 @@ vennDiagram <- function(x, show_category_names=T){
     filename=NULL,
     category.names=catNames,
     col="black",
-    fill=ggsci::pal_d3()(length(x)),
+    fill=colors,
     alpha=0.50,
     cex=cexOption,
-    cat.col=ggsci::pal_d3()(length(x)),
+    cat.col=colors,
     cat.cex=1.5,
     fontfamily="sans",
     cat.fontfamily="sans",

@@ -3,10 +3,6 @@
 #' @param featureDFFileNames A character vector of binary file names with either ".fst" or ".rds" extensions.
 #' @param featureDFList A named list of feature dataframes.
 #' @param fileNameHeader A file name header.
-#' @importFrom stringr str_detect
-#' @importFrom fst read.fst
-#' @importFrom fst write.fst
-#' @importFrom pbapply pblapply
 #' @export
 #' @rdname Features_IO
 #' @name Features_IO

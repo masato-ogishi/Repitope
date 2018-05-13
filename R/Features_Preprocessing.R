@@ -12,40 +12,6 @@
 #' @param corThreshold The threshold of correlation to eliminate features.
 #' @param featureN The number of features to be retained.
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to disable.
-#' @importFrom dplyr %>%
-#' @importFrom dplyr distinct
-#' @importFrom dplyr filter
-#' @importFrom dplyr mutate
-#' @importFrom dplyr left_join
-#' @importFrom dplyr select
-#' @importFrom data.table as.data.table
-#' @importFrom data.table :=
-#' @importFrom data.table setcolorder
-#' @importFrom data.table setorder
-#' @importFrom data.table copy
-#' @importFrom stringr str_split
-#' @importFrom stringr fixed
-#' @importFrom parallel splitIndices
-#' @importFrom parallel detectCores
-#' @importFrom parallel makeCluster
-#' @importFrom parallel clusterEvalQ
-#' @importFrom parallel clusterExport
-#' @importFrom parallel stopCluster
-#' @importFrom doParallel registerDoParallel
-#' @importFrom pbapply pbapply
-#' @importFrom pbapply pblapply
-#' @importFrom foreach foreach
-#' @importFrom foreach %do%
-#' @importFrom caret createDataPartition
-#' @importFrom caret preProcess
-#' @importFrom caret findCorrelation
-#' @importFrom caret sbfControl
-#' @importFrom caret sbf
-#' @importFrom caret rfSBF
-#' @importFrom caret rfeControl
-#' @importFrom caret rfe
-#' @importFrom caret rfFuncs
-#' @importFrom caret predictors
 #' @export
 #' @rdname Features_Preprocessing
 #' @name Features_Preprocessing

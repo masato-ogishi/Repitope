@@ -5,7 +5,6 @@
 #' @param groups A vector indicating strata. Disable by setting NA.
 #' @param colors A set of colors. The length should be the same with the number of groups.
 #' @param plotTypes A character vector indicating which types of plots should be generated.
-#' @import ggplot2
 #' @export
 #' @rdname Utility_Classifier
 #' @name Utility_Classifier
@@ -24,6 +23,7 @@ rocPlot <- function(trueClass, predProb, groups=NA, colors=NA){
     aucSet <- cvAUC::ci.cvAUC(predictions=d$"Probability", labels=d$"Truth")
     data.table::data.table(Group=unique(d$"Group"), AUC=paste0("AUC: ", format(aucSet$cvAUC*100, digits=3), "% [", format(aucSet$ci[1]*100, digits=3), "%-", format(aucSet$ci[2]*100, digits=3),"%]"))
   }))
+  data.table::setorder(auc_dt, "Group")
   if(identical(groups, NA)){
     plt <- ggplot(roc_dt, aes(x=x, y=y)) +
       geom_line(size=1.5) +

@@ -6,7 +6,6 @@
 #' @param descending Logical. Whether the dataframe should be reordered in a descending order.
 #' @param .predictate A predictate function to be applied to the rows or a logical vector. Note: columns to be mutated have to be created in advance.
 #' @param ... Other parameters passed to \code{dplyr::mutate}.
-#' @importFrom dplyr %>%
 #' @export
 #' @rdname Utility_DF
 #' @name Utility_DF

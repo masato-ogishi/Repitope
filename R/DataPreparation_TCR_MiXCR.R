@@ -10,24 +10,6 @@
 #' @param clonesFileNames (Optional) Alternativey, MiXCR clonotype TXT filenames can be provided as a list.
 #' @param countSummarise Logical. If True, the number of datasets containing each CDR3 sequence is counted. If False, raw SRA accessions are provided as such.
 #' @param rdsFileName (Optional) A filename to which the clonotype summary table is saved as an RDS file.
-#' @importFrom stringr str_split
-#' @importFrom stringr str_detect
-#' @importFrom stringr fixed
-#' @importFrom dplyr %>%
-#' @importFrom dplyr group_by
-#' @importFrom dplyr summarise
-#' @importFrom dplyr distinct
-#' @importFrom dplyr filter
-#' @importFrom dplyr select
-#' @importFrom dplyr mutate
-#' @importFrom dplyr left_join
-#' @importFrom dplyr one_of
-#' @importFrom purrr is_empty
-#' @importFrom magrittr set_colnames
-#' @importFrom pbapply pblapply
-#' @importFrom data.table fread
-#' @importFrom data.table rbindlist
-#' @importFrom Biostrings AA_STANDARD
 #' @export
 #' @rdname DataPreparation_TCR_MiXCR
 #' @name DataPreparation_TCR_MiXCR

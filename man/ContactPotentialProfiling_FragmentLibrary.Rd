@@ -18,5 +18,5 @@ CPP_FragmentLibrary(sequenceSet, fragLenSet = 3:8, maxFragDepth = 1e+05,
 \item{seedSet}{A set of random seeds.}
 }
 \description{
-Generate sequence fragment libraries.
+\code{CPP_FragmentLibrary} generates a formatted fragment library datatable.
 }

@@ -9,7 +9,6 @@
 #' @param featureNSet The number of the features that should be retained. Can also be a vector of numbers. In that case, a list of minimum sets of features would be returned.
 #' @param criteria The criteria of feature extraction. Can either be "intersect" or "union".
 #' @param returnImpDFList Logical. Whether the lists of feature importance dataframes should be returned as well.
-#' @importFrom dplyr %>%
 #' @export
 #' @rdname Features_MinimumFeatures
 #' @name Features_MinimumFeatures

@@ -8,38 +8,6 @@
 #' @param weighted Should the network be converted to weihted? Edge weights are determined using the \code{numSet} provided.
 #' @param annotateMutType Should mutational types be annotated? A little bit time-consuming.
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to disable.
-#' @importFrom dplyr %>%
-#' @importFrom dplyr rename
-#' @importFrom dplyr filter
-#' @importFrom dplyr select
-#' @importFrom dplyr if_else
-#' @importFrom dplyr bind_rows
-#' @importFrom dplyr inner_join
-#' @importFrom dplyr last
-#' @importFrom stringr str_sub
-#' @importFrom stringr str_split
-#' @importFrom S4Vectors nchar
-#' @importFrom Biostrings AAStringSet
-#' @importFrom Biostrings pairwiseAlignment
-#' @importFrom Biostrings mismatchTable
-#' @importFrom stringdist stringdist
-#' @importFrom Matrix sparseMatrix
-#' @importFrom Matrix t
-#' @importFrom igraph V
-#' @importFrom igraph E
-#' @importFrom igraph set_vertex_attr
-#' @importFrom igraph graph_from_adjacency_matrix
-#' @importFrom igraph graph_from_data_frame
-#' @importFrom igraph simplify
-#' @importFrom igraph as_edgelist
-#' @importFrom parallel detectCores
-#' @importFrom parallel makeCluster
-#' @importFrom parallel clusterEvalQ
-#' @importFrom parallel clusterExport
-#' @importFrom parallel stopCluster
-#' @importFrom pbapply timerProgressBar
-#' @importFrom pbapply setTimerProgressBar
-#' @importFrom pbapply pblapply
 #' @export
 #' @rdname NeighborNetwork
 #' @name NeighborNetwork

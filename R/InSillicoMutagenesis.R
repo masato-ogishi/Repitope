@@ -6,16 +6,6 @@
 #' @param peptideSet A set of peptide sequences.
 #' @param peptidePair A pair of peptide sequences.
 #' @param coreN The number of threads for parallelization.
-#' @importFrom Biostrings AA_STANDARD
-#' @importFrom stringdist stringdist
-#' @importFrom Matrix t
-#' @importFrom igraph graph_from_adjacency_matrix
-#' @importFrom igraph set_vertex_attr
-#' @importFrom pbapply pblapply
-#' @importFrom parallel detectCores
-#' @importFrom parallel makeCluster
-#' @importFrom parallel stopCluster
-#' @importFrom parallel clusterExport
 #' @export
 #' @rdname InSillicoMutagenesis
 #' @name InSillicoMutagenesis

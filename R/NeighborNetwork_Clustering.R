@@ -10,35 +10,6 @@
 #' @param seed A random seed.
 #' @param plot Logical. Whether the network cluster plot shuould be generated.
 #' @param coreN The number of threads for parallelization.
-#' @importFrom dplyr %>%
-#' @importFrom dplyr filter
-#' @importFrom dplyr select
-#' @importFrom dplyr tibble
-#' @importFrom dplyr left_join
-#' @importFrom dplyr arrange
-#' @importFrom dplyr mutate
-#' @importFrom dplyr group_by
-#' @importFrom dplyr summarise
-#' @importFrom dplyr if_else
-#' @importFrom magrittr set_colnames
-#' @importFrom data.table as.data.table
-#' @importFrom igraph induced_subgraph
-#' @importFrom igraph V
-#' @importFrom igraph E
-#' @importFrom igraph layout_nicely
-#' @importFrom igraph cluster_walktrap
-#' @importFrom scales alpha
-#' @importFrom scales rescale
-#' @importFrom msa msaClustalW
-#' @importFrom msa msaConsensusSequence
-#' @importFrom stringr str_replace_all
-#' @importFrom stringr fixed
-#' @importFrom stringr str_locate
-#' @importFrom ggsci pal_d3
-#' @importFrom pbapply pblapply
-#' @importFrom parallel makeCluster
-#' @importFrom parallel stopCluster
-#' @importFrom parallel clusterExport
 #' @export
 #' @rdname NeighborNetwork_Clustering
 #' @name NeighborNetwork_Clustering

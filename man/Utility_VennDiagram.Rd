@@ -5,10 +5,13 @@
 \alias{vennDiagram}
 \title{A utility function for creating a Venn diagram.}
 \usage{
-vennDiagram(x, show_category_names = T)
+vennDiagram(x, colors = (ggsci::pal_d3())(length(x)),
+  show_category_names = T)
 }
 \arguments{
 \item{x}{A list of vectors (e.g., integers, chars), with each component corresponding to a separate circle in the Venn diagram. The length should fall into the range between 1 and 5.}
+
+\item{colors}{A set of colors for the venn diagram.}
 
 \item{show_category_names}{Logical. Whether the names of \code{x} should be printed?}
 }

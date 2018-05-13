@@ -1,24 +1,11 @@
 #' Generate sequence fragment libraries.
 #'
+#' \code{CPP_FragmentLibrary} generates a formatted fragment library datatable.
+#'
 #' @param sequenceSet A set of amino acid sequences.
 #' @param fragLenSet A set of sliding window sizes. Must be between 3 and 8.
 #' @param maxFragDepth The maximum size of the fragment library.
 #' @param seedSet A set of random seeds.
-#' @importFrom Biostrings reverse
-#' @importFrom stringr str_sub
-#' @importFrom dplyr %>%
-#' @importFrom dplyr full_join
-#' @importFrom dplyr mutate
-#' @importFrom dplyr transmute
-#' @importFrom data.table :=
-#' @importFrom data.table rbindlist
-#' @importFrom data.table as.data.table
-#' @importFrom parallel detectCores
-#' @importFrom parallel makeCluster
-#' @importFrom parallel clusterExport
-#' @importFrom parallel stopCluster
-#' @importFrom pbapply pblapply
-#' @importFrom Biostrings AA_STANDARD
 #' @export
 #' @rdname ContactPotentialProfiling_FragmentLibrary
 #' @name ContactPotentialProfiling_FragmentLibrary

@@ -3,24 +3,6 @@
 #' \code{CPP_AACPMatrix} generates a formatted AACP datatable.
 #'
 #' @param sourceFile A source file. By default, the AACP dataset downloaded from the official AAIndex database will be used. Alternatively, users can provide modified AACP scales.
-#' @importFrom dplyr %>%
-#' @importFrom dplyr select
-#' @importFrom dplyr filter
-#' @importFrom dplyr mutate
-#' @importFrom dplyr bind_rows
-#' @importFrom dplyr distinct
-#' @importFrom tidyr gather
-#' @importFrom tidyr spread
-#' @importFrom tidyr nest
-#' @importFrom stringr str_sub
-#' @importFrom readr read_csv
-#' @importFrom magrittr set_rownames
-#' @importFrom data.table rbindlist
-#' @importFrom data.table setcolorder
-#' @importFrom Biostrings reverse
-#' @importFrom Biostrings AA_STANDARD
-#' @importFrom scales rescale
-#' @importFrom pbapply pblapply
 #' @export
 #' @rdname ContactPotentialProfiling_AACPMatrix
 #' @name ContactPotentialProfiling_AACPMatrix

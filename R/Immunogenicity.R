@@ -14,23 +14,6 @@
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to disable.
 #' @param trainModelResults The model training result returned by \code{Immunogenicity_TrainModels}.
 #' @param externalFeatureDFList The feature dataframes for which immunogenicity is to be predicted.
-#' @importFrom dplyr %>%
-#' @importFrom dplyr transmute
-#' @importFrom dplyr select
-#' @importFrom dplyr left_join
-#' @importFrom dplyr right_join
-#' @importFrom dplyr group_by
-#' @importFrom dplyr summarise
-#' @importFrom dplyr distinct
-#' @importFrom purrr flatten
-#' @importFrom data.table :=
-#' @importFrom data.table rbindlist
-#' @importFrom data.table as.data.table
-#' @importFrom caret preProcess
-#' @importFrom extraTrees extraTrees
-#' @importFrom BBmisc chunk
-#' @importFrom parallel detectCores
-#' @importFrom pbapply pblapply
 #' @export
 #' @rdname Immunogenicity
 #' @name Immunogenicity
