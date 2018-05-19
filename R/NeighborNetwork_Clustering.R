@@ -128,9 +128,9 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
       vertex.label.family="sans",
       vertex.color=vertexColors,
       vertex.frame.color="black",
-      edge.width=0.1,
-      edge.arrow.size=0.1,
-      edge.arrow.width=0.1,
+      edge.width=0.5,
+      edge.arrow.size=0.5,
+      edge.arrow.width=0.5,
       edge.color=scales::alpha("gray50", 0.75)
     )
     for(i in 1:length(clusterCentroids$ClusterID)){
