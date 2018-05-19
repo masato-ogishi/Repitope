@@ -123,14 +123,14 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
       vertex.shape=vertexShapes,
       vertex.label=vertexLabels,
       vertex.label.color="black",
-      vertex.label.cex=1.0,
+      vertex.label.cex=1.25,
       vertex.label.dist=0.5,
       vertex.label.family="sans",
       vertex.color=vertexColors,
       vertex.frame.color="black",
       edge.width=0.5,
-      edge.arrow.size=0.5,
-      edge.arrow.width=0.5,
+      edge.arrow.size=0.25,
+      edge.arrow.width=0.1,
       edge.color=scales::alpha("gray50", 0.75)
     )
     for(i in 1:length(clusterCentroids$ClusterID)){
