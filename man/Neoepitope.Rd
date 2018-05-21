@@ -2,6 +2,8 @@
 % Please edit documentation in R/Neoepitope.R
 \name{Neoepitope}
 \alias{Neoepitope}
+\alias{Neoepitope_BurdenDT}
+\alias{Neoepitope}
 \alias{Neoepitope_PValueDT}
 \alias{Neoepitope}
 \alias{Neoepitope_PValueDT_Batch}
@@ -11,6 +13,8 @@
 \alias{Neoepitope_KMPlot}
 \title{Neoepitope analysis.}
 \usage{
+Neoepitope_BurdenDT(dt_neoepitope, thr = "none", thr.ne = 1)
+
 Neoepitope_PValueDT(dt_neoepitope, thr = "none")
 
 Neoepitope_PValueDT_Batch(dt_neoepitope, thrSet = seq(0, 1, length.out =
@@ -25,16 +29,18 @@ Neoepitope_KMPlot(dt_neoepitope, thr = "none", thr.ne = 1)
 
 \item{thr}{A threshold of neoepitope dissimilarity index. Can be set as "none" to disabled. In that case, neoepitope dissimilarity indices were aggregated by patients without thresholding.}
 
+\item{thr.ne}{A threshold of neoepitope burden or aggregated neoepitope dissimilarity index per patient.}
+
 \item{thrSet}{A set of thresholds of neoepitope dissimilarity index.}
 
 \item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to disable parallelization.}
 
 \item{dt_pvalue}{A datatable containing thresholds and P-values by the log-rank test.}
-
-\item{thr.ne}{A threshold of neoepitope burden or aggregated neoepitope dissimilarity index per patient.}
 }
 \description{
+\code{Neoepitope_BurdenDT} returns a neoepitope summary datatable using the thresholds provided. \cr
 \code{Neoepitope_PValueDT} calculates P-values by the log-rank test with varying thresholds for the neoepitope burden defined by the specified threshold of the neoepitope dissimilarity index. If no threshold is provided, neoepitope dissimilarity indices were aggregated by patients without thresholding. \cr
+\code{Neoepitope_PValueDT_Batch} does the jobs for a set of thresholds of the neoepitope dissimilarity index. \cr
 \code{Neoepitope_PValueLineChart} generates a line chart of threshold values and P-values.\cr
 \code{Neoepitope_KMPlot} generates a Kaplan-Mayer curve with the thresholds provided.
 }

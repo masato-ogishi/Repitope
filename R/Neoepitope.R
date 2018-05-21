@@ -1,6 +1,8 @@
 #' Neoepitope analysis.
 #'
+#' \code{Neoepitope_BurdenDT} returns a neoepitope summary datatable using the thresholds provided. \cr
 #' \code{Neoepitope_PValueDT} calculates P-values by the log-rank test with varying thresholds for the neoepitope burden defined by the specified threshold of the neoepitope dissimilarity index. If no threshold is provided, neoepitope dissimilarity indices were aggregated by patients without thresholding. \cr
+#' \code{Neoepitope_PValueDT_Batch} does the jobs for a set of thresholds of the neoepitope dissimilarity index. \cr
 #' \code{Neoepitope_PValueLineChart} generates a line chart of threshold values and P-values.\cr
 #' \code{Neoepitope_KMPlot} generates a Kaplan-Mayer curve with the thresholds provided.
 #'
@@ -10,6 +12,26 @@
 #' @param thrSet A set of thresholds of neoepitope dissimilarity index.
 #' @param thr.ne A threshold of neoepitope burden or aggregated neoepitope dissimilarity index per patient.
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to disable parallelization.
+#' @export
+#' @rdname Neoepitope
+#' @name Neoepitope
+Neoepitope_BurdenDT <- function(dt_neoepitope, thr="none", thr.ne=1){
+  dt_neoepitope[,Neoepitope:=abs(ImmunogenicityScore.WT - ImmunogenicityScore.MT)/ImmunogenicityScore.WT]
+  if(is.numeric(thr)){
+    dt_neoepitope[,Neoepitope:=Neoepitope>=thr]
+    if(sum(dt_neoepitope$Neoepitope)==0){
+      cat("No neoepitopes were retained! Try different thresholds.", sep="")
+      return(NULL)
+    }
+    neoepitopeCount <- sum(dt_neoepitope$Neoepitope)
+    cat(formatC(neoepitopeCount/nrow(dt_neoepitope)*100, digits=1, format="f", drop0trailing=F), "% of neoepitope candidates were retained after filtering by neoepitope dissimilarity index.", sep="")
+  }
+  dt_neoepitope <- data.table::dcast.data.table(dt_neoepitope, Dataset+Sample+Months+Status~., value.var="Neoepitope", fun=sum)
+  colnames(dt_neoepitope) <- c("Dataset","Sample","Months","Status","NeoepitopeBurden")
+  dt_neoepitope[,NeoepitopeBurdenGroup:=factor(dplyr::if_else(dt_neoepitope$NeoepitopeBurden>=thr.ne, 1, 0), levels=c(0, 1), labels=c("Low","High"))]
+  return(dt_neoepitope)
+}
+
 #' @export
 #' @rdname Neoepitope
 #' @name Neoepitope
@@ -37,7 +59,7 @@ Neoepitope_PValueDT <- function(dt_neoepitope, thr="none"){
       return(data.table::data.table("PValue"=NA, "NeoepitopeBurdenThreshold"=thr.ne))
     }else{
       diff <- survival::survdiff(survival::Surv(Months, Status)~NeoepitopeBurdenGroup, data=dt)
-      p <- pchisq(diff$chisq, length(diff$n)-1, lower.tail=F)
+      p <- stats::pchisq(diff$chisq, length(diff$n)-1, lower.tail=F)
       return(data.table::data.table("PValue"=p, "NeoepitopeBurdenThreshold"=thr.ne))
     }
   }
@@ -72,7 +94,7 @@ Neoepitope_PValueLineChart <- function(dt_pvalue){
   if(identical(unique(dt_pvalue$"Threshold"), "none")){
     g <- ggplot(dt_pvalue, aes_string(x="NeoepitopeBurdenThreshold", y="PValue")) + geom_line()
   }else{
-    dt_pvalue_plot <- data.table::dcast.data.table(dt_pvalue[complete.cases(dt_pvalue),], Threshold~., value.var="PValue", fun=min)
+    dt_pvalue_plot <- data.table::dcast.data.table(dt_pvalue[stats::complete.cases(dt_pvalue),], Threshold~., value.var="PValue", fun=min)
     colnames(dt_pvalue_plot) <- c("Threshold", "PValue")
     g <- ggplot(dt_pvalue_plot, aes_string(x="Threshold", y="PValue")) + geom_line()
   }
@@ -85,19 +107,7 @@ Neoepitope_PValueLineChart <- function(dt_pvalue){
 #' @rdname Neoepitope
 #' @name Neoepitope
 Neoepitope_KMPlot <- function(dt_neoepitope, thr="none", thr.ne=1){
-  dt_neoepitope[,Neoepitope:=abs(ImmunogenicityScore.WT - ImmunogenicityScore.MT)/ImmunogenicityScore.WT]
-  if(is.numeric(thr)){
-    dt_neoepitope[,Neoepitope:=Neoepitope>=thr]
-    if(sum(dt_neoepitope$Neoepitope)==0){
-      cat("No neoepitopes were retained! Try different thresholds.", sep="")
-      return(NULL)
-    }
-    neoepitopeCount <- sum(dt_neoepitope$Neoepitope)
-    cat(formatC(neoepitopeCount/nrow(dt_neoepitope)*100, digits=1, format="f", drop0trailing=F), "% of neoepitope candidates were retained after filtering by neoepitope dissimilarity index.", sep="")
-  }
-  dt_neoepitope <- data.table::dcast.data.table(dt_neoepitope, Dataset+Sample+Months+Status~., value.var="Neoepitope", fun=sum)
-  colnames(dt_neoepitope) <- c("Dataset","Sample","Months","Status","NeoepitopeBurden")
-  dt_neoepitope[,NeoepitopeBurdenGroup:=factor(dplyr::if_else(dt_neoepitope$NeoepitopeBurden>=thr.ne, 1, 0), levels=c(0, 1), labels=c("Low","High"))]
+  dt_neoepitope <- Neoepitope_BurdenDT(dt_neoepitope, thr=thr)
   surv <- survival::survfit(survival::Surv(Months, Status)~NeoepitopeBurdenGroup, data=dt_neoepitope)
   res <- survminer::ggsurvplot(
     fit=surv,
