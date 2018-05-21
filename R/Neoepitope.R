@@ -7,7 +7,8 @@
 #' \code{Neoepitope_KMPlot} generates a Kaplan-Mayer curve with the thresholds provided.
 #'
 #' @param dt_neoepitope A datatable of neoepitopes that contains the following columns: "Dataset","Sample","Months","Status", "ImmunogenicityScore.WT", and, "ImmunogenicityScore.MT".
-#' @param dt_pvalue A datatable containing thresholds and P-values by the log-rank test.
+#' @param dt_neoepitope_burden A datatable returned by \code{Neoepitope_BurdenDT}.
+#' @param dt_pvalue A datatable returned by \code{Neoepitope_PValueDT_Batch}.
 #' @param thr A threshold of neoepitope dissimilarity index. Can be set as "none" to disabled. In that case, neoepitope dissimilarity indices were aggregated by patients without thresholding.
 #' @param thrSet A set of thresholds of neoepitope dissimilarity index.
 #' @param thr.ne A threshold of neoepitope burden or aggregated neoepitope dissimilarity index per patient.
@@ -106,12 +107,11 @@ Neoepitope_PValueLineChart <- function(dt_pvalue){
 #' @export
 #' @rdname Neoepitope
 #' @name Neoepitope
-Neoepitope_KMPlot <- function(dt_neoepitope, thr="none", thr.ne=1){
-  dt_neoepitope <- Neoepitope_BurdenDT(dt_neoepitope, thr=thr)
-  surv <- survival::survfit(survival::Surv(Months, Status)~NeoepitopeBurdenGroup, data=dt_neoepitope)
+Neoepitope_KMPlot <- function(dt_neoepitope_burden){
+  surv <- survival::survfit(survival::Surv(Months, Status)~NeoepitopeBurdenGroup, data=dt_neoepitope_burden)
   res <- survminer::ggsurvplot(
     fit=surv,
-    data=dt_neoepitope,
+    data=dt_neoepitope_burden,
     palette=c("grey50", "firebrick1"), linetype="solid", conf.int=T, size=0.75,
     font.x=16, font.y=16, font.tickslab=12, font.legend=16,
     pval=T, pval.method=T, log.rank.weights="1", pval.size=6, pval.coord=c(0.1, 0.1), pval.method.coord=c(0.1, 0.2),

@@ -22,7 +22,7 @@ Neoepitope_PValueDT_Batch(dt_neoepitope, thrSet = seq(0, 1, length.out =
 
 Neoepitope_PValueLineChart(dt_pvalue)
 
-Neoepitope_KMPlot(dt_neoepitope, thr = "none", thr.ne = 1)
+Neoepitope_KMPlot(dt_neoepitope_burden)
 }
 \arguments{
 \item{dt_neoepitope}{A datatable of neoepitopes that contains the following columns: "Dataset","Sample","Months","Status", "ImmunogenicityScore.WT", and, "ImmunogenicityScore.MT".}
@@ -35,7 +35,9 @@ Neoepitope_KMPlot(dt_neoepitope, thr = "none", thr.ne = 1)
 
 \item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to disable parallelization.}
 
-\item{dt_pvalue}{A datatable containing thresholds and P-values by the log-rank test.}
+\item{dt_pvalue}{A datatable returned by \code{Neoepitope_PValueDT_Batch}.}
+
+\item{dt_neoepitope_burden}{A datatable returned by \code{Neoepitope_BurdenDT}.}
 }
 \description{
 \code{Neoepitope_BurdenDT} returns a neoepitope summary datatable using the thresholds provided. \cr
