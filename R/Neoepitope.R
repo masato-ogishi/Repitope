@@ -9,15 +9,17 @@
 #' @param dt_neoepitope A datatable of neoepitopes that contains the following columns: "Dataset","Sample","Months","Status", "ImmunogenicityScore.WT", and, "ImmunogenicityScore.MT".
 #' @param dt_neoepitope_burden A datatable returned by \code{Neoepitope_BurdenDT}.
 #' @param dt_pvalue A datatable returned by \code{Neoepitope_PValueDT_Batch}.
+#' @param metric Can be either "m", "d", or "nd". "m" uses the immunogenicity scores of neoepitopes. "d" calculates absolute differences of the immunogenicity scores between wildtype and mutated peptides. "nd" calculates absolute score differences normalized by the sum of scores of wildtype and mutated peptides.
 #' @param thr A threshold of neoepitope dissimilarity index. Can be set as "none" to disabled. In that case, neoepitope dissimilarity indices were aggregated by patients without thresholding.
-#' @param thrSet A set of thresholds of neoepitope dissimilarity index.
 #' @param thr.ne A threshold of neoepitope burden or aggregated neoepitope dissimilarity index per patient.
 #' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to disable parallelization.
 #' @export
 #' @rdname Neoepitope
 #' @name Neoepitope
-Neoepitope_BurdenDT <- function(dt_neoepitope, thr="none", thr.ne=1){
-  dt_neoepitope[,Neoepitope:=abs(ImmunogenicityScore.WT - ImmunogenicityScore.MT)/ImmunogenicityScore.WT]
+Neoepitope_BurdenDT <- function(dt_neoepitope, metric="nd", thr="none", thr.ne=1){
+  if(identical(metric, "m")) dt_neoepitope[,Neoepitope:=ImmunogenicityScore.MT]
+  if(identical(metric, "d")) dt_neoepitope[,Neoepitope:=abs(ImmunogenicityScore.WT-ImmunogenicityScore.MT)]
+  if(identical(metric, "nd")) dt_neoepitope[,Neoepitope:=abs(ImmunogenicityScore.WT-ImmunogenicityScore.MT)/(ImmunogenicityScore.WT+ImmunogenicityScore.MT)]
   if(is.numeric(thr)){
     dt_neoepitope[,Neoepitope:=Neoepitope>=thr]
     if(sum(dt_neoepitope$Neoepitope)==0){
@@ -36,8 +38,10 @@ Neoepitope_BurdenDT <- function(dt_neoepitope, thr="none", thr.ne=1){
 #' @export
 #' @rdname Neoepitope
 #' @name Neoepitope
-Neoepitope_PValueDT <- function(dt_neoepitope, thr="none"){
-  dt_neoepitope[,Neoepitope:=abs(ImmunogenicityScore.WT - ImmunogenicityScore.MT)/ImmunogenicityScore.WT]
+Neoepitope_PValueDT <- function(dt_neoepitope, metric="nd", thr="none"){
+  if(identical(metric, "m")) dt_neoepitope[,Neoepitope:=ImmunogenicityScore.MT]
+  if(identical(metric, "d")) dt_neoepitope[,Neoepitope:=abs(ImmunogenicityScore.WT-ImmunogenicityScore.MT)]
+  if(identical(metric, "nd")) dt_neoepitope[,Neoepitope:=abs(ImmunogenicityScore.WT-ImmunogenicityScore.MT)/(ImmunogenicityScore.WT+ImmunogenicityScore.MT)]
   if(is.numeric(thr)){
     dt_neoepitope[,Neoepitope:=Neoepitope>=thr]
     if(sum(dt_neoepitope$Neoepitope)==0){
@@ -72,16 +76,21 @@ Neoepitope_PValueDT <- function(dt_neoepitope, thr="none"){
 #' @export
 #' @rdname Neoepitope
 #' @name Neoepitope
-Neoepitope_PValueDT_Batch <- function(dt_neoepitope, thrSet=seq(0, 1, length.out=1000), coreN=parallel::detectCores()){
+Neoepitope_PValueDT_Batch <- function(dt_neoepitope, metric="nd", coreN=parallel::detectCores()){
+  if(identical(metric, "m")) dt_neoepitope[,Neoepitope:=ImmunogenicityScore.MT]
+  if(identical(metric, "d")) dt_neoepitope[,Neoepitope:=abs(ImmunogenicityScore.WT-ImmunogenicityScore.MT)]
+  if(identical(metric, "nd")) dt_neoepitope[,Neoepitope:=abs(ImmunogenicityScore.WT-ImmunogenicityScore.MT)/(ImmunogenicityScore.WT+ImmunogenicityScore.MT)]
+  thrSet <- dt_neoepitope$Neoepitope
+  thrSet <- seq(min(thrSet), max(thrSet), length.out=1000)
   if(is.null(coreN)){
     dt_pvalue <- foreach::foreach(thr=thrSet, .export="Neoepitope_PValueDT", .packages="data.table", .inorder=F) %do% {
-      Neoepitope_PValueDT(dt_neoepitope, thr)
+      Neoepitope_PValueDT(dt_neoepitope, metric=metric, thr=thr)
     } %>% data.table::rbindlist()
     return(dt_pvalue)
   }else{
     doParallel::registerDoParallel(coreN)
     dt_pvalue <- foreach::foreach(thr=thrSet, .export="Neoepitope_PValueDT", .packages="data.table", .inorder=F) %dopar% {
-      Neoepitope_PValueDT(dt_neoepitope, thr)
+      Neoepitope_PValueDT(dt_neoepitope, metric=metric, thr=thr)
     } %>% data.table::rbindlist()
     doParallel::stopImplicitCluster()
     return(dt_pvalue)

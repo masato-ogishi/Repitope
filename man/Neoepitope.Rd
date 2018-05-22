@@ -13,12 +13,13 @@
 \alias{Neoepitope_KMPlot}
 \title{Neoepitope analysis.}
 \usage{
-Neoepitope_BurdenDT(dt_neoepitope, thr = "none", thr.ne = 1)
+Neoepitope_BurdenDT(dt_neoepitope, metric = "nd", thr = "none",
+  thr.ne = 1)
 
-Neoepitope_PValueDT(dt_neoepitope, thr = "none")
+Neoepitope_PValueDT(dt_neoepitope, metric = "nd", thr = "none")
 
-Neoepitope_PValueDT_Batch(dt_neoepitope, thrSet = seq(0, 1, length.out =
-  1000), coreN = parallel::detectCores())
+Neoepitope_PValueDT_Batch(dt_neoepitope, metric = "nd",
+  coreN = parallel::detectCores())
 
 Neoepitope_PValueLineChart(dt_pvalue)
 
@@ -27,11 +28,11 @@ Neoepitope_KMPlot(dt_neoepitope_burden)
 \arguments{
 \item{dt_neoepitope}{A datatable of neoepitopes that contains the following columns: "Dataset","Sample","Months","Status", "ImmunogenicityScore.WT", and, "ImmunogenicityScore.MT".}
 
+\item{metric}{Can be either "m", "d", or "nd". "m" uses the immunogenicity scores of neoepitopes. "d" calculates absolute differences of the immunogenicity scores between wildtype and mutated peptides. "nd" calculates absolute score differences normalized by the sum of scores of wildtype and mutated peptides.}
+
 \item{thr}{A threshold of neoepitope dissimilarity index. Can be set as "none" to disabled. In that case, neoepitope dissimilarity indices were aggregated by patients without thresholding.}
 
 \item{thr.ne}{A threshold of neoepitope burden or aggregated neoepitope dissimilarity index per patient.}
-
-\item{thrSet}{A set of thresholds of neoepitope dissimilarity index.}
 
 \item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to disable parallelization.}
 
