@@ -64,6 +64,63 @@ MHCII_Human <- Epitope_Import(
 fragLibDT <- CPP_FragmentLibrary(TCRSet_Public, fragLenSet=3:11, maxFragDepth=100000, seedSet=1:5)
 fst::write_fst(fragLibDT, "./Path/To/Your/Directory/FragmentLibrary_TCRSet_Public.fst", compress=0)
 ```
+2. Features
+-   Features can be calculated as follows.
+``` r
+# Features [MHC I]
+FeatureDFList_MHCI <- Features(
+  peptideSet=unique(c(MHCI_Human$Peptide, MHCI_Rodents$Peptide, MHCI_Primates$Peptide)),
+  fragLib="./Path/To/Your/Directory/FragmentLibrary_TCRSet_Public.fst",
+  aaIndexIDSet="all",
+  fragLenSet=3:8,
+  fragDepthSet=10000,
+  fragLibTypeSet="Weighted",
+  seedSet=1:5,                                   ## must be the same seed set for the fragment library
+  coreN=parallel::detectCores()                  ## parallelization
+  tmpDir="./Path/To/Your/Temporary/Directory/"   ## where intermediate files are stored
+)
+saveFeatureDFList(FeatureDFList_MHCI, "./Path/To/Your/Directory/MHCI/FeatureDF_")
+# Features [MHC II]
+FeatureDFList_MHCII <- Features(
+  peptideSet=unique(c(MHCII_Human$Peptide, MHCII_Rodents$Peptide, MHCII_Primates$Peptide)),
+  fragLib="./Path/To/Your/Directory/FragmentLibrary_TCRSet_Public.fst",
+  aaIndexIDSet="all",
+  fragLenSet=3:11,
+  fragDepthSet=10000,
+  fragLibTypeSet="Weighted",
+  seedSet=1:5,                                   ## must be the same seed set for the fragment library
+  coreN=parallel::detectCores()                  ## parallelization
+  tmpDir="./Path/To/Your/Temporary/Directory/"   ## where intermediate files are stored
+)
+saveFeatureDFList(FeatureDFList_MHCII, "./Path/To/Your/Directory/MHCII/FeatureDF_")
+```
+-   Feature selection can be performed as follows.
+``` r
+# Feature selection [MHC I]
+dt_feature_MHCI <- fst::read_fst("./Path/To/Your/Directory/MHCI/FeatureDF_Weighted.10000.fst", as.data.table=T)
+minFeatureSet_MHCI_Human <- Features_MinimumFeatures(
+  featureDFList=list(dt_feature_MHCI[Peptide%in%MHCI_Human$Peptide,]),
+  metadataDF=MHCI_Human[,.(Peptide,Immunogenicity)][,Cluster:=.I],
+  seedSet=1:5,
+  corThreshold=0.75,
+  featureNSet=100,
+  criteria="intersect",
+  returnImpDFList=T
+)
+saveRDS(minFeatureSet_MHCI_Human, "./Path/To/Your/Directory/MHCI/MinimumFeatureSet_MHCI_Human.rds")
+# Feature selection [MHC II]
+dt_feature_MHCII <- fst::read_fst("./Path/To/Your/Directory/MHCII/FeatureDF_Weighted.10000.fst", as.data.table=T)
+minFeatureSet_MHCII_Human <- Features_MinimumFeatures(
+  featureDFList=list(dt_feature_MHCII[Peptide%in%MHCII_Human$Peptide,]),
+  metadataDF=MHCII_Human[,.(Peptide,Immunogenicity)][,Cluster:=.I],
+  seedSet=1:5,
+  corThreshold=0.75,
+  featureNSet=100,
+  criteria="intersect",
+  returnImpDFList=T
+)
+saveRDS(minFeatureSet_MHCII_Human, "./Path/To/Your/Directory/MHCII/MinimumFeatureSet_MHCII_Human.rds")
+```
 
 Reference
 ------------------------
