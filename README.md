@@ -1,8 +1,7 @@
-Repitope: Epitope immunogenicity prediction from interresidue contact potential profiling
+Repitope: Epitope immunogenicity prediction through in silico TCR-peptide contact potential profiling
 ===============================================
 
-The 'Repitope' package provides a structured framework of quantitative prediction of the immunogenicity of MHC-I-loaded peptides through interresidue contact potential profiling.
-Note: Repitope is currently under construction.
+The 'Repitope' package provides a structured framework of quantitative prediction of immunogenicity for peptides bound to MHC class I and class II through TCR-peptide contact potential profiling (CPP).
 
 Installation
 ------------------------
