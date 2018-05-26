@@ -19,7 +19,7 @@ devtools::install_github("masato-ogishi/Repitope")
 
 Loading
 ------------------
-
+Working environment setup
 ``` r
 options(java.parameters="-Xmx60G")  ## allow the JAVA session to use larger memory space
 library(tidyverse)
@@ -29,4 +29,4 @@ library(Repitope)
 Reference
 ------------------------
 
-Ogishi, M and Yotsuyanagi, H. (2018) "Immunogenicity landscape of cytotoxic T lymphocyte epitopes in sequence space." bioRxiv. doi: https://doi.org/10.1101/155317
+Ogishi, M and Yotsuyanagi, H. (2018) "The landscapes of T cell epitope immunogenicity in sequence space." bioRxiv. doi: https://doi.org/10.1101/155317
