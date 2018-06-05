@@ -39,7 +39,7 @@ NetMHC_Script <- function(outDir="./NetMHC/"){
     paste0(
       "./netMHC -a ", hla_string,
       " -l ", gsub("mer", "", unlist(strsplit(FASTAFileName, "_"))[2]),
-      " -xls 1 -xlsfile ", gsub("fasta", "xls", FASTAFileName),
+      " -xls -xlsfile ./Peptides/", gsub("fasta", "xls", FASTAFileName),
       " -f ./Peptides/", FASTAFileName
     )
   }
@@ -54,7 +54,7 @@ NetMHC_Script <- function(outDir="./NetMHC/"){
     paste0(
       "./NetMHCIIpan-3.2.pl -a ", hla_string,
       " -length ", gsub("mer", "", unlist(strsplit(FASTAFileName, "_"))[2]),
-      " -xls 1 -xlsfile ", gsub("fasta", "xls", FASTAFileName),
+      " -xls -xlsfile ./Peptides/", gsub("fasta", "xls", FASTAFileName),
       " -f ./Peptides/", FASTAFileName
     )
   }
