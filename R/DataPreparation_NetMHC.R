@@ -52,7 +52,7 @@ NetMHC_Script <- function(outDir="./NetMHC/"){
   hla_string <- "DRB1_0101,DRB3_0101,DRB4_0101,DRB5_0101,HLA-DPA10103-DPB10101,HLA-DQA10101-DQB10201"
   script_single <- function(FASTAFileName){
     paste0(
-      "./NetMHCIIpan-3.2.pl -a ", hla_string,
+      "./netMHCIIpan -a ", hla_string,
       " -length ", gsub("mer", "", unlist(strsplit(FASTAFileName, "_"))[2]),
       " -xls -xlsfile ./Peptides/", gsub("fasta", "xls", FASTAFileName),
       " -f ./Peptides/", FASTAFileName
