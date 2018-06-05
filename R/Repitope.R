@@ -45,6 +45,7 @@
 #' @importFrom data.table transpose
 #' @importFrom doParallel registerDoParallel
 #' @importFrom doParallel stopImplicitCluster
+#' @importFrom doSNOW registerDoSNOW
 #' @importFrom dplyr %>%
 #' @importFrom dplyr arrange
 #' @importFrom dplyr bind_cols

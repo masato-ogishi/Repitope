@@ -12,7 +12,7 @@
 #' @param fragLibTypeSet A set of strings indicating the types of fragment libraries to be used.
 #' @param featureSet A minimum set of features. Combinations of fragment lengths and AAIndex IDs are internally extracted for calculating CPPs.
 #' @param seedSet A set of random seeds.
-#' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to disable parallelization.
+#' @param coreN The number of cores to be used for parallelization.
 #' @param tmpDir Destination directory to save intermediate files.
 #' @export
 #' @rdname Features
@@ -65,16 +65,15 @@ Features_PeptDesc <- function(
   parameterDT <- data.table::CJ(peptideSet, fragLenSet) %>%
     magrittr::set_colnames(c("Peptide", "FragLen"))
   cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
-  parallel::clusterExport(
-    cl=cl,
-    list("parameterDT", "peptideDescriptor.FragStat.Single", "peptideDescriptor.Batch", "peptideDescriptor.NameSet"),
-    envir=environment()
-  )
-  dt_peptdesc <- pbapply::pblapply(
-    1:nrow(parameterDT),
-    function(i){peptideDescriptor.FragStat.Single(parameterDT$"Peptide"[[i]], parameterDT$"FragLen"[[i]])},
-    cl=cl
-  ) %>% data.table::rbindlist()
+  doSNOW::registerDoSNOW(cl)
+  sink(tempfile())
+  pb <- pbapply::timerProgressBar(max=nrow(parameterDT), style=1)
+  sink()
+  opts <- list(progress=function(n){pbapply::setTimerProgressBar(pb, n)})
+  dt_peptdesc <- foreach::foreach(i=1:nrow(parameterDT), .inorder=F, .options.snow=opts)%dopar%{
+    peptideDescriptor.FragStat.Single(parameterDT$"Peptide"[[i]], parameterDT$"FragLen"[[i]])
+  } %>% data.table::rbindlist()
+  close(pb)
   parallel::stopCluster(cl)
   gc();gc()
 
@@ -91,6 +90,7 @@ Features_PeptDesc <- function(
     dt_basic[,paste0("Peptide_Contain", aa):=as.numeric(stringr::str_detect(peptideSet, aa))]
   }
   dt_peptdesc <- merge(dt_basic, dt_peptdesc, by="Peptide")
+  data.table::setorder(dt_peptdesc, Peptide)
 
   # Minimum set of features (optional)
   if(!is.null(featureSet)){
@@ -125,7 +125,7 @@ Features_CPP <- function(
   coreN=parallel::detectCores(),
   tmpDir=file.path(tempdir(), "FeatureDF", format(Sys.time(), "%Y.%m.%d.%H.%M.%S"))
 ){
-  # Temp directory check
+  # Temporary directory
   dir.create(tmpDir, showWarnings=F, recursive=T)
 
   # Start calculation
@@ -141,10 +141,10 @@ Features_CPP <- function(
     AACPMatrixList <- AACPMatrixList[aaIndexIDSet]
   }
 
-  # Fragment library for alignment
+  # Fragment library for pairwise alignment
   if(is.character(fragLib)) fragLib <- fst::read_fst(fragLib)
 
-  # Contact potential profiling
+  # Parameter sets for contact potential profiling
   if(is.null(featureSet)){
     parameterDT <- data.table::CJ(peptideSet, aaIndexIDSet, fragLenSet, fragDepthSet, fragLibTypeSet) %>%
       magrittr::set_colnames(c("Peptide","AAIndexID","FragLen","FragDepth","Library"))
@@ -168,68 +168,57 @@ Features_CPP <- function(
     data.table::setorder(parameterDT)
   }
   message("Number of parameter combinations = ", nrow(parameterDT))
-  if(!is.null(coreN)){
-    message("Launching parallel clusters...")
-    cl <- parallel::makeCluster(coreN, type="SOCK")
-    parallel::clusterExport(
-      cl=cl,
-      list("parameterDT","AACPMatrixList","fragLib"),
-      envir=environment()
-    )
-  }else{
-    cl <- NULL
-  }
-  message("Contact potential profiling...")
-  cpp <- function(seedNumber=12345){
-    if(is.null(cl)){
-      set.seed(seedNumber)
-    }else{
-      snow::clusterSetupRNGstream(cl, seed=rep(seedNumber, 6))
-    }
-    dt <- pbapply::pblapply(
-      1:nrow(parameterDT),
-      function(i){
-        pept <- parameterDT[[i,1]]
-        aaIndexID <- parameterDT[[i,2]]
-        aacpMat <- AACPMatrixList[[aaIndexID]]
-        fragLen <- parameterDT[[i,3]]
-        fragDepth <- parameterDT[[i,4]]
-        libraryType <- parameterDT[[i,5]]
-        libraryID <- paste0(c(libraryType, fragLen, seedNumber), collapse="_")
-        fragSet <- sample(fragLib[[libraryID]], size=fragDepth)
-        al <- Biostrings::pairwiseAlignment(
-          subject=pept, pattern=fragSet,
-          substitutionMatrix=aacpMat,
-          type="global-local", gapOpening=100, gapExtension=100,
-          scoreOnly=T
-        )
-        statSet <- c("mean","sd","median","trimmed","mad","skew","kurtosis","se","IQR","Q0.1","Q0.9")
-        stat <- psych::describe(al, trim=.1, interp=F, skew=T, type=3, ranges=T, IQR=T, quant=c(.10, .90))[statSet]
-        return(as.numeric(stat))
-      }, cl=cl) %>%
-      data.table::as.data.table() %>%
-      data.table::transpose()
-    colnames(dt) <- c("Mean","SD","Med","TrM","MAD","Skew","Kurt","SE","IQR","Q10","Q90")
-    dt[,"Peptide":=parameterDT$Peptide][,"AAIndexID":=parameterDT$AAIndexID][,"FragLen":=parameterDT$FragLen][,"FragDepth":=parameterDT$FragDepth][,"Library":=parameterDT$Library][,"Seed":=seedNumber]
-    data.table::setcolorder(dt, c("Peptide","AAIndexID","FragLen","FragDepth","Library","Seed","Mean","SD","Med","TrM","MAD","Skew","Kurt","SE","IQR","Q10","Q90"))
-    fst::write_fst(dt, file.path(tmpDir, paste0("dt_feature_cpp_seed", seedNumber, ".fst")))
-    return(dt)
-  }
+
+  # Skip random seed numbers for which feature dataframes were already created
   dt_cpp_filenames <- list.files(pattern="dt_feature_cpp_seed.+fst", path=tmpDir, full.names=F)
   if(length(dt_cpp_filenames)>=1){
     seedSet_done <- as.numeric(gsub("seed", "", gsub(".fst", "", t(as.data.frame(strsplit(dt_cpp_filenames, "_"), fix.empty.names=F))[,4], fixed=T)))
     message(" - Skipping random seeds ", paste0(seedSet_done, collapse=", "))
     seedSet <- setdiff(seedSet, seedSet_done)
   }
+
+  # Conduct contact potential profiling
   for(s in seedSet){
     cat("Random seed = ", s, "\n", sep="")
-    cpp(seedNumber=s)
+    cl <- parallel::makeCluster(coreN, type="SOCK")
+    snow::clusterSetupRNGstream(cl, seed=rep(s, 6))
+    doSNOW::registerDoSNOW(cl)
+    sink(tempfile())
+    pb <- pbapply::timerProgressBar(max=nrow(parameterDT), style=1)
+    sink()
+    opts <- list(progress=function(n){pbapply::setTimerProgressBar(pb, n)})
+    dt_cpp <- foreach::foreach(i=1:nrow(parameterDT), .inorder=F, .options.snow=opts)%dopar%{
+      pept <- parameterDT[[i,1]]
+      aaIndexID <- parameterDT[[i,2]]
+      aacpMat <- AACPMatrixList[[aaIndexID]]
+      fragLen <- parameterDT[[i,3]]
+      fragDepth <- parameterDT[[i,4]]
+      libraryType <- parameterDT[[i,5]]
+      libraryID <- paste0(c(libraryType, fragLen, s), collapse="_")
+      fragSet <- sample(fragLib[[libraryID]], size=fragDepth)
+      al <- Biostrings::pairwiseAlignment(
+        subject=pept, pattern=fragSet,
+        substitutionMatrix=aacpMat,
+        type="global-local", gapOpening=100, gapExtension=100,
+        scoreOnly=T
+      )
+      statSet <- c("mean","sd","median","trimmed","mad","skew","kurtosis","se","IQR","Q0.1","Q0.9")
+      stat <- psych::describe(al, trim=.1, interp=F, skew=T, type=3, ranges=T, IQR=T, quant=c(.10, .90))[statSet]
+      as.numeric(stat)
+    } %>%
+      data.table::as.data.table() %>%
+      data.table::transpose()
+    colnames(dt_cpp) <- c("Mean","SD","Med","TrM","MAD","Skew","Kurt","SE","IQR","Q10","Q90")
+    dt_cpp[,"Peptide":=parameterDT$Peptide][,"AAIndexID":=parameterDT$AAIndexID][,"FragLen":=parameterDT$FragLen][,"FragDepth":=parameterDT$FragDepth][,"Library":=parameterDT$Library][,"Seed":=s]
+    data.table::setcolorder(dt_cpp, c("Peptide","AAIndexID","FragLen","FragDepth","Library","Seed","Mean","SD","Med","TrM","MAD","Skew","Kurt","SE","IQR","Q10","Q90"))
+    data.table::setorder(dt_cpp, Peptide, FragDepth, Library)
+    fst::write_fst(dt_cpp, file.path(tmpDir, paste0("dt_feature_cpp_seed", s, ".fst")))
+    close(pb)
+    parallel::stopCluster(cl)
     gc();gc()
   }
-  if(!is.null(cl)) parallel::stopCluster(cl)
-  gc();gc()
 
-  ## Final formatting
+  # Final formatting
   message("Data formatting...")
   dt_cpp_filenames <- list.files(pattern="dt_feature_cpp_seed.+fst", path=tmpDir, full.names=T)
   dt_cpp <- data.table::rbindlist(lapply(dt_cpp_filenames, fst::read_fst, as.data.table=T))

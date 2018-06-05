@@ -37,7 +37,7 @@ Features(peptideSet, fragLib, aaIndexIDSet = "all", fragLenSet = 3:8,
 
 \item{seedSet}{A set of random seeds.}
 
-\item{coreN}{The number of cores to be used for parallelization. Set \code{NULL} to disable parallelization.}
+\item{coreN}{The number of cores to be used for parallelization.}
 
 \item{tmpDir}{Destination directory to save intermediate files.}
 }
