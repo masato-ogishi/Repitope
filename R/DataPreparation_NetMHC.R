@@ -77,14 +77,6 @@ NetMHC_Import <- function(netMHCOutputFileNames, MHCType=c("MHCI", "MHCII")){
       if(rankPercent<=2) return("WeakBinder")
       return("NonBinder")
     }
-    df.netmhc <- data.table::rbindlist(lapply(
-      netMHCOutputFileNames,
-      function(netMHCFileName){suppressWarnings(suppressMessages(readr::read_delim(netMHCFileName, "\t", escape_double=F, trim_ws=T, skip=1)))}
-    )) %>%
-      dplyr::select(Peptide, dplyr::matches("Rank"), -H_Avg_Ranks) %>%
-      magrittr::set_colnames(c("Peptide", hlaSuperTypeSet)) %>%
-      tidyr::gather(HLARestriction, Rank, -Peptide) %>%
-      dplyr::mutate(BinderCategory=factor(sapply(Rank, binderCategory), levels=c("NonBinder", "WeakBinder", "StrongBinder")))
   }
   if(MHCType=="MHCII"){
     hlaSuperTypeSet <- c("DRB1","DRB3","DRB4","DRB5","DP","DQ")
@@ -93,17 +85,21 @@ NetMHC_Import <- function(netMHCOutputFileNames, MHCType=c("MHCI", "MHCII")){
       if(rankPercent<=10) return("WeakBinder")
       return("NonBinder")
     }
-    df.netmhc <- data.table::rbindlist(lapply(
-      netMHCOutputFileNames,
-      function(netMHCFileName){suppressWarnings(suppressMessages(readr::read_delim(netMHCFileName, "\t", escape_double=F, trim_ws=T, skip=1)))}
-    )) %>%
-      dplyr::select(Peptide, dplyr::matches("Rank")) %>%
-      magrittr::set_colnames(c("Peptide", hlaSuperTypeSet)) %>%
-      tidyr::gather(HLARestriction, Rank, -Peptide) %>%
-      dplyr::mutate(BinderCategory=factor(sapply(Rank, binderCategory), levels=c("NonBinder", "WeakBinder", "StrongBinder")))
   }
-  df.netmhc.rank <- df.netmhc %>% dplyr::select(-BinderCategory) %>% tidyr::spread(HLARestriction, Rank)
-  df.netmhc.bind <- df.netmhc %>% dplyr::mutate(BinderCategory=as.numeric(BinderCategory)) %>% dplyr::select(-Rank) %>% tidyr::spread(HLARestriction, BinderCategory)
+  dt_netmhc <- data.table::rbindlist(lapply(netMHCOutputFileNames, data.table::fread))
+  dt_netmhc <- dt_netmhc[!stringr::str_detect(Peptide, "X"), ]
+  dt_netmhc <- dt_netmhc[,which(colnames(dt_netmhc) %in% c("Peptide","Rank")), with=F]
+  colnames(dt_netmhc) <- c("Peptide", hlaSuperTypeSet)
+  df.netmhc <- dt_netmhc %>%
+    tidyr::gather(HLARestriction, Rank, -Peptide) %>%
+    dplyr::mutate(BinderCategory=factor(sapply(Rank, binderCategory), levels=c("NonBinder", "WeakBinder", "StrongBinder")))
+  df.netmhc.rank <- df.netmhc %>%
+    dplyr::select(-BinderCategory) %>%
+    tidyr::spread(HLARestriction, Rank)
+  df.netmhc.bind <- df.netmhc %>%
+    dplyr::mutate(BinderCategory=as.numeric(BinderCategory)) %>%
+    dplyr::select(-Rank) %>%
+    tidyr::spread(HLARestriction, BinderCategory)
   list("DF"=df.netmhc, "DF_Rank"=df.netmhc.rank, "DF_Bind"=df.netmhc.bind)
 }
 
