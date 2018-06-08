@@ -72,27 +72,24 @@ NetMHC_Script <- function(outDir="./NetMHC/"){
 NetMHC_Import <- function(netMHCOutputFileNames, MHCType=c("MHCI", "MHCII")){
   if(MHCType=="MHCI"){
     hlaSuperTypeSet <- c("A01","A02","A03","A24","A26","B07","B08","B27","B39","B44","B58","B62")
-    binderCategory <- function(rankPercent){
-      if(rankPercent<=0.5) return("StrongBinder")
-      if(rankPercent<=2) return("WeakBinder")
-      return("NonBinder")
-    }
+    thr_w <- 2
+    thr_s <- 0.5
   }
   if(MHCType=="MHCII"){
     hlaSuperTypeSet <- c("DRB1","DRB3","DRB4","DRB5","DP","DQ")
-    binderCategory <- function(rankPercent){
-      if(rankPercent<=2) return("StrongBinder")
-      if(rankPercent<=10) return("WeakBinder")
-      return("NonBinder")
-    }
+    thr_w <- 10
+    thr_s <- 2
   }
-  dt_netmhc <- data.table::rbindlist(lapply(netMHCOutputFileNames, data.table::fread))
+  dt_netmhc <- data.table::rbindlist(pbapply::pblapply(netMHCOutputFileNames, data.table::fread))
+  dt_netmhc <- unique(dt_netmhc, by="ID", fromLast=F)
   dt_netmhc <- dt_netmhc[!stringr::str_detect(Peptide, "X"), ]
   dt_netmhc <- dt_netmhc[,which(colnames(dt_netmhc) %in% c("Peptide","Rank")), with=F]
   colnames(dt_netmhc) <- c("Peptide", hlaSuperTypeSet)
   df.netmhc <- dt_netmhc %>%
     tidyr::gather(HLARestriction, Rank, -Peptide) %>%
-    dplyr::mutate(BinderCategory=factor(sapply(Rank, binderCategory), levels=c("NonBinder", "WeakBinder", "StrongBinder")))
+    dplyr::mutate(BinderCategory=factor(dplyr::if_else(Rank<=thr_w, 1, 0) + dplyr::if_else(Rank<=thr_s, 1, 0), 
+                                        levels=c(0, 1, 2),
+                                        labels=c("NonBinder", "WeakBinder", "StrongBinder")))
   df.netmhc.rank <- df.netmhc %>%
     dplyr::select(-BinderCategory) %>%
     tidyr::spread(HLARestriction, Rank)
