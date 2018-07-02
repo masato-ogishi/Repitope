@@ -5,7 +5,7 @@
 \alias{sortByMedian}
 \alias{Utility_DF}
 \alias{mutate_if_byrow}
-\title{Utility functions for dataframes.}
+\title{Utility functions for data frames.}
 \usage{
 sortByMedian(df, groupColumnName = "FeatureID",
   valueColumnName = "Importance", descending = F)
@@ -26,5 +26,5 @@ mutate_if_byrow(df, .predictate, ...)
 \item{...}{Other parameters passed to \code{dplyr::mutate}.}
 }
 \description{
-Utility functions for dataframes.
+Utility functions for data frames.
 }

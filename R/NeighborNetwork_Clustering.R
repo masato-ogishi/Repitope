@@ -76,7 +76,7 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
   consensusSequence <- function(sequenceSet){
     if(length(sequenceSet)==1) return(sequenceSet)
     sink(tempfile())
-    s <- msa::msaConsensusSequence(msa::msaClustalW(sequenceSet, type="protein"), type="Biostrings", ambiguityMap="X")
+    s <- msa::msaConsensusSequence(msa::msaClustalW(sequenceSet, type="protein"), type="Biostrings", ambiguityMap="X", threshold=0.5)
     sink()
     return(s)
   }

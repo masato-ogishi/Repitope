@@ -1,4 +1,4 @@
-#' Utility functions for dataframes.
+#' Utility functions for data frames.
 #'
 #' @param df Any dataframe.
 #' @param groupColumnName The column name for the grouping variables.

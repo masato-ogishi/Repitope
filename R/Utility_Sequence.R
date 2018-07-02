@@ -1,7 +1,8 @@
-#' Sequence utility functions.
+#' Utility functions for sequence analysis.
 #'
 #' \code{sequenceFilter} filters amino acid sequences so that those containing non-standard letters are excluded.\cr
 #' \code{sequenceSlidingWindow} does a sliding window with a fixed window size.\cr
+#' \code{InSilicoMutagenesis} generates single-aa-substituted sequences. Currently insertions and deletions are not supported.\cr
 #'
 #' @param sequenceSet A set of amino acid sequences.
 #' @param windowSize A size of the sliding window.
@@ -27,4 +28,23 @@ sequenceSlidingWindow <- function(sequenceSet, windowSize){
               function(i){stringr::str_sub(sequenceSet, i, i+windowSize-1)})
   f <- f[nchar(f)==windowSize]
   return(f)
+}
+
+#' @export
+#' @rdname Utility_Sequence
+#' @name Utility_Sequence
+InSilicoMutagenesis <- function(sequenceSet){
+  coreN <- parallel::detectCores()
+  cl <- parallel::makeCluster(coreN)
+  mut <- pbapply::pblapply(
+    sequenceSet,
+    function(s){
+      apply(expand.grid(1:nchar(s), Biostrings::AA_STANDARD), 1, function(v){substr(s, v[1], v[1]) <- v[2]; return(s)})
+    },
+    cl=cl
+  )
+  parallel::stopCluster(cl)
+  gc();gc()
+  mut <- unique(unlist(mut))
+  return(mut)
 }

@@ -5,11 +5,15 @@
 \alias{sequenceFilter}
 \alias{Utility_Sequence}
 \alias{sequenceSlidingWindow}
-\title{Sequence utility functions.}
+\alias{Utility_Sequence}
+\alias{InSilicoMutagenesis}
+\title{Utility functions for sequence analysis.}
 \usage{
 sequenceFilter(sequenceSet)
 
 sequenceSlidingWindow(sequenceSet, windowSize)
+
+InSilicoMutagenesis(sequenceSet)
 }
 \arguments{
 \item{sequenceSet}{A set of amino acid sequences.}
@@ -19,4 +23,5 @@ sequenceSlidingWindow(sequenceSet, windowSize)
 \description{
 \code{sequenceFilter} filters amino acid sequences so that those containing non-standard letters are excluded.\cr
 \code{sequenceSlidingWindow} does a sliding window with a fixed window size.\cr
+\code{InSilicoMutagenesis} generates single-aa-substituted sequences. Currently insertions and deletions are not supported.\cr
 }
