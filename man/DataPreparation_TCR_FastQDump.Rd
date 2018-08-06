@@ -4,12 +4,15 @@
 \alias{FastQDump_Script}
 \title{Downloading fastQ files from NCBI Sequence Read Archive (SRA).}
 \usage{
-FastQDump_Script(accessionSet, outDir = "C:/SRA/output")
+FastQDump_Script(accessionSet, outDir = "C:/SRA/output",
+  FastQDumpPath = "C:\\\\SRA\\\\sratoolkit.2.9.2-win64\\\\bin\\\\fastq-dump.exe")
 }
 \arguments{
 \item{accessionSet}{A set of SRA Run Accession numbers.}
 
 \item{outDir}{A directory for outputs.}
+
+\item{FastQDumpPath}{A full path to fastq-dump.exe.}
 }
 \description{
 \code{FastQDump_Script} generates fustq-dump script.

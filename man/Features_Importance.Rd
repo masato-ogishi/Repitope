@@ -2,7 +2,6 @@
 % Please edit documentation in R/Features_Importance.R
 \name{Features_Importance}
 \alias{Features_Importance}
-\alias{Features_Importance}
 \alias{Features_Importance_Reduce}
 \title{Feature selection based on their importances.}
 \usage{

@@ -3,13 +3,9 @@
 \name{Immunogenicity}
 \alias{Immunogenicity}
 \alias{Immunogenicity_TrainModels}
-\alias{Immunogenicity}
 \alias{Immunogenicity_SummarizeInternalScores}
-\alias{Immunogenicity}
 \alias{Immunogenicity_Score}
-\alias{Immunogenicity}
 \alias{Immunogenicity_Score_Cluster}
-\alias{Immunogenicity}
 \alias{Immunogenicity_Predict}
 \title{Immunogenicity score.}
 \usage{

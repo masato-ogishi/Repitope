@@ -3,7 +3,6 @@
 \name{Features_IO}
 \alias{Features_IO}
 \alias{readFeatureDFList}
-\alias{Features_IO}
 \alias{saveFeatureDFList}
 \title{Feature dataframes In/Out.}
 \usage{

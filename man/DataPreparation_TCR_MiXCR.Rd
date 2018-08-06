@@ -3,7 +3,6 @@
 \name{DataPreparation_TCR_MiXCR}
 \alias{DataPreparation_TCR_MiXCR}
 \alias{MiXCR_Script}
-\alias{DataPreparation_TCR_MiXCR}
 \alias{MiXCR_CombineClonotypes}
 \title{MiXCR workflow.}
 \usage{

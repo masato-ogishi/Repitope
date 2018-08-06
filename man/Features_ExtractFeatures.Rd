@@ -2,7 +2,6 @@
 % Please edit documentation in R/Features_ExtractFeatures.R
 \name{Features_ExtractFeatures}
 \alias{Features_ExtractFeatures}
-\alias{Features_ExtractFeatures}
 \alias{Features_ExtractParameters}
 \title{Extract features from a list of dataframes.}
 \usage{

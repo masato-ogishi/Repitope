@@ -4,15 +4,10 @@
 \name{Dataset_EpitopeDataset}
 \alias{Dataset_EpitopeDataset}
 \alias{MHCI_Human}
-\alias{Dataset_EpitopeDataset}
 \alias{MHCI_Rodents}
-\alias{Dataset_EpitopeDataset}
 \alias{MHCI_Primates}
-\alias{Dataset_EpitopeDataset}
 \alias{MHCII_Human}
-\alias{Dataset_EpitopeDataset}
 \alias{MHCII_Rodents}
-\alias{Dataset_EpitopeDataset}
 \alias{MHCII_Primates}
 \title{Compiled datasets of MHC class I and class II epitopes and ligands.}
 \format{data.table}

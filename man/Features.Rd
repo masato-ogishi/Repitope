@@ -8,11 +8,12 @@
 \usage{
 Features_PeptDesc(peptideSet, fragLenSet = 3:8, featureSet = NULL)
 
-Features_CPP(peptideSet, fragLib, aaIndexIDSet = "all", fragLenSet = 3:8,
-  fragDepthSet = 10000, fragLibTypeSet = c("Deduplicated", "Weighted",
-  "Mock"), featureSet = NULL, seedSet = 1:5,
-  coreN = parallel::detectCores(), tmpDir = file.path(tempdir(),
-  "FeatureDF", format(Sys.time(), "\%Y.\%m.\%d.\%H.\%M.\%S")))
+Features_CPP(peptideSet, fragLib, aaIndexIDSet = "all",
+  fragLenSet = 3:8, fragDepthSet = 10000,
+  fragLibTypeSet = c("Deduplicated", "Weighted", "Mock"),
+  featureSet = NULL, seedSet = 1:5, coreN = parallel::detectCores(),
+  tmpDir = file.path(tempdir(), "FeatureDF", format(Sys.time(),
+  "\%Y.\%m.\%d.\%H.\%M.\%S")))
 
 Features(peptideSet, fragLib, aaIndexIDSet = "all", fragLenSet = 3:8,
   fragDepthSet = 10000, fragLibTypeSet = c("Deduplicated", "Weighted",

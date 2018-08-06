@@ -3,11 +3,8 @@
 \name{Features_Preprocessing}
 \alias{Features_Preprocessing}
 \alias{Features_Preprocess}
-\alias{Features_Preprocessing}
 \alias{Features_CorFilter}
-\alias{Features_Preprocessing}
 \alias{Features_FeatureSelect}
-\alias{Features_Preprocessing}
 \alias{inverseColOrderDFList}
 \title{Preprocess peptide feature dataframes for machine learning.}
 \usage{

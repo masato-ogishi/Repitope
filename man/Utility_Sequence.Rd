@@ -3,9 +3,7 @@
 \name{Utility_Sequence}
 \alias{Utility_Sequence}
 \alias{sequenceFilter}
-\alias{Utility_Sequence}
 \alias{sequenceSlidingWindow}
-\alias{Utility_Sequence}
 \alias{InSilicoMutagenesis}
 \title{Utility functions for sequence analysis.}
 \usage{

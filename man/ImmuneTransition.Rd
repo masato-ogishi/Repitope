@@ -3,11 +3,8 @@
 \name{ImmuneTransition}
 \alias{ImmuneTransition}
 \alias{ImmuneTransition_TrainModels}
-\alias{ImmuneTransition}
 \alias{ImmuneTransition_SummarizeInternalScores}
-\alias{ImmuneTransition}
 \alias{ImmuneTransition_Score}
-\alias{ImmuneTransition}
 \alias{ImmuneTransition_Predict}
 \title{Immune transition score.}
 \usage{

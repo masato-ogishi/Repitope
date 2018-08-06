@@ -3,7 +3,6 @@
 \name{Utility_DF}
 \alias{Utility_DF}
 \alias{sortByMedian}
-\alias{Utility_DF}
 \alias{mutate_if_byrow}
 \title{Utility functions for data frames.}
 \usage{

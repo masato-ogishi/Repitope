@@ -3,18 +3,17 @@
 \name{NeighborNetwork_Clustering}
 \alias{NeighborNetwork_Clustering}
 \alias{neighborNetwork_ConnectedSubGraph}
-\alias{NeighborNetwork_Clustering}
 \alias{neighborNetwork_Cluster}
-\alias{NeighborNetwork_Clustering}
 \alias{neighborNetwork_Cluster_Batch}
 \title{Neighbor network clustering analysis.}
 \usage{
 neighborNetwork_ConnectedSubGraph(neighborNetResult, peptide)
 
-neighborNetwork_Cluster(peptide, graph, metadataDF, seed = 12345, plot = T)
+neighborNetwork_Cluster(peptide, graph, metadataDF, seed = 12345,
+  plot = T)
 
-neighborNetwork_Cluster_Batch(neighborNetResult, metadataDF, seed = 12345,
-  coreN = parallel::detectCores())
+neighborNetwork_Cluster_Batch(neighborNetResult, metadataDF,
+  seed = 12345, coreN = parallel::detectCores())
 }
 \arguments{
 \item{neighborNetResult}{The result returned from \code{neighborNetwork}.}

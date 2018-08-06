@@ -5,8 +5,8 @@
 \alias{CPP_FragmentLibrary}
 \title{Generate sequence fragment libraries.}
 \usage{
-CPP_FragmentLibrary(sequenceSet, fragLenSet = 3:8, maxFragDepth = 1e+05,
-  seedSet = 1:5)
+CPP_FragmentLibrary(sequenceSet, fragLenSet = 3:8,
+  maxFragDepth = 1e+05, seedSet = 1:5)
 }
 \arguments{
 \item{sequenceSet}{A set of amino acid sequences.}

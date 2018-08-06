@@ -3,9 +3,7 @@
 \name{NeighborNetwork}
 \alias{NeighborNetwork}
 \alias{distMat_Sbst}
-\alias{NeighborNetwork}
 \alias{distMat_Indel}
-\alias{NeighborNetwork}
 \alias{neighborNetwork}
 \title{Neighbor network analysis.}
 \usage{
@@ -13,8 +11,8 @@ distMat_Sbst(peptideSet)
 
 distMat_Indel(longerPeptideSet, shorterPeptideSet)
 
-neighborNetwork(peptideSet, numSet = NULL, directed = T, weighted = T,
-  annotateMutType = T, coreN = parallel::detectCores())
+neighborNetwork(peptideSet, numSet = NULL, directed = T,
+  weighted = T, annotateMutType = T, coreN = parallel::detectCores())
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}

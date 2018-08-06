@@ -4,12 +4,16 @@
 #'
 #' @param accessionSet A set of SRA Run Accession numbers.
 #' @param outDir A directory for outputs.
+#' @param FastQDumpPath A full path to fastq-dump.exe.
 #' @export
 #' @rdname DataPreparation_TCR_FastQDump
-FastQDump_Script <- function(accessionSet, outDir="C:/SRA/output"){
+FastQDump_Script <- function(
+  accessionSet, outDir="C:/SRA/output",
+  FastQDumpPath="C:\\SRA\\sratoolkit.2.9.2-win64\\bin\\fastq-dump.exe"
+){
   dir.create(outDir, showWarnings=F, recursive=T)
   fastq.dump.script <- paste0(
-    sapply(sort(accessionSet), function(a){paste0("C:\\SRA\\sratoolkit.2.8.1-3-win64\\bin\\fastq-dump.exe --outdir ", normalizePath(outDir), " --gzip --skip-technical  --readids --read-filter pass --dumpbase --split-files --clip --accession ", a)}),
+    sapply(sort(accessionSet), function(a){paste0(FastQDumpPath, " --outdir ", normalizePath(outDir), " --gzip --skip-technical  --readids --read-filter pass --dumpbase --split-files --clip --accession ", a)}),
     collapse="\n"
   )
   write.table(fastq.dump.script, file.path(outDir, "fastq-dump_script.txt"), row.names=F, col.names=F, quote=F)
@@ -20,7 +24,7 @@ FastQDump_Script <- function(accessionSet, outDir="C:/SRA/output"){
     acc.rem <- sort(setdiff(accessionSet, d$V1))
     if(purrr::is_empty(acc.rem)){message("No FastQ files remaining to be downloaded.")}
     fastq.dump.script.rem <- paste0(
-      sapply(acc.rem, function(a){paste0("C:\\SRA\\sratoolkit.2.8.1-3-win64\\bin\\fastq-dump.exe --outdir ", normalizePath(outDir), " --gzip --skip-technical  --readids --read-filter pass --dumpbase --split-files --clip --accession ", a)}),
+      sapply(acc.rem, function(a){paste0(FastQDumpPath, " --outdir ", normalizePath(outDir), " --gzip --skip-technical  --readids --read-filter pass --dumpbase --split-files --clip --accession ", a)}),
       collapse="\n"
     )
     write.table(fastq.dump.script.rem, file.path(outDir, "fastq-dump_script_remaining.txt"), row.names=F, col.names=F, quote=F)

@@ -3,9 +3,7 @@
 \name{DataPreparation_EpitopeDataset}
 \alias{DataPreparation_EpitopeDataset}
 \alias{Epitope_Import}
-\alias{DataPreparation_EpitopeDataset}
 \alias{compressedToLongFormat}
-\alias{DataPreparation_EpitopeDataset}
 \alias{compressedToDummyDF}
 \title{Compile epitope datasets retrieved from IEDB and other sources.}
 \usage{

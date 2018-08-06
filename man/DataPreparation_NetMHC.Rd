@@ -3,13 +3,12 @@
 \name{DataPreparation_NetMHC}
 \alias{DataPreparation_NetMHC}
 \alias{NetMHC_PeptideExport}
-\alias{DataPreparation_NetMHC}
 \alias{NetMHC_Script}
-\alias{DataPreparation_NetMHC}
 \alias{NetMHC_Import}
 \title{Utility functions for NetMHC.}
 \usage{
-NetMHC_PeptideExport(peptideSet, outDir = "./NetMHC/", maxPeptides = NULL)
+NetMHC_PeptideExport(peptideSet, outDir = "./NetMHC/",
+  maxPeptides = NULL)
 
 NetMHC_Script(outDir = "./NetMHC/")
 
