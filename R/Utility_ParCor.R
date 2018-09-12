@@ -6,7 +6,7 @@
 #' @export
 #' @rdname Utility_ParCor
 #' @name Utility_ParCor
-parCor <- function(mat, coreN=parallel::detectCores(), verbose=T){
+parCor <- function(mat, coreN=parallel::detectCores(logical=F), verbose=T){
   # Input check
   if(!any(class(mat)=="matrix")){
     mat <- try(as.matrix(mat), silent=T)
@@ -70,7 +70,7 @@ parCor <- function(mat, coreN=parallel::detectCores(), verbose=T){
   ### computes blocks of the cov. matrix
   if(verbose) cat(" - parCor: computing `crossprod` by blocks:", num_batches, "batches\n")
   if(coreN>=2){
-    cl <- parallel::makeCluster(min(coreN, parallel::detectCores()), type="SOCK")
+    cl <- parallel::makeCluster(min(coreN, parallel::detectCores(logical=F)), type="SOCK")
     parallel::clusterExport(
       cl,
       list("grid", "batches", "beg", "end", "mat.descfile", "tmp.dir"),

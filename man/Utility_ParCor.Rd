@@ -5,7 +5,7 @@
 \alias{parCor}
 \title{Parallelized correlation matrix calculation.}
 \usage{
-parCor(mat, coreN = parallel::detectCores(), verbose = T)
+parCor(mat, coreN = parallel::detectCores(logical = F), verbose = T)
 }
 \arguments{
 \item{mat}{A matrix. A data.frame or a data.table is internally converted into a matrix.}

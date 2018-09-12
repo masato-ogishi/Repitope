@@ -12,7 +12,8 @@ distMat_Sbst(peptideSet)
 distMat_Indel(longerPeptideSet, shorterPeptideSet)
 
 neighborNetwork(peptideSet, numSet = NULL, directed = T,
-  weighted = T, annotateMutType = T, coreN = parallel::detectCores())
+  weighted = T, annotateMutType = T,
+  coreN = parallel::detectCores(logical = F))
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}

@@ -64,7 +64,7 @@ Features_PeptDesc <- function(
   # Parallelized calculation of descriptive statistics
   parameterDT <- data.table::CJ(peptideSet, fragLenSet) %>%
     magrittr::set_colnames(c("Peptide", "FragLen"))
-  cl <- parallel::makeCluster(parallel::detectCores(), type="SOCK")
+  cl <- parallel::makeCluster(parallel::detectCores(logical=F), type="SOCK")
   doSNOW::registerDoSNOW(cl)
   sink(tempfile())
   pb <- pbapply::timerProgressBar(max=nrow(parameterDT), style=1)
@@ -122,7 +122,7 @@ Features_CPP <- function(
   fragLibTypeSet=c("Deduplicated", "Weighted", "Mock"),
   featureSet=NULL,
   seedSet=1:5,
-  coreN=parallel::detectCores(),
+  coreN=parallel::detectCores(logical=F),
   tmpDir=file.path(tempdir(), "FeatureDF", format(Sys.time(), "%Y.%m.%d.%H.%M.%S"))
 ){
   # Temporary directory
@@ -264,7 +264,7 @@ Features <- function(
   fragLibTypeSet=c("Deduplicated", "Weighted", "Mock"),
   featureSet=NULL,
   seedSet=1:5,
-  coreN=parallel::detectCores(),
+  coreN=parallel::detectCores(logical=F),
   tmpDir=file.path(tempdir(), "FeatureDF", format(Sys.time(), "%Y.%m.%d.%H.%M.%S"))
 ){
   message("Peptide contact potential profiling analysis...")

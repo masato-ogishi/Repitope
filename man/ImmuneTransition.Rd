@@ -9,12 +9,12 @@
 \title{Immune transition score.}
 \usage{
 ImmuneTransition_TrainModels(featureDF, metadataDF, featureSet = "all",
-  seedSet = 1:5, coreN = parallel::detectCores())
+  seedSet = 1:5, coreN = parallel::detectCores(logical = F))
 
 ImmuneTransition_SummarizeInternalScores(trainModelResults)
 
 ImmuneTransition_Score(featureDF, metadataDF, featureSet = "all",
-  seedSet = 1:5, coreN = parallel::detectCores())
+  seedSet = 1:5, coreN = parallel::detectCores(logical = F))
 
 ImmuneTransition_Predict(externalFeatureDFList, trainModelResults)
 }

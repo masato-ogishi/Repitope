@@ -11,10 +11,10 @@
 Features_Preprocess(featureDFList, metadataDF, seedSet = 1:5)
 
 Features_CorFilter(preprocessedDFList, corThreshold = 0.75,
-  coreN = parallel::detectCores())
+  coreN = parallel::detectCores(logical = F))
 
 Features_FeatureSelect(preprocessedDFList, featureN = 100,
-  coreN = parallel::detectCores())
+  coreN = parallel::detectCores(logical = F))
 
 inverseColOrderDFList(preprocessedDFList)
 }

@@ -104,7 +104,7 @@ Features_Preprocess <- function(featureDFList, metadataDF, seedSet=1:5){
 #' @export
 #' @rdname Features_Preprocessing
 #' @name Features_Preprocessing
-Features_CorFilter <- function(preprocessedDFList, corThreshold=0.75, coreN=parallel::detectCores()){
+Features_CorFilter <- function(preprocessedDFList, corThreshold=0.75, coreN=parallel::detectCores(logical=F)){
   # Correlation-based feature elimination using the training subdataset
   corFilter <- function(df, corThreshold=0.75, coreN=NULL){
     dt <- data.table::as.data.table(df)
@@ -138,7 +138,7 @@ Features_CorFilter <- function(preprocessedDFList, corThreshold=0.75, coreN=para
 #' @export
 #' @rdname Features_Preprocessing
 #' @name Features_Preprocessing
-Features_FeatureSelect <- function(preprocessedDFList, featureN=100, coreN=parallel::detectCores()){
+Features_FeatureSelect <- function(preprocessedDFList, featureN=100, coreN=parallel::detectCores(logical=F)){
   # Selection by filtering
   Features_SBF_Single <- function(df, seed=12345, coreN=NULL){
     caretSeeds_SBF <- function(seed=12345, number=5){

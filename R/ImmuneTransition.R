@@ -20,7 +20,7 @@ ImmuneTransition_TrainModels <- function(
   metadataDF,
   featureSet="all",
   seedSet=1:5,
-  coreN=parallel::detectCores()
+  coreN=parallel::detectCores(logical=F)
 ){
   # A combined feature dataframe
   dt <- merge(data.table::as.data.table(metadataDF), data.table::as.data.table(featureDF), by="Peptide")
@@ -86,7 +86,7 @@ ImmuneTransition_Score <- function(
   metadataDF,
   featureSet="all",
   seedSet=1:5,
-  coreN=parallel::detectCores()
+  coreN=parallel::detectCores(logical=F)
 ){
   trainModelResults <- ImmuneTransition_TrainModels(featureDF, metadataDF, featureSet, seedSet, coreN)
   dt_score <- ImmuneTransition_SummarizeInternalScores(trainModelResults)

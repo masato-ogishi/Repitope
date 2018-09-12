@@ -93,7 +93,7 @@ distMat_Indel <- function(longerPeptideSet, shorterPeptideSet){
 #' @export
 #' @rdname NeighborNetwork
 #' @name NeighborNetwork
-neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, annotateMutType=T, coreN=parallel::detectCores()){
+neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, annotateMutType=T, coreN=parallel::detectCores(logical=F)){
   # Internally used workflows
   net_main <- function(peptideSet){
     ## Input check...

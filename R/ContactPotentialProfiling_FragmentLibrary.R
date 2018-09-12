@@ -14,7 +14,7 @@ CPP_FragmentLibrary <- function(sequenceSet, fragLenSet=3:8, maxFragDepth=100000
   fragmentLibrary_default <- function(sequenceSet, fragLen){
     cat("Fragment length = ", fragLen, "\n", sep="")
     maxLen <- max(nchar(sequenceSet), na.rm=T)
-    cl <- parallel::makeCluster(parallel::detectCores())
+    cl <- parallel::makeCluster(parallel::detectCores(logical=F))
     parallel::clusterExport(cl, varlist=c("sequenceSet", "fragLen", "maxLen"), envir=environment())
     f <- unlist(pbapply::pblapply(seq(1, maxLen-fragLen+1),
                                   function(i){stringr::str_sub(sequenceSet, i, i+fragLen-1)}, cl=cl))
@@ -45,7 +45,7 @@ CPP_FragmentLibrary <- function(sequenceSet, fragLenSet=3:8, maxFragDepth=100000
   }
   cat("Formatting...\n", sep="")
   paramGrid <- expand.grid(fragLenSet, seedSet)
-  cl <- parallel::makeCluster(parallel::detectCores())
+  cl <- parallel::makeCluster(parallel::detectCores(logical=F))
   parallel::clusterExport(cl, varlist=c("format_FragLib", "fragLibList", "paramGrid"), envir=environment())
   fragLibDT <- pbapply::pblapply(1:nrow(paramGrid), function(i){
     format_FragLib(paramGrid[i, 1], maxFragDepth, paramGrid[i, 2])

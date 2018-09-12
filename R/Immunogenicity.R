@@ -22,7 +22,7 @@ Immunogenicity_TrainModels <- function(
   metadataDF,
   featureSet="all",
   seedSet=1:5,
-  coreN=parallel::detectCores()
+  coreN=parallel::detectCores(logical=F)
 ){
   # A combined feature dataframe
   dt <- merge(data.table::as.data.table(metadataDF), data.table::as.data.table(featureDF), by="Peptide")
@@ -88,7 +88,7 @@ Immunogenicity_Score <- function(
   metadataDF,
   featureSet="all",
   seedSet=1:5,
-  coreN=parallel::detectCores()
+  coreN=parallel::detectCores(logical=F)
 ){
   trainModelResults <- Immunogenicity_TrainModels(featureDF, metadataDF, featureSet, seedSet, coreN)
   dt_score <- Immunogenicity_SummarizeInternalScores(trainModelResults)
@@ -104,7 +104,7 @@ Immunogenicity_Score_Cluster <- function(
   clusterDF,
   featureSet="all",
   seedSet=1:5,
-  coreN=parallel::detectCores()
+  coreN=parallel::detectCores(logical=F)
 ){
   dt_score <- lapply(seedSet, function(s){
     set.seed(s)

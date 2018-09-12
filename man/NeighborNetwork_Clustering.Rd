@@ -13,7 +13,7 @@ neighborNetwork_Cluster(peptide, graph, metadataDF, seed = 12345,
   plot = T)
 
 neighborNetwork_Cluster_Batch(neighborNetResult, metadataDF,
-  seed = 12345, coreN = parallel::detectCores())
+  seed = 12345, coreN = parallel::detectCores(logical = F))
 }
 \arguments{
 \item{neighborNetResult}{The result returned from \code{neighborNetwork}.}

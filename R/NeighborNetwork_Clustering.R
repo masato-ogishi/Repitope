@@ -158,7 +158,7 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
 #' @export
 #' @rdname NeighborNetwork_Clustering
 #' @name NeighborNetwork_Clustering
-neighborNetwork_Cluster_Batch <- function(neighborNetResult, metadataDF, seed=12345, coreN=parallel::detectCores()){
+neighborNetwork_Cluster_Batch <- function(neighborNetResult, metadataDF, seed=12345, coreN=parallel::detectCores(logical=F)){
   cluster_single <- function(peptide, neighborNetResult, metadataDF, seed=12345){
     graph <- Repitope::neighborNetwork_ConnectedSubGraph(neighborNetResult, peptide)
     df_meta <- Repitope::neighborNetwork_Cluster(peptide, graph, metadataDF, seed, plot=F)
