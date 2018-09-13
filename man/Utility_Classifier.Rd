@@ -7,6 +7,7 @@
 \alias{calibPlot}
 \alias{cumGainPlot}
 \alias{classifierDiagnosticPlots}
+\alias{compute_auc}
 \title{Utility functions for creating diagnostic plots for binary classifiers.}
 \usage{
 rocPlot(trueClass, predProb, groups = NA, colors = NA)
@@ -19,6 +20,8 @@ cumGainPlot(trueClass, predProb, groups = NA, colors = NA)
 
 classifierDiagnosticPlots(trueClass, predProb, groups = NA,
   colors = NA, plotTypes = c("ROC", "PRC", "Calibration", "CumGain"))
+
+compute_auc(trueClass, predProb)
 }
 \arguments{
 \item{trueClass}{A factor of true class labels.}

@@ -196,3 +196,13 @@ classifierDiagnosticPlots <- function(trueClass, predProb, groups=NA, colors=NA,
   if("CumGain" %in% plotTypes) plotList$"CumGain" <- cumGainPlot(trueClass, predProb, groups, colors)
   return(plotList)
 }
+
+#' @export
+#' @rdname Utility_Classifier
+#' @name Utility_Classifier
+compute_auc <- function(trueClass, predProb){
+  aucSet <- cvAUC::ci.cvAUC(predictions=predProb, labels=trueClass)
+  aucSet <- c(aucSet$cvAUC*100, aucSet$ci[1]*100, aucSet$ci[2]*100)
+  names(aucSet) <- c("AUC", "95%CI_Lo", "95%CI_Up")
+  return(aucSet)
+}
