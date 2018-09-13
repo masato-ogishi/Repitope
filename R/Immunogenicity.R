@@ -49,7 +49,8 @@ Immunogenicity_TrainModels <- function(
     mat_train <- as.matrix(dt_train[, featureSet, with=F])
     ert <- extraTrees::extraTrees(
       x=mat_train, y=trgt,
-      mtry=35, numRandomCuts=2, weights=w,
+      weights=w,
+      ntree=10, mtry=5, numRandomCuts=1,
       numThreads=ifelse(is.null(coreN), 1, coreN)
     )
     mat_test <- as.matrix(dt_test[, featureSet, with=F])

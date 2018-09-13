@@ -63,27 +63,16 @@ Epitope_Import <- function(IEDBAssayFileName=NULL, OtherFileNames=NULL, peptideL
 
   resolveImmunogenicityContradiction <- function(df){
     df <- df %>%
-      dplyr::mutate(Immunogenicity_Contradiction=stringr::str_detect(Immunogenicity, stringr::fixed("Positive|Negative")))
+      dplyr::mutate(ImmunogenicityContradiction=stringr::str_detect(Immunogenicity, stringr::fixed("Positive|Negative")))
 
-    cont <- table(df$"Immunogenicity_Contradiction")
-    cat(cont[[2]], "/", nrow(df), " (", scales::percent(cont[[2]]/nrow(df)), ") peptides have contradicting annotations.\n", sep="")
+    cont <- table(df$"ImmunogenicityContradiction")
+    cat(cont[[2]], "/", nrow(df), " (", scales::percent(cont[[2]]/nrow(df)), ") peptides have contradicting annotations regarding immunogenicity.\n", sep="")
 
-    chooseOneImmunogenicity_Definitive <- function(ImmunogenicityString){
-      paste0(unique(purrr::flatten_chr(stringr::str_split(ImmunogenicityString, stringr::fixed("|")))), collapse="|")
-    }
-    chooseOneImmunogenicity_Consensus <- function(ImmunogenicityString){
-      which.max(table(purrr::flatten_chr(stringr::str_split(ImmunogenicityString, stringr::fixed("|")))))
-    }
     df <- df %>%
-      dplyr::mutate(
-        #Immunogenicity_Definitive=sapply(Immunogenicity, chooseOneImmunogenicity_Definitive)
-        Immunogenicity_Loose=dplyr::if_else(stringr::str_detect(Immunogenicity, "Positive"), "Positive", "Negative")
-        #Immunogenicity_Strict=dplyr::if_else(stringr::str_detect(Immunogenicity, "Negative"), "Negative", "Positive")
-        #Immunogenicity_Consensus=sapply(Immunogenicity, chooseOneImmunogenicity_Consensus)
-      ) %>%
       dplyr::transmute(
         Peptide,
-        Immunogenicity=Immunogenicity_Loose,  ## Seems the best
+        Immunogenicity=dplyr::if_else(stringr::str_detect(Immunogenicity, "Positive"), "Positive", "Negative"),
+        ImmunogenicityContradiction,
         ImmunogenicityEvidence,
         MHC,
         MHCEvidence,
@@ -94,7 +83,7 @@ Epitope_Import <- function(IEDBAssayFileName=NULL, OtherFileNames=NULL, peptideL
       dplyr::mutate(Immunogenicity=factor(Immunogenicity, levels=c("Positive", "Negative")))
 
     imm <- table(df$"Immunogenicity")
-    cat(imm[[1]], "/", nrow(df), " (", scales::percent(imm[[1]]/nrow(df)), ") peptides are immunogenic in at least one of the observations.\n", sep="")
+    cat(imm[[1]], "/", nrow(df), " (", scales::percent(imm[[1]]/nrow(df)), ") peptides are considered immunogenic.\n", sep="")
 
     return(df)
   }

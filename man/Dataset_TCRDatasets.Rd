@@ -10,6 +10,6 @@
 TCRSet_Public
 }
 \description{
-\code{TCRSet_Public} is a set of human TCR beta CDR3 clonotype sequences observed in at least 22 out of 220 datasets.
+\code{TCRSet_Public} is a set of TCR beta CDR3 clonotype sequences commonly observed in multiple TCR repertoire datasets obtianed from healthy human individuals.
 }
 \keyword{datasets}

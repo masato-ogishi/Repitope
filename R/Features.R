@@ -1,6 +1,6 @@
 #' Generate peptide features.
 #'
-#' \code{Features_PeptDesc} calculates descriptive statistics of peptide descriptors.\cr
+#' \code{Features_PeptDesc} computes peptide descriptors.\cr
 #' \code{Features_CPP} calculates descriptive statistics of interresidue pairwise contact potential profiles.\cr
 #' \code{Features} is a wrapper function.
 #'

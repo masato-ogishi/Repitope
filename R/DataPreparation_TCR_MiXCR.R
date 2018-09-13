@@ -13,7 +13,11 @@
 #' @export
 #' @rdname DataPreparation_TCR_MiXCR
 #' @name DataPreparation_TCR_MiXCR
-MiXCR_Script <- function(dir="C:/SRA/output", mixcrPath="C:/MiXCR/", javaMaxMemory="6G"){
+MiXCR_Script <- function(
+  dir="C:/SRA/output",
+  mixcrPath="C:/MiXCR/",
+  javaMaxMemory="6G"
+){
   # MiXCR script template [type 1: single-end, type 2: paired-end]
   mixcrJarPath <- normalizePath(file.path(mixcrPath, "mixcr.jar"))
   template <- function(accessionNumber, type){
@@ -68,7 +72,12 @@ MiXCR_Script <- function(dir="C:/SRA/output", mixcrPath="C:/MiXCR/", javaMaxMemo
 #' @export
 #' @rdname DataPreparation_TCR_MiXCR
 #' @name DataPreparation_TCR_MiXCR
-MiXCR_CombineClonotypes <- function(dirClones=NULL, clonesFileNames=NULL, countSummarise=F, rdsFileName=NULL){
+MiXCR_CombineClonotypes <- function(
+  dirClones=NULL,
+  clonesFileNames=NULL,
+  countSummarise=F,
+  rdsFileName=NULL
+){
   TRBClonotypeTableImport <- function(FILEPATH){
     DT <- suppressWarnings(data.table::fread(FILEPATH, sep="\t", data.table=T))
     DT <- subset(DT, stringr::str_detect(allVHitsWithScore, "TRB"))[,list(aaSeqCDR3),]
