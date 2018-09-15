@@ -1,117 +1,66 @@
 #' Parallelized correlation matrix calculation.
 #'
-#' @param mat A matrix. A data.frame or a data.table is internally converted into a matrix.
+#' @param mat A matrix, a data.frame, or a data.table.
+#' @param nblocks The number of sub-matrices.
 #' @param coreN The number of threads for parallelization. Disable by setting \code{NULL}.
-#' @param verbose Logical. Whether the progress should be printed in the colsole?
 #' @export
 #' @rdname Utility_ParCor
 #' @name Utility_ParCor
-parCor <- function(mat, coreN=parallel::detectCores(logical=F), verbose=T){
-  # Input check
-  if(!any(class(mat)=="matrix")){
-    mat <- try(as.matrix(mat), silent=T)
-    if(identical(class(mat), "try-error")){
-      message("The input mat cannot be converted into matrix!")
-      return(NULL)
-    }
-  }
-
-  # Convert to big.matrix
-  tmp.timestamp <- format(Sys.time(), "%Y.%b.%d.%H.%M.%OS3")
-  tmp.dir <- tempdir()
-  mat.binfile <- paste0("ParCor.", tmp.timestamp, ".bin")
-  mat.descfile <- paste0("ParCor.", tmp.timestamp, ".desc")
-  mat <- bigmemory::as.big.matrix(
-    mat, type = "double", separated = F,
-    backingpath = tmp.dir,
-    backingfile = mat.binfile,
-    descriptorfile = mat.descfile
-  )
-
-  # Internally used functions
-  compute_split_size <- function(n, coreN){
-    split_size <- ceiling(n / coreN)
-    stopifnot(split_size > 1)
-    return(split_size)
-  }
-  compute_splits_beg <- function(n, split_size){
-    beg <- seq(1, n, by = split_size)
-    beg <- beg[beg <= n]
-    return(beg)
-  }
-  compute_splits_end <- function(n, split_size, beg){
-    end <- beg - 1 + split_size
-    end[length(end)] <- n
-    return(end)
-  }
-
-  # Parallelized computation of correlation matrix
-  ### The number of threads
-  if(is.null(coreN)) coreN <- 1
-
-  ### variables
-  n <- nrow(mat)
-  p <- ncol(mat)
-
-  ### split into batches
-  if(verbose) cat(" - parCor: preparing batches of block-pairs from ", coreN, "splits\n")
-  split_size <- compute_split_size(p, coreN)
-  beg <- compute_splits_beg(p, split_size)
-  end <- compute_splits_end(p, split_size, beg)
-  coreN <- length(beg)
-  batches <- lapply(1:coreN, function(i){
-    list(batch = i, beg = beg[i], end = end[i])
-  })
-  grid <-  expand.grid(1:coreN, 1:coreN)
-  colnames(grid) <- c("cell1", "cell2")
-  grid <- subset(grid, cell1 <= cell2)
-  num_batches <- nrow(grid)
-
-  ### computes blocks of the cov. matrix
-  if(verbose) cat(" - parCor: computing `crossprod` by blocks:", num_batches, "batches\n")
-  if(coreN>=2){
-    cl <- parallel::makeCluster(min(coreN, parallel::detectCores(logical=F)), type="SOCK")
-    parallel::clusterExport(
-      cl,
-      list("grid", "batches", "beg", "end", "mat.descfile", "tmp.dir"),
-      envir=environment()
-    )
+parCor <- function(mat, nblocks=10, coreN=parallel:::detectCores(logical=F)){
+  ## Add dummy variables if ncol(x) %% nblocks does not give a remainder of 0
+  if (ncol(mat) %% nblocks != 0){
+    DUMMY <- data.table::as.data.table(matrix(data=0, nrow=nrow(mat), ncol=nblocks-(ncol(mat) %% nblocks)))
+    colnames(DUMMY) <- paste0("DUMMY_", 1:ncol(DUMMY))
+    x <- cbind(data.table::as.data.table(mat), DUMMY)
   }else{
-    cl <- NULL
+    x <- data.table::as.data.table(mat)
   }
-  blocks <- pbapply::pblapply(1:num_batches, function(i){
-    tmpmat <- bigmemory::attach.big.matrix(obj=mat.descfile, path=tmp.dir)
-    cell1 <- grid[i, "cell1"]
-    cell2 <- grid[i, "cell2"]
-    ind1 <- with(batches[[cell1]], seq(beg, end))
-    ind2 <- with(batches[[cell2]], seq(beg, end))
-    if(cell1==cell2){
-      cp <- crossprod(tmpmat[, ind1])
-    }else{
-      cp <- crossprod(tmpmat[, ind1], tmpmat[, ind2])
-    }
-    return(list(ind1 = ind1, ind2 = ind2, cp = cp))
-  }, cl=cl)
-  if(!is.null(cl)) parallel::stopCluster(cl=cl)
+
+  ## Split blocks
+  NCOL <- ncol(x)
+  SPLIT <- split(1:NCOL, rep(1:nblocks, each=NCOL/nblocks))
+  COMBS <- data.table::CJ(1:length(SPLIT), 1:length(SPLIT))
+  COMBS <- t(apply(COMBS, 1, sort))
+  COMBS <- unique(COMBS)
+
+  ## Parallel computation
+  cat("Starting parallelized computation of sub-matrices.\n")
+  cl <- parallel::makeCluster(coreN, type="SOCK")
+  doSNOW::registerDoSNOW(cl)
+  sink(tempfile())
+  pb <- pbapply::timerProgressBar(max=nrow(COMBS), style=1)
+  sink()
+  opts <- list(progress=function(n){pbapply::setTimerProgressBar(pb, n)})
+  results <- foreach::foreach(i=1:nrow(COMBS), .packages="data.table", .inorder=T, .options.snow=opts)%dopar%{
+    COMB <- COMBS[i, ]
+    G1 <- SPLIT[[COMB[1]]]
+    G2 <- SPLIT[[COMB[2]]]
+    cor(x[, ..G1], x[, ..G2])
+  }
+  cat("\n")
+  close(pb)
+  parallel::stopCluster(cl)
   gc();gc()
 
-  ### build the output matrix block by block
-  if(verbose) cat(" - parCor: merging the batches into", p, "x", p, "output matrix\n")
-  outmat <- matrix(0, ncol = p, nrow = p)
-  for(i in 1:length(blocks)){
-    outmat[blocks[[i]]$ind1, blocks[[i]]$ind2] <- blocks[[i]]$cp
+  ## Integrate sub-matrices into one correlation matrix
+  corMAT <- matrix(0, ncol=NCOL, nrow=NCOL)
+  for(i in 1:nrow(COMBS)){
+    COMB <- COMBS[i, ]
+    G1 <- SPLIT[[COMB[1]]]
+    G2 <- SPLIT[[COMB[2]]]
+    COR <- results[[i]]
+    corMAT[G1, G2] <- COR
   }
-  outmat <- Matrix::forceSymmetric(outmat, uplo = "U")
-  outmat <- as.matrix(outmat)
-  rownames(outmat) <- colnames(mat)
-  colnames(outmat) <- colnames(mat)
+  close(pb)
+  corMAT <- Matrix::forceSymmetric(corMAT, uplo="U")
+  corMAT <- as.matrix(corMAT)
+  colnames(corMAT) <- colnames(x)
+  rownames(corMAT) <- colnames(x)
+  P <- setdiff(1:ncol(x), grep("^DUMMY_", colnames(x)))
+  corMAT <- corMAT[P,P]
 
-  ### convert a covariance matrix to a correlation matrix
-  outmat <- cov2cor(outmat)
-
-  # output
-  rm(list=setdiff(ls(), c("outmat", "tmp.dir", "mat.binfile", "mat.descfile")))
+  ## Finish
+  rm(list=setdiff(ls(), c("corMAT")))
   gc();gc()
-  file.remove(file.path(tmp.dir, mat.binfile))
-  return(outmat)
+  return(corMAT)
 }

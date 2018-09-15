@@ -5,14 +5,14 @@
 \alias{parCor}
 \title{Parallelized correlation matrix calculation.}
 \usage{
-parCor(mat, coreN = parallel::detectCores(logical = F), verbose = T)
+parCor(mat, nblocks = 10, coreN = parallel:::detectCores(logical = F))
 }
 \arguments{
-\item{mat}{A matrix. A data.frame or a data.table is internally converted into a matrix.}
+\item{mat}{A matrix, a data.frame, or a data.table.}
+
+\item{nblocks}{The number of sub-matrices.}
 
 \item{coreN}{The number of threads for parallelization. Disable by setting \code{NULL}.}
-
-\item{verbose}{Logical. Whether the progress should be printed in the colsole?}
 }
 \description{
 Parallelized correlation matrix calculation.
