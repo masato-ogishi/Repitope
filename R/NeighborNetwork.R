@@ -6,8 +6,6 @@
 #' @param numSet An attribute for the vertices.
 #' @param directed Should the network be converted from undirected to directed? Directions are determined using the \code{numSet} provided.
 #' @param weighted Should the network be converted to weihted? Edge weights are determined using the \code{numSet} provided.
-#' @param annotateMutType Should mutational types be annotated? A little bit time-consuming.
-#' @param coreN The number of cores to be used for parallelization. Set \code{NULL} to disable.
 #' @export
 #' @rdname NeighborNetwork
 #' @name NeighborNetwork
@@ -93,7 +91,7 @@ distMat_Indel <- function(longerPeptideSet, shorterPeptideSet){
 #' @export
 #' @rdname NeighborNetwork
 #' @name NeighborNetwork
-neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, annotateMutType=T, coreN=parallel::detectCores(logical=F)){
+neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T){
   # Internally used workflows
   net_main <- function(peptideSet){
     ## Input check...
@@ -153,7 +151,7 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, ann
       igraph::simplify()
     return(net)
   }
-  net_pairs_DF <- function(net, annotateMutType=F, coreN=NULL){
+  net_pairs_DF <- function(net){
     ## Get peptide pairs
     df <- as.data.frame(igraph::as_edgelist(net, names=T))
     colnames(df) <- c("Node1","Node2")
@@ -162,71 +160,67 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, ann
     df <- dplyr::select(df, -Node1, -Node2)
 
     ## Annotate mutational types and patterns
-    mutType <- function(pept1, pept2){
-      if(nchar(pept1)==nchar(pept2)){
-        pwal <- Biostrings::pairwiseAlignment(pattern=pept1, subject=pept2, type="global")
-        sbst <- Biostrings::mismatchTable(pwal)
-        sbst <- paste0(c(as.character(sbst$PatternSubstring), sbst$PatternStart, as.character(sbst$SubjectSubstring)), collapse="_")
-        return(sbst)
-      }
-      if(nchar(pept1)<nchar(pept2)){
-        shorterseq <- pept1
-        longerSeq <- pept2
-        leng_longer <- nchar(longerSeq)
-        longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
-        longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
-        del.pos <- dplyr::last(which(longerSeq.degenerate==shorterseq))
-        sbst <- paste0(c("-", del.pos, substr(longerSeq, del.pos, del.pos)), collapse="_")
-        return(sbst)
-      }
-      if(nchar(pept1)>nchar(pept2)){
-        shorterseq <- pept2
-        longerSeq <- pept1
-        leng_longer <- nchar(longerSeq)
-        longerSeq.degenerate <- unlist(lapply(1:leng_longer, function(i){seq <- longerSeq; stringr::str_sub(seq, i, i) <- ""; return(seq)}))
-        longerSeq.degenerate <- matrix(longerSeq.degenerate, ncol=leng_longer)
-        del.pos <- dplyr::last(which(longerSeq.degenerate==shorterseq))
-        sbst <- paste0(c(substr(longerSeq, del.pos, del.pos), del.pos, "-"), collapse="_")
-        return(sbst)
-      }
-    }
-    peptSet1 <- df$"AASeq1"
-    peptSet2 <- df$"AASeq2"
+    message("Annotating mutations...")
+    pept1 <- df$"AASeq1"
+    pept2 <- df$"AASeq2"
+    n_max <- max(nchar(c(pept1, pept2)))
+    df_mut <- data.table::data.table("AASeq1"=pept1, "AASeq2"=pept2, "MutType"=NA, "MutPattern"="Substitution")
+    df_mut[nchar(AASeq1)<nchar(AASeq2), MutPattern:="Insertion"]
+    df_mut[nchar(AASeq1)>nchar(AASeq2), MutPattern:="Deletion"]
 
-    message("Annotating mutational types...")
-    if(annotateMutType){
-      if(!is.null(coreN)){
-        cl <- parallel::makeCluster(coreN, type='SOCK')
-        parallel::clusterExport(
-          cl,
-          list("peptSet1", "peptSet2", "mutType"),
-          envir=environment()
-        )
-      }else{
-        cl <- NULL
-      }
-      df$"MutType" <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutType(peptSet1[[i]], peptSet2[[i]])}, cl=cl)) ## a bit slow...
-      parallel::stopCluster(cl)
-    }else{
-      df$"MutType" <- ""
-    }
+    ### Substitutions
+    paramDT <- data.table::CJ("Position"=1:n_max, "AA"=Biostrings::AA_STANDARD)
+    subst <- foreach::foreach(i=1:nrow(paramDT))%do%{
+      pos <- paramDT$Position[[i]]
+      aa <- paramDT$AA[[i]]
+      pept1_tmp <- pept1
+      mut <- paste0("_", pos, "_", aa)
+      mut <- paste0(stringr::str_sub(pept1_tmp, pos, pos), mut, ";")
+      stringr::str_sub(pept1_tmp, pos, pos) <- aa
+      mut[!pept1_tmp==pept2] <- ""
+      return(mut)
+    } %>%
+      data.table::as.data.table() %>%
+      apply(1, paste0, collapse="") %>%
+      stringr::str_replace(";$", "")
+    df_mut[, MutType:=subst]
 
-    message("Annotating mutational patterns...")
-    mutPattern <- function(pept1, pept2){
-      if(nchar(pept1)==nchar(pept2)) return("Substitution")
-      if(nchar(pept1)<nchar(pept2)) return("Insertion")
-      if(nchar(pept1)>nchar(pept2)) return("Deletion")
-    }
-    df$"MutPattern" <- unlist(pbapply::pblapply(1:nrow(df), function(i){mutPattern(peptSet1[[i]], peptSet2[[i]])}, cl=NULL)) ## parallelization makes calculation slower
+    ### Indels
+    ins <- foreach::foreach(pos=1:n_max)%do%{
+      pept2_tmp <- pept2
+      mut <- paste0("-_", pos, "_")
+      mut <- paste0(mut, stringr::str_sub(pept2_tmp, pos, pos), ";")
+      stringr::str_sub(pept2_tmp, pos, pos) <- ""
+      mut[!pept2_tmp==pept1] <- ""
+      return(mut)
+    } %>%
+      data.table::as.data.table() %>%
+      apply(1, paste0, collapse="") %>%
+      stringr::str_replace(";$", "")
+    del <- foreach::foreach(pos=1:n_max)%do%{
+      pept1_tmp <- pept1
+      mut <- paste0("_", pos, "_-")
+      mut <- paste0(stringr::str_sub(pept1_tmp, pos, pos), mut, ";")
+      stringr::str_sub(pept1_tmp, pos, pos) <- ""
+      mut[!pept1_tmp==pept2] <- ""
+      return(mut)
+    } %>%
+      data.table::as.data.table() %>%
+      apply(1, paste0, collapse="") %>%
+      stringr::str_replace(";$", "")
+    df_mut[MutPattern=="Insertion", MutType:=ins[ins!=""]]
+    df_mut[MutPattern=="Deletion", MutType:=del[del!=""]]
 
     ## Output
+    df <- dplyr::left_join(df, df_mut, by=c("AASeq1", "AASeq2"))
+    df$"MutType" <- sapply(stringr::str_split(df$"MutType", ";"), dplyr::last)
     gc();gc()
     return(df)
   }
 
   # A basic, non-directional, non-weighted network
   net <- net_main(peptideSet)
-  pairDF <- net_pairs_DF(net, annotateMutType=annotateMutType, coreN=coreN)
+  pairDF <- net_pairs_DF(net)
   if(is.null(numSet)) return(list("NeighborNetwork"=net, "PairDF"=pairDF))
 
   # A directional, weighted network
@@ -250,6 +244,12 @@ neighborNetwork <- function(peptideSet, numSet=NULL, directed=T, weighted=T, ann
   net_DW <- igraph::graph_from_data_frame(pairDF_DW, directed=directed)
   net_DW <- igraph::set_vertex_attr(net_DW, name="label", value=igraph::V(net_DW)$name)
   if(weighted==T) igraph::E(net_DW)$weight <- 1/igraph::E(net_DW)$ScoreRatio ## inverse to transform ratios (distances) into edge weights
-  return(list("NeighborNetwork"=net, "PairDF"=pairDF,
-              "NeighborNetwork_DW"=net_DW, "PairDF_DW"=pairDF_DW))
+  return(
+    list(
+      "NeighborNetwork"=net,
+      "PairDF"=pairDF,
+      "NeighborNetwork_DW"=net_DW,
+      "PairDF_DW"=pairDF_DW
+    )
+  )
 }

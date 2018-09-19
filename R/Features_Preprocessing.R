@@ -112,7 +112,7 @@ Features_CorFilter <- function(preprocessedDFList, corThreshold=0.75, coreN=para
     dt_train <- dt_train[DataType=="Train", ]
     dt_train <- dt_train[, -c("DataType", "Peptide", "Immunogenicity", "Cluster"), with=F]
     message("Calculating correlation matrix...")
-    corMat <- parCor(dt_train, coreN=coreN, verbose=T)
+    corMat <- parCor(dt_train, coreN=coreN)
     removedFeatureSet <- caret::findCorrelation(corMat, cutoff=corThreshold, verbose=F, names=T)
     if(length(removedFeatureSet)>0) dt <- dt[, -removedFeatureSet, with=F]
     message(length(removedFeatureSet), " features were removed based on their correlations.")
