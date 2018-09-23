@@ -260,6 +260,6 @@ multivariateRegressionPrediction <- function(dt_deltaG_sCPP, dt_deltaG_sCPP_new=
   if(is.null(dt_deltaG_sCPP_new)){
     return(dplyr::mutate(dt_deltaG_sCPP, Prediction=predict(step.model, newdata=dt_deltaG_sCPP)))
   }else{
-    return(dplyr::mutate(dt_deltaG_sCPP, Prediction=predict(step.model, newdata=dt_deltaG_sCPP_new)))
+    return(dplyr::mutate(dt_deltaG_sCPP_new, Prediction=predict(step.model, newdata=dt_deltaG_sCPP_new)))
   }
 }
