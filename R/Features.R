@@ -1,4 +1,4 @@
-#' Generate peptide features.
+#' Features for immunogenicity prediction.
 #'
 #' \code{Features_PeptDesc} computes peptide descriptors.\cr
 #' \code{Features_CPP} calculates descriptive statistics of interresidue pairwise contact potential profiles.\cr

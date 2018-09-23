@@ -4,7 +4,7 @@
 \alias{Features_PeptDesc}
 \alias{Features_CPP}
 \alias{Features}
-\title{Generate peptide features.}
+\title{Features for immunogenicity prediction.}
 \usage{
 Features_PeptDesc(peptideSet, fragLenSet = 3:8, featureSet = NULL)
 
