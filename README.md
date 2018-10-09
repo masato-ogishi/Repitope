@@ -121,60 +121,33 @@ minFeatureSet_MHCII_Human <- Features_MinimumFeatures(
 )
 saveRDS(minFeatureSet_MHCII_Human, "./Path/To/Your/Directory/MHCII/MinimumFeatureSet_MHCII_Human.rds")
 ```
-3. NetMHC
--   Binding to HLA representatives should be predicted using NetMHC4.0 or NetMHCIIpan3.2.
--   Output files can be imported and combined as follows.
-``` r
-# MHCI
-netmhcResults <- NetMHC_Import(list.files(pattern=".xls$", path="./Path/To/Your/Directory/MHCI/NetMHC4.0/", full.names=T), "MHCI")
-readr::write_csv(netmhcResults$DF, "./Path/To/Your/Directory/MHCI/NetMHC4.0/SummaryTable.csv")
-readr::write_csv(netmhcResults$DF_Rank, "./Path/To/Your/Directory/MHCI/NetMHC4.0/SummaryTable_Rank.csv")
-readr::write_csv(netmhcResults$DF_Bind, "./Path/To/Your/Directory/MHCI/NetMHC4.0/SummaryTable_Bind.csv")
-# MHCII
-netmhcResults <- NetMHC_Import(list.files(pattern=".xls$", path="./Path/To/Your/Directory/MHCII/NetMHCIIpan3.2/", full.names=T), "MHCII")
-readr::write_csv(netmhcResults$DF, "./Path/To/Your/Directory/MHCII/NetMHCIIpan3.2/SummaryTable.csv")
-readr::write_csv(netmhcResults$DF_Rank, "./Path/To/Your/Directory/MHCII/NetMHCIIpan3.2/SummaryTable_Rank.csv")
-readr::write_csv(netmhcResults$DF_Bind, "./Path/To/Your/Directory/MHCII/NetMHCIIpan3.2/SummaryTable_Bind.csv")
-```
-4. Immunogenicity scores
+3. Immunogenicity scores
 -   Probability estimates from multiple extremely randomized trees (ERTs) are summrized into a single numerical scale.
 -   Predictions can be performed as follows.
 ``` r
 # Parameters & datasets
 featureDF_MHCI <- fst::read_fst("./Path/To/Your/Directory/MHCI/FeatureDF_Weighted.10000.fst", as.data.table=T)
-hlaDF_rank_MHCI <- data.table::fread("./Path/To/Your/Directory/MHCI/NetMHC4.0/SummaryTable_Rank.csv")
-hlaDF_bind_MHCI <- data.table::fread("./Path/To/Your/Directory/MHCI/NetMHC4.0/SummaryTable_Bind.csv")
 featureDF_MHCI_Human <- featureDF_MHCI[Peptide%in%MHCI_Human$Peptide, ]
-featureDF_MHCI_Human_Rank <- merge(featureDF_MHCI_Human, hlaDF_rank_MHCI, by="Peptide", all.x=T, all.y=F)
-featureDF_MHCI_Human_Bind <- merge(featureDF_MHCI_Human, hlaDF_bind_MHCI, by="Peptide", all.x=T, all.y=F)
-minFeatureSet_MHCI_Human <- readRDS("./Path/To/Your/Directory/MHCI/MinimumFeatureSet_MHCI_Human.rds")
-hlaI <- c("A01","A02","A03","A24","A26","B07","B08","B27","B39","B44","B58","B62")
 featureDF_MHCII <- fst::read_fst("D:/Research/Immunogenicity/MHCII/FeatureDF_Weighted.10000.fst", as.data.table=T)
-hlaDF_rank_MHCII <- data.table::fread("./Path/To/Your/Directory/MHCII/NetMHCIIpan3.2/SummaryTable_Rank.csv")
-hlaDF_bind_MHCII <- data.table::fread("./Path/To/Your/Directory/MHCII/NetMHCIIpan3.2/SummaryTable_Bind.csv")
 featureDF_MHCII_Human <- featureDF_MHCII[Peptide%in%MHCII_Human$Peptide, ]
-featureDF_MHCII_Human_Rank <- merge(featureDF_MHCII_Human, hlaDF_rank_MHCII, by="Peptide", all.x=T, all.y=F)
-featureDF_MHCII_Human_Bind <- merge(featureDF_MHCII_Human, hlaDF_bind_MHCII, by="Peptide", all.x=T, all.y=F)
-minFeatureSet_MHCII_Human <- readRDS("./Path/To/Your/Directory/MHCII/MinimumFeatureSet_MHCII_Human.rds")
-hlaII <- c("DP","DQ","DRB1","DRB3","DRB4","DRB5")
 # MHCI
-scoreDF_MHCI_Human_Rank <- Immunogenicity_Score(
-  featureDF=featureDF_MHCI_Human_Rank, 
-  metadataDF=MHCI_Human[,.(Peptide, Immunogenicity)], 
-  featureSet=c(hlaI, minFeatureSet_MHCI_Human$MinimumFeatureSet),
+scoreDF_MHCI_Human <- Immunogenicity_Score(
+  featureDF=featureDF_MHCI_Human,
+  metadataDF=MHCI_Human[,.(Peptide, Immunogenicity)],
+  featureSet=MHCI_Human_MinimumFeatureSet,
   seedSet=1:5
 )
-readr::write_csv(scoreDF_MHCI_Human_Rank, "./Path/To/Your/Directory/MHCI/ScoreDF_MHCI_Human_Rank.csv")
+readr::write_csv(scoreDF_MHCI_Human, "./Path/To/Your/Directory/MHCI/ScoreDF_MHCI_Human.csv")
 # MHCII
-scoreDF_MHCII_Human_Rank <- Immunogenicity_Score(
-  featureDF=featureDF_MHCII_Human_Rank, 
-  metadataDF=MHCII_Human[,.(Peptide, Immunogenicity)], 
-  featureSet=c(hlaII, minFeatureSet_MHCII_Human$MinimumFeatureSet),
+scoreDF_MHCII_Human <- Immunogenicity_Score(
+  featureDF=featureDF_MHCII_Human,
+  metadataDF=MHCII_Human[,.(Peptide, Immunogenicity)],
+  featureSet=MHCII_Human_MinimumFeatureSet,
   seedSet=1:5
 )
-readr::write_csv(scoreDF_MHCII_Human_Rank, "./Path/To/Your/Directory/MHCII/ScoreDF_MHCII_Human_Rank.csv")
+readr::write_csv(scoreDF_MHCII_Human, "./Path/To/Your/Directory/MHCII/ScoreDF_MHCII_Human.csv")
 ```
 
 Reference
 ------------------------
-Ogishi, M and Yotsuyanagi, H. (2018) "The landscapes of T cell epitope immunogenicity in sequence space." bioRxiv. doi: https://doi.org/10.1101/155317
+Ogishi, M and Yotsuyanagi, H. (2018) "The landscape of T cell epitope immunogenicity in sequence space." bioRxiv. doi: https://doi.org/10.1101/155317
