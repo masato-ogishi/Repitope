@@ -11,6 +11,7 @@
 \alias{MHCII_Rodents}
 \alias{MHCII_Primates}
 \alias{MHCI_Human_MinimumFeatureSet}
+\alias{MHCII_Human_MinimumFeatureSet}
 \title{Compiled datasets of MHC class I and class II epitopes and ligands.}
 \format{data.table}
 \usage{
@@ -28,7 +29,7 @@ MHCII_Primates
 
 MHCI_Human_MinimumFeatureSet
 
-MHCI_Human_MinimumFeatureSet
+MHCII_Human_MinimumFeatureSet
 }
 \description{
 Datasets were compiled from source files attached in the package using \code{Epitope_Import}.

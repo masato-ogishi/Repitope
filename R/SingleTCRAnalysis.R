@@ -13,7 +13,6 @@
 #' @param corVarName A variable name used for univariate analysis.
 #' @param corVarNames A set of variable names used for multivariate regression.
 #' @param dt_univ An output data.table of univariate analysis.
-#' @param aaIndexIDSet A set of AAIndices of interest for univariate feature selection.
 #' @param sig A siginificance cutoff for univariate feature selection.
 #' @param bestOnly Logical. If True, only the best sCPP feature per AAIndex will be returned. If False, all sCPP features derived from selected AAIndices will be returned.
 #' @export

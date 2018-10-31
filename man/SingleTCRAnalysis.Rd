@@ -62,8 +62,6 @@ multivariateRegressionPrediction(dt_deltaG_sCPP,
 \item{corVarNames}{A set of variable names used for multivariate regression.}
 
 \item{dt_deltaG_sCPP_new}{Optional. If provided, TCR affnities would be predicted for this dataset. Otherwise, predicted TCR affinities for the original dataset would be returned.}
-
-\item{aaIndexIDSet}{A set of AAIndices of interest for univariate feature selection.}
 }
 \description{
 Single TCR-peptide contact potential profiling.

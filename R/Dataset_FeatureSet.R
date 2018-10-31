@@ -10,5 +10,5 @@
 
 #' @name Dataset_EpitopeDataset
 #' @rdname Dataset_EpitopeDataset
-"MHCI_Human_MinimumFeatureSet"
+"MHCII_Human_MinimumFeatureSet"
 
