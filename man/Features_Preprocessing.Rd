@@ -6,7 +6,7 @@
 \alias{Features_CorFilter}
 \alias{Features_FeatureSelect}
 \alias{inverseColOrderDFList}
-\title{Preprocess peptide feature dataframes for machine learning.}
+\title{Feature preprocessing.}
 \usage{
 Features_Preprocess(featureDFList, metadataDF, seedSet = 1:5)
 

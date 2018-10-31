@@ -3,7 +3,7 @@
 \name{Features_ExtractFeatures}
 \alias{Features_ExtractFeatures}
 \alias{Features_ExtractParameters}
-\title{Extract features from a list of dataframes.}
+\title{Extract features from a list of feature dataframes.}
 \usage{
 Features_ExtractFeatures(preprocessedDFList, criteria = "intersect")
 

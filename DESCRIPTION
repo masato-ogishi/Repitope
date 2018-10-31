@@ -1,7 +1,7 @@
 Package: Repitope
 Type: Package
 Title: Epitope immunogenicity prediction through in silico TCR-peptide contact potential profiling
-Version: 1.3.0
+Version: 1.3.1
 Author: Masato Ogishi
 Maintainer: Masato Ogishi <oogishi-tky@umin.ac.jp>
 Description: In silico screening of immunogenic epitopes among the vast amount of MHC-loaded peptides is a critical step toward effective precision immunotherapy.
@@ -14,8 +14,8 @@ LazyData: true
 RoxygenNote: 6.1.0
 Imports:
     BBmisc (>= 1.11),
-    bigmemory (>= 4.5.33),
     Biostrings (>= 2.48.0),
+    car (>= 3.0-2),
     caret (>= 6.0-79),
     cvAUC (>= 1.1.0),
     data.table (>= 1.11.2),
@@ -29,12 +29,18 @@ Imports:
     ggplot2 (>= 2.2.1),
     ggpubr (>= 0.1.6),
     ggsci (>= 2.8),
+    graphics (>= 3.5.0),
+    grDevices (>= 3.5.0),
+    grid (>= 3.5.0),
     gridExtra (>= 2.3),
     igraph (>= 1.2.1),
     magrittr (>= 1.5),
+    MASS (>= 7.3-50),
+    Matrix (>= 1.2-14),
     matrixStats (>= 0.53.1),
     mlr (>= 2.12.1),
     msa (>= 1.12.0),
+    parallel (>= 3.5.0),
     pbapply (>= 1.3-4),
     Peptides (>= 2.3),
     precrec (>= 0.9.1),
@@ -48,17 +54,12 @@ Imports:
     scales (>= 0.5.0),
     seqinr (>= 3.4-5),
     snow (>= 0.4-2),
-    survminer (>= 0.4.2),
-    survival (>= 2.41-3),
+    stats (>= 3.5.0),
     stringdist (>= 0.9.4.7),
     stringr (>= 1.3.1),
+    survminer (>= 0.4.2),
+    survival (>= 2.41-3),
     tidyr (>= 0.8.0),
-    VennDiagram (>= 1.6.20),
-    graphics (>= 3.5.0),
-    grDevices (>= 3.5.0),
-    grid (>= 3.5.0),
-    Matrix (>= 1.2-14),
-    parallel (>= 3.5.0),
-    stats (>= 3.5.0),
     utils (>= 3.5.0),
+    VennDiagram (>= 1.6.20),
     zoo (>= 1.8-1)

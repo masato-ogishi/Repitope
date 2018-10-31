@@ -4,7 +4,7 @@
 \alias{Features_PeptDesc}
 \alias{Features_CPP}
 \alias{Features}
-\title{Features for immunogenicity prediction.}
+\title{Feature computation.}
 \usage{
 Features_PeptDesc(peptideSet, fragLenSet = 3:8, featureSet = NULL)
 
@@ -26,7 +26,7 @@ Features(peptideSet, fragLib, aaIndexIDSet = "all", fragLenSet = 3:8,
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}
 
-\item{fragLenSet}{A set of sliding window sizes. Must be between 3 and 8.}
+\item{fragLenSet}{A set of sliding window sizes.}
 
 \item{featureSet}{A minimum set of features. Combinations of fragment lengths and AAIndex IDs are internally extracted for calculating CPPs.}
 
@@ -34,7 +34,7 @@ Features(peptideSet, fragLib, aaIndexIDSet = "all", fragLenSet = 3:8,
 
 \item{aaIndexIDSet}{A set of AAIndex IDs indicating the AACP scales to be used. Set "all" to shortcut the selection of all available AACP scales.}
 
-\item{fragDepthSet}{A set of fragment library sizes. Must be below 100000.}
+\item{fragDepthSet}{A set of fragment library sizes.}
 
 \item{fragLibTypeSet}{A set of strings indicating the types of fragment libraries to be used.}
 
@@ -46,6 +46,6 @@ Features(peptideSet, fragLib, aaIndexIDSet = "all", fragLenSet = 3:8,
 }
 \description{
 \code{Features_PeptDesc} computes peptide descriptors.\cr
-\code{Features_CPP} calculates descriptive statistics of interresidue pairwise contact potential profiles.\cr
+\code{Features_CPP} computes descriptive statistics of TCR repertoire-wide contact potential distributions.\cr
 \code{Features} is a wrapper function.
 }

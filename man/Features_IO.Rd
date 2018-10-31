@@ -4,7 +4,7 @@
 \alias{Features_IO}
 \alias{readFeatureDFList}
 \alias{saveFeatureDFList}
-\title{Feature dataframes In/Out.}
+\title{Importing and exporting utilities for feature dataframes.}
 \usage{
 readFeatureDFList(featureDFFileNames)
 
@@ -18,5 +18,5 @@ saveFeatureDFList(featureDFList, fileNameHeader)
 \item{fileNameHeader}{A file name header.}
 }
 \description{
-Feature dataframes In/Out.
+Importing and exporting utilities for feature dataframes.
 }

@@ -1,4 +1,4 @@
-#' Preprocess peptide feature dataframes for machine learning.
+#' Feature preprocessing.
 #'
 #' \code{Features_Preprocess} does preprocessing, i.e. centering and rescaling using the internally separated training subdata.\cr
 #' \code{Features_CorFilter} filters highly correlated features. Internally using \code{parCor} to do parallelized calculation of a correlational matrix.\cr

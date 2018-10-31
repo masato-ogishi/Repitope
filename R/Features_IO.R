@@ -1,4 +1,4 @@
-#' Feature dataframes In/Out.
+#' Importing and exporting utilities for feature dataframes.
 #'
 #' @param featureDFFileNames A character vector of binary file names with either ".fst" or ".rds" extensions.
 #' @param featureDFList A named list of feature dataframes.

@@ -1,4 +1,4 @@
-#' Extract features from a list of dataframes.
+#' Extract features from a list of feature dataframes.
 #'
 #' \code{Features_ExtractFeatures} obtains a set of features from a list of preprocessed/feature-selected dataframes. It also generates a venn diagram.\cr
 #' \code{Features_ExtractParameters} obtains a set of parameters.\cr
