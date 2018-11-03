@@ -5,15 +5,15 @@
 \alias{CPP_FragmentLibrary}
 \title{Generate sequence fragment libraries.}
 \usage{
-CPP_FragmentLibrary(sequenceSet, fragLenSet = 3:8,
-  maxFragDepth = 1e+05, seedSet = 1:5)
+CPP_FragmentLibrary(tcrSequenceSet, fragLenSet = 3:8,
+  fragDepth = 1e+05, seedSet = 1:5)
 }
 \arguments{
-\item{sequenceSet}{A set of amino acid sequences.}
+\item{tcrSequenceSet}{A set of TCR CDR3B amino acid sequences.}
 
-\item{fragLenSet}{A set of sliding window sizes. Must be between 3 and 8.}
+\item{fragLenSet}{A set of sliding window sizes.}
 
-\item{maxFragDepth}{The maximum size of the fragment library.}
+\item{fragDepth}{The depth of fragments used to compute repertoire-wide TCR-peptide contact potentials.}
 
 \item{seedSet}{A set of random seeds.}
 }
