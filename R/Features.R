@@ -82,7 +82,7 @@ Features_PeptDesc <- function(
   col_val <- setdiff(colnames(dt_peptdesc), col_id)
   dt_peptdesc <- data.table::melt.data.table(dt_peptdesc, id=col_id, measure=col_val, variable.name="Stat", value.name="Value")
   dt_peptdesc[,"Feature":=paste0("PeptDesc_", AADescriptor, "_", Stat, "_", FragLen)][,"AADescriptor":=NULL][,"FragLen":=NULL][,"Stat":=NULL]
-  dt_peptdesc <- data.table::dcast.data.table(dt_peptdesc, Peptide~Feature, value.var="Value")
+  dt_peptdesc <- data.table::dcast.data.table(dt_peptdesc, Peptide~Feature, value.var="Value", fun=mean)
 
   # Basic peptide information
   dt_basic <- data.table::data.table("Peptide"=peptideSet, "Peptide_Length"=nchar(peptideSet))
