@@ -22,7 +22,7 @@ library(tidyverse)
 library(Repitope)
 ```
 1. Dataset
--   The following datasets are compiled.
+-   The following epitope datasets are provided as examples.
 ``` r
 MHCI_Human
 MHCI_Rodents
@@ -31,9 +31,9 @@ MHCII_Human
 MHCII_Rodents
 MHCII_Primates
 ```
--   Also, the compilation process itself is defined as a single function.
+-   Also, the compilation process itself is provided as a single function. Users can compile their own epitope datasets from IEDB and other sources.
 ``` r
-# Epitope datasets [MHC class I]
+# Epitope datasets [MHC I]
 MHCI_Human <- Epitope_Import(
   system.file("IEDB_Assay_MHCI_Human.csv.gz", package="Repitope"),
   OtherFileNames=list(
@@ -51,7 +51,8 @@ MHCI_Human <- Epitope_Import(
 )
 ## 1873/21162 (8.85%) peptides have contradicting annotations.
 ## 6957/21162 (32.9%) peptides are immunogenic in at least one of the observations.
-# Epitope datasets [MHC class II]
+
+# Epitope datasets [MHC II]
 MHCII_Human <- Epitope_Import(
   system.file("IEDB_Assay_MHCII_Human.csv.gz", package="Repitope"),
   peptideLengthSet=11:30
@@ -65,7 +66,7 @@ fragLibDT <- CPP_FragmentLibrary(TCRSet_Public, fragLenSet=3:11, maxFragDepth=10
 fst::write_fst(fragLibDT, "./Path/To/Your/Directory/FragmentLibrary_TCRSet_Public.fst", compress=0)
 ```
 2. Features
--   Features can be calculated as follows.
+-   Features can be calculated as follows. Note: Computation is resumed if temporary files are stored in the temporary directory provided.
 ``` r
 # Features [MHC I]
 FeatureDFList_MHCI <- Features(
@@ -75,11 +76,12 @@ FeatureDFList_MHCI <- Features(
   fragLenSet=3:8,
   fragDepthSet=10000,
   fragLibTypeSet="Weighted",
-  seedSet=1:5,                                   ## must be the same seed set for the fragment library
-  coreN=parallel::detectCores()                  ## parallelization
+  seedSet=1:5,                                   ## must be the same random seeds used for preparing the fragment library
+  coreN=parallel::detectCores(logical=F)         ## parallelization
   tmpDir="./Path/To/Your/Temporary/Directory/"   ## where intermediate files are stored
 )
 saveFeatureDFList(FeatureDFList_MHCI, "./Path/To/Your/Directory/MHCI/FeatureDF_")
+
 # Features [MHC II]
 FeatureDFList_MHCII <- Features(
   peptideSet=unique(c(MHCII_Human$Peptide, MHCII_Rodents$Peptide, MHCII_Primates$Peptide)),
@@ -108,6 +110,7 @@ minFeatureSet_MHCI_Human <- Features_MinimumFeatures(
   returnImpDFList=T
 )
 saveRDS(minFeatureSet_MHCI_Human, "./Path/To/Your/Directory/MHCI/MinimumFeatureSet_MHCI_Human.rds")
+
 # Feature selection [MHC II]
 dt_feature_MHCII <- fst::read_fst("./Path/To/Your/Directory/MHCII/FeatureDF_Weighted.10000.fst", as.data.table=T)
 minFeatureSet_MHCII_Human <- Features_MinimumFeatures(
@@ -130,7 +133,8 @@ featureDF_MHCI <- fst::read_fst("./Path/To/Your/Directory/MHCI/FeatureDF_Weighte
 featureDF_MHCI_Human <- featureDF_MHCI[Peptide%in%MHCI_Human$Peptide, ]
 featureDF_MHCII <- fst::read_fst("D:/Research/Immunogenicity/MHCII/FeatureDF_Weighted.10000.fst", as.data.table=T)
 featureDF_MHCII_Human <- featureDF_MHCII[Peptide%in%MHCII_Human$Peptide, ]
-# MHCI
+
+# Probability estimation [MHC I]
 scoreDF_MHCI_Human <- Immunogenicity_Score(
   featureDF=featureDF_MHCI_Human,
   metadataDF=MHCI_Human[,.(Peptide, Immunogenicity)],
@@ -138,7 +142,8 @@ scoreDF_MHCI_Human <- Immunogenicity_Score(
   seedSet=1:5
 )
 readr::write_csv(scoreDF_MHCI_Human, "./Path/To/Your/Directory/MHCI/ScoreDF_MHCI_Human.csv")
-# MHCII
+
+# Probability estimation [MHC II]
 scoreDF_MHCII_Human <- Immunogenicity_Score(
   featureDF=featureDF_MHCII_Human,
   metadataDF=MHCII_Human[,.(Peptide, Immunogenicity)],

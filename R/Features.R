@@ -20,7 +20,8 @@
 Features_PeptDesc <- function(
   peptideSet,
   fragLenSet=3:8,
-  featureSet=NULL
+  featureSet=NULL,
+  coreN=parallel::detectCores(logical=F)
 ){
   # Start calculation
   set.seed(12345)
@@ -62,29 +63,34 @@ Features_PeptDesc <- function(
   }
 
   # Parallelized calculation of descriptive statistics
-  parameterDT <- data.table::CJ(peptideSet, fragLenSet) %>%
-    magrittr::set_colnames(c("Peptide", "FragLen"))
-  cl <- parallel::makeCluster(parallel::detectCores(logical=F), type="SOCK")
-  doSNOW::registerDoSNOW(cl)
-  sink(tempfile())
-  pb <- pbapply::timerProgressBar(max=nrow(parameterDT), style=1)
-  sink()
-  opts <- list(progress=function(n){pbapply::setTimerProgressBar(pb, n)})
-  dt_peptdesc <- foreach::foreach(i=1:nrow(parameterDT), .inorder=F, .options.snow=opts)%dopar%{
-    peptideDescriptor.FragStat.Single(parameterDT$"Peptide"[[i]], parameterDT$"FragLen"[[i]])
-  } %>% data.table::rbindlist()
-  close(pb)
-  parallel::stopCluster(cl)
-  gc();gc()
+  flag1 <- is.null(featureSet)
+  flag2 <- length(grep("PeptDesc_", featureSet))>=1
+  flag_comp <- flag1==T | (flag1==F & flag2==T)
+  if(flag_comp==T){
+    parameterDT <- data.table::CJ(peptideSet, fragLenSet) %>%
+      magrittr::set_colnames(c("Peptide", "FragLen"))
+    cl <- parallel::makeCluster(coreN, type="SOCK")
+    doSNOW::registerDoSNOW(cl)
+    sink(tempfile())
+    pb <- pbapply::timerProgressBar(max=nrow(parameterDT), style=1)
+    sink()
+    opts <- list(progress=function(n){pbapply::setTimerProgressBar(pb, n)})
+    dt_peptdesc <- foreach::foreach(i=1:nrow(parameterDT), .inorder=F, .options.snow=opts)%dopar%{
+      peptideDescriptor.FragStat.Single(parameterDT$"Peptide"[[i]], parameterDT$"FragLen"[[i]])
+    } %>% data.table::rbindlist()
+    close(pb)
+    parallel::stopCluster(cl)
+    gc();gc()
+    col_id <- c("Peptide", "AADescriptor", "FragLen")
+    col_val <- setdiff(colnames(dt_peptdesc), col_id)
+    dt_peptdesc <- data.table::melt.data.table(dt_peptdesc, id=col_id, measure=col_val, variable.name="Stat", value.name="Value")
+    dt_peptdesc[,"Feature":=paste0("PeptDesc_", AADescriptor, "_", Stat, "_", FragLen)][,"AADescriptor":=NULL][,"FragLen":=NULL][,"Stat":=NULL]
+    dt_peptdesc <- data.table::dcast.data.table(dt_peptdesc, Peptide~Feature, value.var="Value", fun=mean)
+  }else{
+    dt_peptdesc <- data.table::data.table("Peptide"=peptideSet)
+  }
 
-  # Formatting
-  col_id <- c("Peptide", "AADescriptor", "FragLen")
-  col_val <- setdiff(colnames(dt_peptdesc), col_id)
-  dt_peptdesc <- data.table::melt.data.table(dt_peptdesc, id=col_id, measure=col_val, variable.name="Stat", value.name="Value")
-  dt_peptdesc[,"Feature":=paste0("PeptDesc_", AADescriptor, "_", Stat, "_", FragLen)][,"AADescriptor":=NULL][,"FragLen":=NULL][,"Stat":=NULL]
-  dt_peptdesc <- data.table::dcast.data.table(dt_peptdesc, Peptide~Feature, value.var="Value", fun=mean)
-
-  # Basic peptide information
+  # Basic peptide characteristics
   dt_basic <- data.table::data.table("Peptide"=peptideSet, "Peptide_Length"=nchar(peptideSet))
   for(aa in Biostrings::AA_STANDARD){
     dt_basic[,paste0("Peptide_Contain", aa):=as.numeric(stringr::str_detect(peptideSet, aa))]
