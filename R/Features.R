@@ -276,7 +276,7 @@ Features <- function(
   message("Peptide contact potential profiling analysis...")
   dt_cpp <- Features_CPP(peptideSet, fragLib, aaIndexIDSet, fragLenSet, fragDepthSet, fragLibTypeSet, featureSet, seedSet, coreN, tmpDir)
   message("Peptide descriptor analysis...")
-  dt_peptdesc <- Features_PeptDesc(peptideSet, fragLenSet, featureSet)
+  dt_peptdesc <- Features_PeptDesc(peptideSet, fragLenSet, featureSet, coreN)
   message("Merging...")
   dt <- merge(dt_peptdesc, dt_cpp, by="Peptide")
   data.table::setorder(dt, Peptide, FragDepth, Library)
