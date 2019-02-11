@@ -143,21 +143,20 @@ Immunogenicity_Predict <- function(externalFeatureDFList, trainModelResults){
   scoreDT_list <- foreach::foreach(i=1:length(externalFeatureDFList))%do%{
     cat("Data set #", i, "\n", sep="")
     dt <- data.table::as.data.table(externalFeatureDFList[[i]])
-    dt <- dt[, featureSet, with=F]
+    pept <- dt$"Peptide"
+    dt_feat <- dt[, featureSet, with=F]
     dt_score <- pbapply::pblapply(1:length(pp_list), function(j){
-      mat <- as.matrix(predict(pp_list[[j]], dt))
-      d <- data.table::data.table(
-        "Peptide"=dt$"Peptide",
-        "ImmunogenicityScore"=predict(ert_list[[j]], mat, probability=T)[,"Positive"]
+      data.table::data.table(
+        "Peptide"=pept,
+        "ImmunogenicityScore"=predict(ert_list[[j]], as.matrix(predict(pp_list[[j]], dt_feat)), probability=T)[,"Positive"]
       )
-      gc();gc()
-      return(d)
     }) %>%
       data.table::rbindlist()
     dt_score <- dt_score[, list(ImmunogenicityScore.ave=mean(ImmunogenicityScore), ImmunogenicityScore.sd=sd(ImmunogenicityScore)), by=Peptide]
-    dt_score <- dt_score[, ImmunogenicityScore:=ImmunogenicityScore.ave]
-    dt_score <- dt_score[, ImmunogenicityScore.cv:=ImmunogenicityScore.sd/ImmunogenicityScore.ave]
+    dt_score[, ImmunogenicityScore:=ImmunogenicityScore.ave]
+    dt_score[, ImmunogenicityScore.cv:=ImmunogenicityScore.sd/ImmunogenicityScore.ave]
     dt_score <- dt_score[, c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.cv"), with=F]
+    gc();gc()
     return(dt_score)
   }
   names(scoreDT_list) <- paste0("Score_", 1:length(externalFeatureDFList))
