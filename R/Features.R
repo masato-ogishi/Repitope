@@ -69,7 +69,7 @@ Features_PeptDesc <- function(
   if(flag_comp==T){
     parameterDT <- data.table::CJ(peptideSet, fragLenSet) %>%
       magrittr::set_colnames(c("Peptide", "FragLen"))
-    cl <- parallel::makeCluster(coreN, type="SOCK")
+    cl <- parallel::makeCluster(coreN, type="PSOCK")
     doSNOW::registerDoSNOW(cl)
     sink(tempfile())
     pb <- pbapply::timerProgressBar(max=nrow(parameterDT), style=1)
@@ -186,7 +186,7 @@ Features_CPP <- function(
   # Conduct contact potential profiling
   for(s in seedSet){
     cat("Random seed = ", s, "\n", sep="")
-    cl <- parallel::makeCluster(coreN, type="SOCK")
+    cl <- parallel::makeCluster(coreN, type="PSOCK")
     snow::clusterSetupRNGstream(cl, seed=rep(s, 6))
     doSNOW::registerDoSNOW(cl)
     sink(tempfile())

@@ -62,6 +62,7 @@ Immunogenicity_TrainModels <- function(
   }
   resList <- foreach::foreach(i=1:length(seedSet))%do%{
     cat("Random seed = ", seedSet[i], "\n", sep="")
+    set.seed(seedSet[i])
     pbapply::pblapply(trainIDList[[i]], function(trainIDs){main(dt, trainIDs)})
   }
   return(list("TrainModelResults"=resList, "FeatureSet"=featureSet, "SeedSet"=seedSet))
@@ -142,11 +143,15 @@ Immunogenicity_Predict <- function(externalFeatureDFList, trainModelResults){
   scoreDT_list <- foreach::foreach(i=1:length(externalFeatureDFList))%do%{
     cat("Data set #", i, "\n", sep="")
     dt <- data.table::as.data.table(externalFeatureDFList[[i]])
+    dt <- dt[, featureSet, with=F]
     dt_score <- pbapply::pblapply(1:length(pp_list), function(j){
-      mat <- as.matrix(predict(pp_list[[j]], dt[, featureSet, with=F]))
-      predDT <- data.table::data.table("Peptide"=dt$"Peptide")
-      predDT[,ImmunogenicityScore:=predict(ert_list[[j]], mat, probability=T)[,"Positive"]]
-      return(predDT)
+      mat <- as.matrix(predict(pp_list[[j]], dt))
+      d <- data.table::data.table(
+        "Peptide"=dt$"Peptide",
+        "ImmunogenicityScore"=predict(ert_list[[j]], mat, probability=T)[,"Positive"]
+      )
+      gc();gc()
+      return(d)
     }) %>%
       data.table::rbindlist()
     dt_score <- dt_score[, list(ImmunogenicityScore.ave=mean(ImmunogenicityScore), ImmunogenicityScore.sd=sd(ImmunogenicityScore)), by=Peptide]
@@ -155,5 +160,6 @@ Immunogenicity_Predict <- function(externalFeatureDFList, trainModelResults){
     dt_score <- dt_score[, c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.cv"), with=F]
     return(dt_score)
   }
+  names(scoreDT_list) <- paste0("Score_", 1:length(externalFeatureDFList))
   return(scoreDT_list)
 }
