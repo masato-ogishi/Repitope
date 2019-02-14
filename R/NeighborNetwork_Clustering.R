@@ -1,15 +1,30 @@
 #' Neighbor network clustering analysis.
-#'
-#' \code{neighborNetwork_ConnectedSubGraph} extracts the minimum connected subgraph focusing on the target peptide.\cr
-#' \code{neighborNetwork_Cluster} and {neighborNetwork_Cluster_Batch} conduct a network clustering analysis using a walktrap algorithm.\cr
+#' \code{neighborNetwork_ConnectedSubGraph} and \code{neighborNetwork_ConnectedSubGraphDF} extract the minimum connected subgraph focusing on a target peptide.\cr
+#' \code{neighborNetwork_Cluster} and \code{neighborNetwork_Cluster_Batch} conduct a network clustering analysis using a walktrap algorithm.\cr
+#' \code{neighborNetwork_Cluster_FeatureDF} computes per-cluster and per-peptide features, including "escape potential".
 #'
 #' @param neighborNetResult The result returned from \code{neighborNetwork}.
-#' @param peptide The target peptide sequence.
+#' @param neighborNetClusterResult The result returned from \code{neighborNetwork_Cluster_Batch}.
+#' @param peptide A target peptide sequence.
 #' @param graph A directed and weighted neighbor network of the target peptide.
 #' @param metadataDF A dataframe which has "Peptide" and "ImmunogenicityScore" columns. Optionally, an "Immunogenicity" column would be integrated if present.
 #' @param seed A random seed.
 #' @param plot Logical. Whether the network cluster plot shuould be generated.
 #' @param coreN The number of threads for parallelization.
+#' @export
+#' @rdname NeighborNetwork_Clustering
+#' @name NeighborNetwork_Clustering
+neighborNetwork_ConnectedSubGraphDF <- function(neighborNetResult, peptide){
+  dplyr::bind_rows(
+    neighborNetResult$"PairDF_DW" %>%
+      dplyr::filter(AASeq1==peptide),
+    neighborNetResult$"PairDF_DW" %>%
+      dplyr::filter(AASeq2==peptide) %>%
+      dplyr::mutate(ScoreRatio=1/ScoreRatio)
+  ) %>%
+    tidyr::separate(col="MutType", into=c("AA1","Pos","AA2"))
+}
+
 #' @export
 #' @rdname NeighborNetwork_Clustering
 #' @name NeighborNetwork_Clustering
@@ -169,7 +184,7 @@ neighborNetwork_Cluster_Batch <- function(neighborNetResult, metadataDF, seed=12
   }
   peptideSet <- igraph::V(neighborNetResult$"NeighborNetwork_DW")$"name"
   if(!is.null(coreN)){
-    cl <- parallel::makeCluster(coreN, type="SOCK")
+    cl <- parallel::makeCluster(coreN, type="PSOCK")
     parallel::clusterExport(cl=cl, varlist=c("cluster_single","neighborNetResult","peptideSet","metadataDF"), envir=environment())
     snow::clusterSetupRNGstream(cl, seed=rep(seed, 6))
     res <- pbapply::pblapply(
@@ -192,4 +207,32 @@ neighborNetwork_Cluster_Batch <- function(neighborNetResult, metadataDF, seed=12
   return(res)
 }
 
-
+#' @export
+#' @rdname NeighborNetwork_Clustering
+#' @name NeighborNetwork_Clustering
+neighborNetwork_Cluster_FeatureDF <- function(neighborNetClusterResult, coreN=parallel::detectCores(logical=F)){
+  if(!is.null(coreN)){
+    cl <- parallel::makeCluster(coreN, type="PSOCK")
+  }else{
+    cl <- NULL
+  }
+  dt_feat <- pbapply::pblapply(1:length(neighborNetClusterResult), function(i){
+    summaryDF <- neighborNetClusterResult[[i]][["SummaryDF"]]
+    summaryDF <- dplyr::arrange(summaryDF, dplyr::desc(Target))
+    dt <- data.table::as.data.table(summaryDF[1,])
+    aveDF <- summaryDF %>%
+      dplyr::group_by(ClusterID) %>%
+      dplyr::summarise(ImmunogenicityScore=mean(ImmunogenicityScore))
+    dt[,ImmunogenicityScore_Cluster_Average:=dplyr::filter(aveDF, ClusterID==dt$"ClusterID"[1])$"ImmunogenicityScore"]
+    aveDF <- dplyr::filter(aveDF, ClusterID!=dt$"ClusterID"[1])
+    dt[,ImmunogenicityScore_Cluster_Diff_Max:=max(aveDF$"ImmunogenicityScore") - ImmunogenicityScore_Cluster_Average]
+    dt[,ImmunogenicityScore_Cluster_Diff_Min:=ImmunogenicityScore_Cluster_Average - min(aveDF$"ImmunogenicityScore")]  ## Considered to be an "escape potential"
+    dt[,ImmunogenicityScore_Diff_Max:=max(summaryDF$"ImmunogenicityScore") - ImmunogenicityScore]
+    dt[,ImmunogenicityScore_Diff_Min:=ImmunogenicityScore - min(summaryDF$"ImmunogenicityScore")]
+    return(dt)
+  }, cl=cl) %>%
+    data.table::rbindlist()
+  if(!is.null(coreN)) parallel::stopCluster(cl)
+  gc();gc()
+  return(dt_feat)
+}

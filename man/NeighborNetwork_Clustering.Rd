@@ -2,11 +2,18 @@
 % Please edit documentation in R/NeighborNetwork_Clustering.R
 \name{NeighborNetwork_Clustering}
 \alias{NeighborNetwork_Clustering}
+\alias{neighborNetwork_ConnectedSubGraphDF}
 \alias{neighborNetwork_ConnectedSubGraph}
 \alias{neighborNetwork_Cluster}
 \alias{neighborNetwork_Cluster_Batch}
-\title{Neighbor network clustering analysis.}
+\alias{neighborNetwork_Cluster_FeatureDF}
+\title{Neighbor network clustering analysis.
+\code{neighborNetwork_ConnectedSubGraph} and \code{neighborNetwork_ConnectedSubGraphDF} extract the minimum connected subgraph focusing on a target peptide.\cr
+\code{neighborNetwork_Cluster} and \code{neighborNetwork_Cluster_Batch} conduct a network clustering analysis using a walktrap algorithm.\cr
+\code{neighborNetwork_Cluster_FeatureDF} computes per-cluster and per-peptide features, including "escape potential".}
 \usage{
+neighborNetwork_ConnectedSubGraphDF(neighborNetResult, peptide)
+
 neighborNetwork_ConnectedSubGraph(neighborNetResult, peptide)
 
 neighborNetwork_Cluster(peptide, graph, metadataDF, seed = 12345,
@@ -14,11 +21,14 @@ neighborNetwork_Cluster(peptide, graph, metadataDF, seed = 12345,
 
 neighborNetwork_Cluster_Batch(neighborNetResult, metadataDF,
   seed = 12345, coreN = parallel::detectCores(logical = F))
+
+neighborNetwork_Cluster_FeatureDF(neighborNetClusterResult,
+  coreN = parallel::detectCores(logical = F))
 }
 \arguments{
 \item{neighborNetResult}{The result returned from \code{neighborNetwork}.}
 
-\item{peptide}{The target peptide sequence.}
+\item{peptide}{A target peptide sequence.}
 
 \item{graph}{A directed and weighted neighbor network of the target peptide.}
 
@@ -29,8 +39,12 @@ neighborNetwork_Cluster_Batch(neighborNetResult, metadataDF,
 \item{plot}{Logical. Whether the network cluster plot shuould be generated.}
 
 \item{coreN}{The number of threads for parallelization.}
+
+\item{neighborNetClusterResult}{The result returned from \code{neighborNetwork_Cluster_Batch}.}
 }
 \description{
-\code{neighborNetwork_ConnectedSubGraph} extracts the minimum connected subgraph focusing on the target peptide.\cr
-\code{neighborNetwork_Cluster} and {neighborNetwork_Cluster_Batch} conduct a network clustering analysis using a walktrap algorithm.\cr
+Neighbor network clustering analysis.
+\code{neighborNetwork_ConnectedSubGraph} and \code{neighborNetwork_ConnectedSubGraphDF} extract the minimum connected subgraph focusing on a target peptide.\cr
+\code{neighborNetwork_Cluster} and \code{neighborNetwork_Cluster_Batch} conduct a network clustering analysis using a walktrap algorithm.\cr
+\code{neighborNetwork_Cluster_FeatureDF} computes per-cluster and per-peptide features, including "escape potential".
 }
