@@ -29,13 +29,15 @@ EpitopePrioritization <- function(
   coreN=parallel::detectCores(logical=F),
   tmpDir=file.path(tempdir(), "FeatureDF", format(Sys.time(), "%Y.%m.%d.%H.%M.%S"))
 ){
-  Cat("#1. Feature computation.\n")
+  cat("#1. In silico mutagenesis.\n")
   peptideSet_ISM <- sort(InSilicoMutagenesis(unique(peptideSet))) ## including original peptides
+
+  cat("#2. Feature computation.\n")
   featureDT_ISM <- Features(peptideSet=peptideSet_ISM,fragLib,aaIndexIDSet,fragLenSet,fragDepthSet,fragLibTypeSet,featureSet,seedSet,coreN,tmpDir)[[1]]
   fst::write_fst(featureDT_ISM, "FeatureDF.fst")
   gc();gc()
 
-  Cat("#2. Immunogenicity prediction.\n")
+  cat("#3. Immunogenicity prediction.\n")
   scoreDT_ISM <- Immunogenicity_Predict(
     list(featureDT_ISM),
     Immunogenicity_TrainModels(
@@ -50,7 +52,7 @@ EpitopePrioritization <- function(
   readr::write_csv(scoreDT_ISM, "ScoreDF.csv")
   gc();gc()
 
-  Cat("#3. Neighbor network simulation and escape potential prediction.\n")
+  cat("#4. Neighbor network analysis and escape potential prediction.\n")
   seed <- eval(parse(text=paste0(as.character(seedSet), collapse="")))
   nnet_ISM <- neighborNetwork(scoreDT_ISM$"Peptide", scoreDT_ISM$"ImmunogenicityScore")
   nnet_ISM_cluster <- neighborNetwork_Cluster_Batch(nnet_ISM, scoreDT_ISM[,.(Peptide,ImmunogenicityScore)], seed=seed)
@@ -62,7 +64,7 @@ EpitopePrioritization <- function(
   readr::write_csv(nnet_ISM_cluster_featureDF, "NeighborNetwork_Cluster_FeatureDF.csv")
   gc();gc()
 
-  Cat("#4. Epitope prioritization.\n")
+  cat("#5. Epitope prioritization.\n")
   summaryDT <- merge(scoreDT_ISM[Peptide %in% peptideSet,], nnet_ISM_cluster_featureDF[Peptide %in% peptideSet,], by="Peptide")
   summaryDT[,EscapePotential:=ImmunogenicityScore_Cluster_Diff_Min]
   summaryDT <- summaryDT[, .(Peptide, ImmunogenicityScore, ImmunogenicityScore_Cluster_Average, EscapePotential)]
