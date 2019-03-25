@@ -28,17 +28,24 @@ library(data.table)
 library(Repitope)
 ```
 1. Datasets
--   The following datasets are provided as examples.
+-   The following datasets are included in the package.
 ``` r
+# A summary table for the peptide sequences with T cell assay annotations
 MHCI_Human
 MHCI_Rodents
 MHCI_Primates
 MHCII_Human
 MHCII_Rodents
 MHCII_Primates
+
+# A compiled set of TCR CDR3b sequences commonly identified in multiple TCR datasets (see the Reference for details)
 TCRSet_Public
+
+# Minimal feature sets
+MHCI_Human_MinimumFeatureSet    ## identified using MHCI_Human
+MHCII_Human_MinimumFeatureSet   ## identified using MHCII_Human
 ```
--   Also, the compilation process itself is provided as a single function so that users can compile their own epitope datasets from IEDB and other sources.
+-   The compilation process of epitope datasets itself is provided as a single function so that users can compile their own epitope datasets from IEDB and other sources.
 ``` r
 # Epitope datasets [MHC-I]
 MHCI_Human <- Epitope_Import(
@@ -73,7 +80,8 @@ fragLibDT <- CPP_FragmentLibrary(TCRSet_Public, fragLenSet=3:11, maxFragDepth=10
 fst::write_fst(fragLibDT, "./Path/To/Your/Directory/FragmentLibrary.fst", compress=0)
 ```
 2. Features
--   Features can be calculated as follows. Note: Computation is resumed if temporary files are stored in the temporary directory provided.
+-   Features can be calculated as follows. Note: This computation is time-consuming and resource-intensive. Computation can be resumed if temporary files are stored in the temporary directory provided.
+-   You may find the pre-computed feature dataframes for the example datasets (i.e., human, rodents, and primates) in [Mendeley Data](https://data.mendeley.com/datasets/2hp96k6m2c/2).
 ``` r
 # Features [MHC-I]
 featureDFList_MHCI <- Features(
@@ -84,7 +92,7 @@ featureDFList_MHCI <- Features(
   fragDepthSet=10000,
   fragLibTypeSet="Weighted",
   seedSet=1:5,                                   ## must be the same random seeds used for preparing the fragment library
-  coreN=parallel::detectCores(logical=F)         ## parallelization
+  coreN=parallel::detectCores(logical=F),        ## parallelization
   tmpDir="./Path/To/Your/Temporary/Directory/"   ## where intermediate files are stored
 )
 saveFeatureDFList(featureDFList_MHCI, "./Path/To/Your/Directory/MHCI/FeatureDF_")
@@ -98,7 +106,7 @@ featureDFList_MHCII <- Features(
   fragDepthSet=10000,
   fragLibTypeSet="Weighted",
   seedSet=1:5,                                   ## must be the same seed set for the fragment library
-  coreN=parallel::detectCores()                  ## parallelization
+  coreN=parallel::detectCores(logical=F),        ## parallelization
   tmpDir="./Path/To/Your/Temporary/Directory/"   ## where intermediate files are stored
 )
 saveFeatureDFList(featureDFList_MHCII, "./Path/To/Your/Directory/MHCII/FeatureDF_")
@@ -178,7 +186,9 @@ res_MHCI <- EpitopePrioritization(
   fragDepthSet=10000,
   fragLibTypeSet="Weighted",
   featureSet=MHCI_Human_MinimumFeatureSet,
-  seedSet=1:5
+  seedSet=1:5,
+  coreN=parallel::detectCores(logical=F),        ## parallelization
+  tmpDir="./Path/To/Your/Temporary/Directory/"   ## where intermediate files are stored
 )
 readr::write_csv(res_MHCI, "./Path/To/Your/Directory/MHCI/EpitopePrioritization_MHCI.csv")
 
@@ -193,7 +203,9 @@ res_MHCII <- EpitopePrioritization(
   fragDepthSet=10000,
   fragLibTypeSet="Weighted",
   featureSet=MHCII_Human_MinimumFeatureSet,
-  seedSet=1:5
+  seedSet=1:5,
+  coreN=parallel::detectCores(logical=F),        ## parallelization
+  tmpDir="./Path/To/Your/Temporary/Directory/"   ## where intermediate files are stored
 )
 readr::write_csv(res_MHCII, "./Path/To/Your/Directory/MHCII/EpitopePrioritization_MHCII.csv")
 ```
