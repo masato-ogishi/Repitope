@@ -81,7 +81,7 @@ fst::write_fst(fragLibDT, "./Path/To/Your/Directory/FragmentLibrary.fst", compre
 ```
 2. Features
 -   Features can be calculated as follows. Note: This computation is time-consuming and resource-intensive. Computation can be resumed if temporary files are stored in the temporary directory provided.
--   You may find the pre-computed feature dataframes for the example datasets (i.e., human, rodents, and primates) in [Mendeley Data](https://data.mendeley.com/datasets/2hp96k6m2c/2).
+-   You may find the pre-computed feature dataframes for the example datasets (i.e., human, rodents, and primates) in [Mendeley Data](https://data.mendeley.com/datasets/2hp96k6m2c/3).
 ``` r
 # Features [MHC-I]
 featureDFList_MHCI <- Features(
@@ -212,4 +212,4 @@ readr::write_csv(res_MHCII, "./Path/To/Your/Directory/MHCII/EpitopePrioritizatio
 
 Reference
 ------------------------
-Ogishi, M and Yotsuyanagi, H. (2018) "The landscape of T cell epitope immunogenicity in sequence space." bioRxiv. doi: https://doi.org/10.1101/155317
+Ogishi, M and Yotsuyanagi, H. (2019) "Quantitative prediction of the landscape of T cell epitope immunogenicity in sequence space." *Frontiers in Immunology*. 
