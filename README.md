@@ -16,7 +16,8 @@ if(!require(devtools)) install.packages("devtools")
 devtools::install_github("masato-ogishi/plotUtility")
 devtools::install_github("masato-ogishi/Repitope")
 ```
--   You might be prompted to install some packages before installling Repitope. Follow the message(s).
+-   You may be prompted to install some packages before installling Repitope. Follow the messages.
+-   This package depends on some packages in the [*Bioconductor*](https://www.bioconductor.org/) that cannot be automatically installed through devtools::install_github. Install packages manually as required.
 
 Usage
 ------------------
