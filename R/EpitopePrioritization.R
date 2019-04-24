@@ -35,15 +35,15 @@ EpitopePrioritization <- function(
   cat("#2. Feature computation.\n")
   featureDT_ISM <- Features(
     peptideSet=peptideSet_ISM,
-    fragLib,
-    aaIndexIDSet,
-    fragLenSet,
-    fragDepthSet,
-    fragLibTypeSet,
-    featureSet,
-    seedSet,
-    coreN,
-    tmpDir
+    fragLib=fragLib,
+    aaIndexIDSet=aaIndexIDSet,
+    fragLenSet=fragLenSet,
+    fragDepthSet=fragDepthSet,
+    fragLibTypeSet=fragLibTypeSet,
+    featureSet=featureSet,
+    seedSet=seedSet,
+    coreN=coreN,
+    tmpDir=tmpDir
   )[[1]]
   fst::write_fst(featureDT_ISM, "FeatureDF.fst")
   gc();gc()

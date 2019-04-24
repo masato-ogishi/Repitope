@@ -173,7 +173,7 @@ readr::write_csv(scoreDF_MHCII_Human, "./Path/To/Your/Directory/MHCII/ScoreDF_MH
 # Datasets
 fragLibDT <- fst::read_fst("./Path/To/Your/Directory/FragmentLibrary.fst", as.data.table=T)
 featureDF_MHCI <- fst::read_fst("./Path/To/Your/Directory/MHCI/FeatureDF_Weighted.10000.fst", as.data.table=T)
-featureDF_MHCII <- fst::read_fst(""./Path/To/Your/Directory/MHCII/FeatureDF_Weighted.10000.fst", as.data.table=T)
+featureDF_MHCII <- fst::read_fst("./Path/To/Your/Directory/MHCII/FeatureDF_Weighted.10000.fst", as.data.table=T)
 
 # Prioritization [MHC-I]
 res_MHCI <- EpitopePrioritization(

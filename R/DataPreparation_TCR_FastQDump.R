@@ -7,6 +7,7 @@
 #' @param FastQDumpPath A full path to fastq-dump.exe.
 #' @export
 #' @rdname DataPreparation_TCR_FastQDump
+#' @name DataPreparation_TCR_FastQDump
 FastQDump_Script <- function(
   accessionSet, outDir="C:/SRA/output",
   FastQDumpPath="C:\\SRA\\sratoolkit.2.9.2-win64\\bin\\fastq-dump.exe"

@@ -16,7 +16,7 @@
 #' @param tmpDir Destination directory to save intermediate files.
 #' @export
 #' @rdname Features
-#' @name Features_PeptDesc
+#' @name Feature_Computation
 Features_PeptDesc <- function(
   peptideSet,
   fragLenSet=3:8,
@@ -118,7 +118,7 @@ Features_PeptDesc <- function(
 
 #' @export
 #' @rdname Features
-#' @name Features_CPP
+#' @name Feature_Computation
 Features_CPP <- function(
   peptideSet,
   fragLib,
@@ -260,7 +260,7 @@ Features_CPP <- function(
 
 #' @export
 #' @rdname Features
-#' @name Features
+#' @name Feature_Computation
 Features <- function(
   peptideSet,
   fragLib,
@@ -274,9 +274,25 @@ Features <- function(
   tmpDir=file.path(tempdir(), "FeatureDF", format(Sys.time(), "%Y.%m.%d.%H.%M.%S"))
 ){
   message("Peptide contact potential profiling analysis...")
-  dt_cpp <- Features_CPP(peptideSet, fragLib, aaIndexIDSet, fragLenSet, fragDepthSet, fragLibTypeSet, featureSet, seedSet, coreN, tmpDir)
+  dt_cpp <- Features_CPP(
+    peptideSet=peptideSet,
+    fragLib=fragLib,
+    aaIndexIDSet=aaIndexIDSet,
+    fragLenSet=fragLenSet,
+    fragDepthSet=fragDepthSet,
+    fragLibTypeSet=fragLibTypeSet,
+    featureSet=featureSet,
+    seedSet=seedSet,
+    coreN=coreN,
+    tmpDir=tmpDir
+  )
   message("Peptide descriptor analysis...")
-  dt_peptdesc <- Features_PeptDesc(peptideSet, fragLenSet, featureSet, coreN)
+  dt_peptdesc <- Features_PeptDesc(
+    peptideSet=peptideSet,
+    fragLenSet=fragLenSet,
+    featureSet=featureSet,
+    coreN=coreN
+  )
   message("Merging...")
   dt <- merge(dt_peptdesc, dt_cpp, by="Peptide")
   data.table::setorder(dt, Peptide, FragDepth, Library)
