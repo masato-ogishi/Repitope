@@ -17,6 +17,7 @@ sequenceFilter <- function(sequenceSet){
   for(l in letters.exclude){
     s <- s[!stringr::str_detect(s, stringr::fixed(l))]
   }
+  s <- s[nchar(s)>=8] ## minimum length
   return(s)
 }
 

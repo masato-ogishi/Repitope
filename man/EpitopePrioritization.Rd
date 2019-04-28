@@ -5,8 +5,8 @@
 \title{Epitope prioritization based on immunogenicity scores and escape potentials.}
 \usage{
 EpitopePrioritization(featureDF, metadataDF, peptideSet, fragLib,
-  aaIndexIDSet = "all", fragLenSet = 3:8, fragDepthSet = 10000,
-  fragLibTypeSet = "Weighted", featureSet = NULL, seedSet = 1:5,
+  aaIndexIDSet = "all", fragLenSet = 3:8, fragDepth = 10000,
+  fragLibType = "Weighted", featureSet = NULL, seedSet = 1:5,
   coreN = parallel::detectCores(logical = F),
   tmpDir = file.path(tempdir(), "FeatureDF", format(Sys.time(),
   "\%Y.\%m.\%d.\%H.\%M.\%S")))
@@ -24,9 +24,9 @@ EpitopePrioritization(featureDF, metadataDF, peptideSet, fragLib,
 
 \item{fragLenSet}{A set of sliding window sizes.}
 
-\item{fragDepthSet}{A fragment library size. ## A vector of length one.}
+\item{fragDepth}{A fragment library size. Must be an integer vector of length one.}
 
-\item{fragLibTypeSet}{A set of strings indicating the types of fragment libraries to be used. ## A vector of length one.}
+\item{fragLibType}{A set of strings indicating the types of fragment libraries to be used. Must be a character vector of length one.}
 
 \item{featureSet}{A minimum set of features. Combinations of fragment lengths and AAIndex IDs are internally extracted for calculating CPPs.}
 
