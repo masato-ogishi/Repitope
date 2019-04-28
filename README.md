@@ -84,7 +84,7 @@ fst::write_fst(fragLibDT, "./Path/To/Your/Directory/FragmentLibrary.fst", compre
 ```
 2. Features
 -   Features can be calculated as follows. Note: This computation is time-consuming and resource-intensive. Computation can be resumed if temporary files are stored in the temporary directory provided.
--   You may find the pre-computed feature dataframes for the example datasets (i.e., human, rodents, and primates) in [Mendeley Data](https://data.mendeley.com/datasets/2hp96k6m2c/3). Note: these data must be downloaded with a good internet connection. Otherwise subsequent codes do not work properly. The expected file sizes are 1.3 and 2.6GB for MHC-I and MHC-II, respectively.
+-   You may find the pre-computed feature dataframes for the example datasets (i.e., human, rodents, and primates) in [Mendeley Data](https://data.mendeley.com/datasets/2hp96k6m2c/3). Note: these data must be downloaded with a good internet connection. Otherwise the downloaded files could be broken, and subsequent codes would not work properly. The expected file sizes are 1.3 and 2.6GB for MHC-I and MHC-II, respectively.
 ``` r
 # Features [MHC-I]
 featureDFList_MHCI <- Features(
