@@ -2,7 +2,7 @@ Repitope: Epitope immunogenicity prediction through in silico TCR-peptide contac
 ===============================================
 
 The 'Repitope' package provides a structured framework of quantitative prediction of immunogenicity and escape potential for a given set of peptides presented onto MHC class I and class II molecules by (approximately) simulating the TCR-peptide intermolecular interactions in silico.  
-Note: This is the original Repitope package repository in R. For Python scripts, see [Repitope-Python](https://github.com/masato-ogishi/Repitope-Python)
+Note: This is the original Repitope package repository in R. For Python scripts, see [Repitope-Python](https://github.com/masato-ogishi/Repitope-Python).
 
 Concept
 ------------------------
