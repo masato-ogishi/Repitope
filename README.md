@@ -1,7 +1,8 @@
 Repitope: Epitope immunogenicity prediction through in silico TCR-peptide contact potential profiling
 ===============================================
 
-The 'Repitope' package provides a structured framework of quantitative prediction of immunogenicity and escape potential for a given set of peptides presented onto MHC class I and class II molecules by (approximately) simulating the TCR-peptide intermolecular interactions in silico.
+The 'Repitope' package provides a structured framework of quantitative prediction of immunogenicity and escape potential for a given set of peptides presented onto MHC class I and class II molecules by (approximately) simulating the TCR-peptide intermolecular interactions in silico.  
+Note: This is the original Repitope package repository in R. For Python scripts, see [Repitope-Python](https://github.com/masato-ogishi/Repitope-Python)
 
 Concept
 ------------------------
@@ -10,14 +11,15 @@ The concept of escape potential is also simple. Even if one epitope has a high i
 
 Installation
 ------------------------
-Install the latest version from [GitHub](https://github.com/masato-ogishi/Repitope) as follows:
+Install the latest version as follows:
 ``` r
 if(!require(devtools)) install.packages("devtools")
 devtools::install_github("masato-ogishi/plotUtility")
 devtools::install_github("masato-ogishi/Repitope")
 ```
--   You may be prompted to install some packages before installling Repitope. Follow the messages.  
--   This package depends on some packages in the [*Bioconductor*](https://www.bioconductor.org/) that cannot be automatically installed through devtools::install_github. Install packages manually as required.
+-   You may be prompted to install some packages before installing Repitope. Follow the messages.  
+-   This package depends on some packages in the [*Bioconductor*](https://www.bioconductor.org/) (e.g., BioStrings) that cannot be automatically installed through devtools::install_github. Install packages manually as required.  
+-   You need an appropriate rJava setting beforehand.
 
 Usage
 ------------------
