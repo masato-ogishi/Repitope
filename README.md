@@ -17,9 +17,9 @@ if(!require(devtools)) install.packages("devtools")
 devtools::install_github("masato-ogishi/plotUtility")
 devtools::install_github("masato-ogishi/Repitope")
 ```
--   You may be prompted to install some packages before installing Repitope. Follow the messages.  
--   This package depends on some packages in the [*Bioconductor*](https://www.bioconductor.org/) (e.g., BioStrings) that cannot be automatically installed through devtools::install_github. Install packages manually as required.  
--   You need an appropriate rJava setting beforehand.
+-  You may be prompted to install some packages before installing Repitope. Follow the messages.  
+-  This package depends on some packages in the [*Bioconductor*](https://www.bioconductor.org/) (e.g., BioStrings) that cannot be automatically installed through devtools::install_github. Install packages manually as required.  
+-  You need an appropriate rJava setting beforehand.
 
 Usage
 ------------------
@@ -31,7 +31,7 @@ library(data.table)
 library(Repitope)
 ```
 1. Datasets
--   The following datasets are included in the package.
+-  The following datasets are included in the package.
 ``` r
 # A summary table for the peptide sequences with T cell assay annotations
 MHCI_Human
@@ -48,7 +48,7 @@ TCRSet_Public
 MHCI_Human_MinimumFeatureSet    ## identified using MHCI_Human
 MHCII_Human_MinimumFeatureSet   ## identified using MHCII_Human
 ```
--   The compilation process of epitope datasets itself is provided as a single function so that users can compile their own epitope datasets from IEDB and other sources.
+-  The compilation process of epitope datasets itself is provided as a single function so that users can compile their own epitope datasets from IEDB and other sources.
 ``` r
 # Epitope datasets [MHC-I]
 MHCI_Human <- Epitope_Import(
@@ -77,14 +77,14 @@ MHCII_Human <- Epitope_Import(
 ## 4505/31693 (14.2%) peptides have contradicting annotations.
 ## 16642/31693 (52.5%) peptides are immunogenic in at least one of the observations.
 ```
--   Create TCR fragment library from the internally stored public TCR clonotype set. Note: you need to use the same set of random seeds throughout the pipeline.
+-  Create TCR fragment library from the internally stored public TCR clonotype set. Note: you need to use the same set of random seeds throughout the pipeline.
 ``` r
 fragLibDT <- CPP_FragmentLibrary(TCRSet_Public, fragLenSet=3:11, maxFragDepth=100000, seedSet=1:5)
 fst::write_fst(fragLibDT, "./Path/To/Your/Directory/FragmentLibrary.fst", compress=0)
 ```
 2. Features
--   Features can be calculated as follows. Note: This computation is time-consuming and resource-intensive. Computation can be resumed if temporary files are stored in the temporary directory provided.  
--   You may find the pre-computed feature dataframes for the example datasets (i.e., human, rodents, and primates) in [Mendeley Data](https://data.mendeley.com/datasets/2hp96k6m2c/3). Note: these data must be downloaded with a good internet connection. Otherwise the downloaded files could be broken, and subsequent codes would not work properly. The expected file sizes are 1.3 and 2.6GB for MHC-I and MHC-II, respectively.
+-  Features can be calculated as follows. Note: This computation is time-consuming and resource-intensive. Computation can be resumed if temporary files are stored in the temporary directory provided.  
+-  You may find the pre-computed feature dataframes for the example datasets (i.e., human, rodents, and primates) in [Mendeley Data](https://data.mendeley.com/datasets/2hp96k6m2c/3). Note: these data must be downloaded with a good internet connection. Otherwise the downloaded files could be broken, and subsequent codes would not work properly. The expected file sizes are 1.3 and 2.6GB for MHC-I and MHC-II, respectively.
 ``` r
 # Features [MHC-I]
 featureDFList_MHCI <- Features(
@@ -114,7 +114,7 @@ featureDFList_MHCII <- Features(
 )
 saveFeatureDFList(featureDFList_MHCII, "./Path/To/Your/Directory/MHCII/FeatureDF_")
 ```
--   Feature selection can be performed as follows.
+-  Feature selection can be performed as follows.
 ``` r
 # Feature selection [MHC-I]
 featureDF_MHCI <- fst::read_fst("./Path/To/Your/Directory/MHCI/FeatureDF_Weighted.10000.fst", as.data.table=T)
@@ -143,8 +143,8 @@ minFeatureSet_MHCII_Human <- Features_MinimumFeatures(
 saveRDS(minFeatureSet_MHCII_Human, "./Path/To/Your/Directory/MHCII/MinimumFeatureSet_MHCII_Human.rds")
 ```
 3. Immunogenicity scores
--   Probability estimates from multiple extremely randomized trees (ERTs) are summrized into a single numerical scale, termed "immunogenicity score".
--   Prediction can be performed as follows.
+-  Probability estimates from multiple extremely randomized trees (ERTs) are summrized into a single numerical scale, termed "immunogenicity score".  
+-  Prediction can be performed as follows.
 ``` r
 # Datasets
 featureDF_MHCI <- fst::read_fst("./Path/To/Your/Directory/MHCI/FeatureDF_Weighted.10000.fst", as.data.table=T)
@@ -170,8 +170,8 @@ readr::write_csv(scoreDF_MHCII_Human, "./Path/To/Your/Directory/MHCII/ScoreDF_MH
 ```
 
 4. Epitope prioritization with immunogenicity scores and escape potentials
--   A straitforward wrapper function to compute the two metrics, immunogenicity score and escape potential, for a given set of peptides is provided.
--   Prediction can be performed as follows.
+-  A straitforward wrapper function to compute the two metrics, immunogenicity score and escape potential, for a given set of peptides is provided.  
+-  Prediction can be performed as follows.
 ``` r
 # Datasets
 fragLibDT <- fst::read_fst("./Path/To/Your/Directory/FragmentLibrary.fst", as.data.table=T)
