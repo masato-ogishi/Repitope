@@ -37,6 +37,7 @@ distMat_Sbst <- function(peptideSet){
   diag(DistMat.auto) <- F
   return(DistMat.auto)  # An m x m triangular matrix: m = length(peptideSet)
 }
+
 #' @export
 #' @rdname NeighborNetwork
 #' @name NeighborNetwork
@@ -88,6 +89,7 @@ distMat_Indel <- function(longerPeptideSet, shorterPeptideSet){
   DistMat.juxt <- Matrix::t(DistMat.juxt)
   return(DistMat.juxt) # An m x n matrix: m = length(longerPeptideSet), n = length(shorterPeptideSet)
 }
+
 #' @export
 #' @rdname NeighborNetwork
 #' @name NeighborNetwork

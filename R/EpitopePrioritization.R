@@ -76,8 +76,8 @@ EpitopePrioritization <- function(
 
   cat("#4. Neighbor network analysis and escape potential prediction.\n")
   nnet_ISM <- neighborNetwork(scoreDT_ISM$"Peptide", scoreDT_ISM$"ImmunogenicityScore")
-  nnet_ISM_cluster <- neighborNetwork_Cluster_Batch(nnet_ISM, scoreDT_ISM[,.(Peptide,ImmunogenicityScore)], seed=seed)
-  nnet_ISM_cluster_featureDF <- neighborNetwork_Cluster_FeatureDF(nnet_ISM_cluster)
+  nnet_ISM_cluster <- neighborNetwork_Cluster_Batch(nnet_ISM, scoreDT_ISM[,.(Peptide,ImmunogenicityScore)], seed=seed, coreN=coreN)
+  nnet_ISM_cluster_featureDF <- neighborNetwork_Cluster_FeatureDF(nnet_ISM_cluster, coreN=coreN)
   nnet_ISM_cluster_featureDF[Peptide %in% peptideSet_ISM, Peptide_Type:="InSilicoMutated"]
   nnet_ISM_cluster_featureDF[Peptide %in% peptideSet, Peptide_Type:="Original"]
   saveRDS(nnet_ISM, file.path(outDir, "NeighborNetwork.rds"))

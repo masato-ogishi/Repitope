@@ -1,4 +1,5 @@
 #' Neighbor network clustering analysis.
+#'
 #' \code{neighborNetwork_ConnectedSubGraph} and \code{neighborNetwork_ConnectedSubGraphDF} extract the minimum connected subgraph focusing on a target peptide.\cr
 #' \code{neighborNetwork_Cluster} and \code{neighborNetwork_Cluster_Batch} conduct a network clustering analysis using a walktrap algorithm.\cr
 #' \code{neighborNetwork_Cluster_FeatureDF} computes per-cluster and per-peptide features, including "escape potential".
@@ -182,6 +183,7 @@ neighborNetwork_Cluster_Batch <- function(neighborNetResult, metadataDF, seed=12
     score <- df_meta$"ImmunogenicityScore"[[pos]]
     return(list("Peptide"=peptide, "Score"=score, "ClusterID"=clust, "SummaryDF"=df_meta))
   }
+  message("Clustering neighbor network...")
   peptideSet <- igraph::V(neighborNetResult$"NeighborNetwork_DW")$"name"
   if(!is.null(coreN)){
     cl <- parallel::makeCluster(coreN, type="PSOCK")
@@ -216,6 +218,7 @@ neighborNetwork_Cluster_FeatureDF <- function(neighborNetClusterResult, coreN=pa
   }else{
     cl <- NULL
   }
+  message("Computing cluster-based metrics...")
   dt_feat <- pbapply::pblapply(1:length(neighborNetClusterResult), function(i){
     summaryDF <- neighborNetClusterResult[[i]][["SummaryDF"]]
     summaryDF <- dplyr::arrange(summaryDF, dplyr::desc(Target))

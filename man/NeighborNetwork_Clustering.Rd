@@ -7,10 +7,7 @@
 \alias{neighborNetwork_Cluster}
 \alias{neighborNetwork_Cluster_Batch}
 \alias{neighborNetwork_Cluster_FeatureDF}
-\title{Neighbor network clustering analysis.
-\code{neighborNetwork_ConnectedSubGraph} and \code{neighborNetwork_ConnectedSubGraphDF} extract the minimum connected subgraph focusing on a target peptide.\cr
-\code{neighborNetwork_Cluster} and \code{neighborNetwork_Cluster_Batch} conduct a network clustering analysis using a walktrap algorithm.\cr
-\code{neighborNetwork_Cluster_FeatureDF} computes per-cluster and per-peptide features, including "escape potential".}
+\title{Neighbor network clustering analysis.}
 \usage{
 neighborNetwork_ConnectedSubGraphDF(neighborNetResult, peptide)
 
@@ -43,7 +40,6 @@ neighborNetwork_Cluster_FeatureDF(neighborNetClusterResult,
 \item{neighborNetClusterResult}{The result returned from \code{neighborNetwork_Cluster_Batch}.}
 }
 \description{
-Neighbor network clustering analysis.
 \code{neighborNetwork_ConnectedSubGraph} and \code{neighborNetwork_ConnectedSubGraphDF} extract the minimum connected subgraph focusing on a target peptide.\cr
 \code{neighborNetwork_Cluster} and \code{neighborNetwork_Cluster_Batch} conduct a network clustering analysis using a walktrap algorithm.\cr
 \code{neighborNetwork_Cluster_FeatureDF} computes per-cluster and per-peptide features, including "escape potential".
