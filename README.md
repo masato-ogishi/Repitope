@@ -191,9 +191,8 @@ res_MHCI <- EpitopePrioritization(
   featureSet=MHCI_Human_MinimumFeatureSet,
   seedSet=1:5,
   coreN=parallel::detectCores(logical=F),        ## parallelization
-  tmpDir="./Path/To/Your/Temporary/Directory/"   ## where intermediate files are stored
+  outDir="./Output"  ## Intermediate and final output files will be stored under this directory
 )
-readr::write_csv(res_MHCI, "./Path/To/Your/Directory/MHCI/EpitopePrioritization_MHCI.csv")
 
 # Prioritization [MHC-II]
 res_MHCII <- EpitopePrioritization(
@@ -207,10 +206,9 @@ res_MHCII <- EpitopePrioritization(
   fragLibTypeSet="Weighted",
   featureSet=MHCII_Human_MinimumFeatureSet,
   seedSet=1:5,
-  coreN=parallel::detectCores(logical=F),        ## parallelization
-  tmpDir="./Path/To/Your/Temporary/Directory/"   ## where intermediate files are stored
+  coreN=parallel::detectCores(logical=F),
+  outDir="./Output"  ## Intermediate and final output files will be stored under this directory
 )
-readr::write_csv(res_MHCII, "./Path/To/Your/Directory/MHCII/EpitopePrioritization_MHCII.csv")
 ```
 
 Reference

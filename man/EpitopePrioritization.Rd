@@ -8,7 +8,7 @@ EpitopePrioritization(featureDF, metadataDF, peptideSet, fragLib,
   aaIndexIDSet = "all", fragLenSet = 3:8, fragDepth = 10000,
   fragLibType = "Weighted", featureSet = NULL, seedSet = 1:5,
   coreN = parallel::detectCores(logical = F),
-  tmpDir = file.path(tempdir(), "FeatureDF", format(Sys.time(),
+  outDir = paste0("./Output_", format(Sys.time(),
   "\%Y.\%m.\%d.\%H.\%M.\%S")))
 }
 \arguments{
@@ -34,7 +34,7 @@ EpitopePrioritization(featureDF, metadataDF, peptideSet, fragLib,
 
 \item{coreN}{The number of cores to be used for parallelization.}
 
-\item{tmpDir}{Destination directory to save intermediate files.}
+\item{outDir}{Destination directory to save the results.}
 }
 \description{
 Epitope prioritization based on immunogenicity scores and escape potentials.

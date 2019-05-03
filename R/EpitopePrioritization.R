@@ -11,7 +11,7 @@
 #' @param featureSet A minimum set of features. Combinations of fragment lengths and AAIndex IDs are internally extracted for calculating CPPs.
 #' @param seedSet A set of random seeds.
 #' @param coreN The number of cores to be used for parallelization.
-#' @param tmpDir Destination directory to save intermediate files.
+#' @param outDir Destination directory to save the results.
 #' @export
 #' @rdname EpitopePrioritization
 #' @name EpitopePrioritization
@@ -27,25 +27,36 @@ EpitopePrioritization <- function(
   featureSet=NULL,
   seedSet=1:5,
   coreN=parallel::detectCores(logical=F),
-  tmpDir=file.path(tempdir(), "FeatureDF", format(Sys.time(), "%Y.%m.%d.%H.%M.%S"))
+  outDir=paste0("./Output_", format(Sys.time(), "%Y.%m.%d.%H.%M.%S"))
 ){
+  ## Preparations before starting...
+  dir.create(file.path(outDir, "Temp"), showWarnings=F, recursive=T)
+  seed <- eval(parse(text=paste0(as.character(seedSet), collapse="")))
+  set.seed(seed)
+
   cat("#1. In silico mutagenesis.\n")
   peptideSet_ISM <- sort(InSilicoMutagenesis(unique(peptideSet))) ## including original peptides
 
   cat("#2. Feature computation.\n")
-  featureDT_ISM <- Features(
-    peptideSet=peptideSet_ISM,
-    fragLib=fragLib,
-    aaIndexIDSet=aaIndexIDSet,
-    fragLenSet=fragLenSet,
-    fragDepthSet=fragDepth,
-    fragLibTypeSet=fragLibType,
-    featureSet=featureSet,
-    seedSet=seedSet,
-    coreN=coreN,
-    tmpDir=tmpDir
-  )[[1]]
-  fst::write_fst(featureDT_ISM, file.path(tmpDir, "FeatureDF.fst"))
+  featureDT_ISM_Filename <- list.files(pattern="FeatureDF.fst", path=outDir, full.names=T)
+  if(length(featureDT_ISM_Filename)==1){
+    message(" - Skipping computation and importing the previously computed file.")
+    featureDT_ISM <- fst::read_fst(featureDT_ISM_Filename, as.data.table=T)
+  }else{
+    featureDT_ISM <- Features(
+      peptideSet=peptideSet_ISM,
+      fragLib=fragLib,
+      aaIndexIDSet=aaIndexIDSet,
+      fragLenSet=fragLenSet,
+      fragDepthSet=fragDepth,
+      fragLibTypeSet=fragLibType,
+      featureSet=featureSet,
+      seedSet=seedSet,
+      coreN=coreN,
+      tmpDir=file.path(outDir, "Temp")
+    )[[1]]
+    fst::write_fst(featureDT_ISM, file.path(outDir, "FeatureDF.fst"))
+  }
   gc();gc()
 
   cat("#3. Immunogenicity prediction.\n")
@@ -60,19 +71,18 @@ EpitopePrioritization <- function(
   )[[1]]
   scoreDT_ISM[Peptide %in% peptideSet_ISM, Peptide_Type:="InSilicoMutated"]
   scoreDT_ISM[Peptide %in% peptideSet, Peptide_Type:="Original"]
-  readr::write_csv(scoreDT_ISM, file.path(tmpDir, "ScoreDF.csv"))
+  readr::write_csv(scoreDT_ISM, file.path(outDir, "ScoreDF.csv"))
   gc();gc()
 
   cat("#4. Neighbor network analysis and escape potential prediction.\n")
-  seed <- eval(parse(text=paste0(as.character(seedSet), collapse="")))
   nnet_ISM <- neighborNetwork(scoreDT_ISM$"Peptide", scoreDT_ISM$"ImmunogenicityScore")
   nnet_ISM_cluster <- neighborNetwork_Cluster_Batch(nnet_ISM, scoreDT_ISM[,.(Peptide,ImmunogenicityScore)], seed=seed)
   nnet_ISM_cluster_featureDF <- neighborNetwork_Cluster_FeatureDF(nnet_ISM_cluster)
   nnet_ISM_cluster_featureDF[Peptide %in% peptideSet_ISM, Peptide_Type:="InSilicoMutated"]
   nnet_ISM_cluster_featureDF[Peptide %in% peptideSet, Peptide_Type:="Original"]
-  saveRDS(nnet_ISM, file.path(tmpDir, "NeighborNetwork.rds"))
-  saveRDS(nnet_ISM_cluster, file.path(tmpDir, "NeighborNetwork_Cluster.rds"))
-  readr::write_csv(nnet_ISM_cluster_featureDF, file.path(tmpDir, "NeighborNetwork_Cluster_FeatureDF.csv"))
+  saveRDS(nnet_ISM, file.path(outDir, "NeighborNetwork.rds"))
+  saveRDS(nnet_ISM_cluster, file.path(outDir, "NeighborNetwork_Cluster.rds"))
+  readr::write_csv(nnet_ISM_cluster_featureDF, file.path(outDir, "NeighborNetwork_Cluster_FeatureDF.csv"))
   gc();gc()
 
   cat("#5. Epitope prioritization.\n")
@@ -80,6 +90,6 @@ EpitopePrioritization <- function(
   summaryDT[,EscapePotential:=ImmunogenicityScore_Cluster_Diff_Min]
   summaryDT <- summaryDT[Peptide_Type=="Original", .(Peptide, ImmunogenicityScore, ImmunogenicityScore_Cluster_Average, EscapePotential)]
   data.table::setorder(summaryDT, -ImmunogenicityScore, -ImmunogenicityScore_Cluster_Average, EscapePotential)
-  readr::write_csv(summaryDT, "EpitopePrioritizationSummary.csv")
+  readr::write_csv(summaryDT, file.path(outDir, "EpitopePrioritizationSummary.csv"))
   return(summaryDT)
 }
