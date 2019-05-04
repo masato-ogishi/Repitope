@@ -149,7 +149,7 @@ Features_CPP <- function(
 
   # Fragment library for pairwise alignment
   if(is.character(fragLib)) fragLib <- fst::read_fst(fragLib, as.data.table=T)
-  condSet <- apply(data.table::CJ(fragLibType, fragLenSet, seedSet), 1, paste0, collapse="_")
+  condSet <- stringr::str_remove_all(apply(data.table::CJ(fragLibType, fragLenSet, seedSet), 1, paste0, collapse="_"), " ")
   fragLib_temp <- fragLib[,condSet,with=F]
   fragLib_temp <- fragLib_temp[1:fragDepth,]
   for(s in seedSet){

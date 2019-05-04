@@ -160,6 +160,7 @@
 #' @importFrom stringr fixed
 #' @importFrom stringr str_detect
 #' @importFrom stringr str_locate
+#' @importFrom stringr str_remove_all
 #' @importFrom stringr str_replace_all
 #' @importFrom stringr str_split
 #' @importFrom stringr str_sub
