@@ -7,7 +7,7 @@
 #' @param aaIndexIDSet A set of AAIndex IDs indicating the AACP scales to be used. Set "all" to shortcut the selection of all available AACP scales.
 #' @param fragLenSet A set of sliding window sizes.
 #' @param fragDepth A fragment library size. Must be an integer vector of length one.
-#' @param fragLibType A set of strings indicating the types of fragment libraries to be used. Must be a character vector of length one.
+#' @param fragLibType A string indicating the types of fragment libraries to be used. Must be a character vector of length one.
 #' @param featureSet A minimum set of features. Combinations of fragment lengths and AAIndex IDs are internally extracted for calculating CPPs.
 #' @param seedSet A set of random seeds.
 #' @param coreN The number of cores to be used for parallelization.
@@ -48,8 +48,8 @@ EpitopePrioritization <- function(
       fragLib=fragLib,
       aaIndexIDSet=aaIndexIDSet,
       fragLenSet=fragLenSet,
-      fragDepthSet=fragDepth,
-      fragLibTypeSet=fragLibType,
+      fragDepth=fragDepth,
+      fragLibType=fragLibType,
       featureSet=featureSet,
       seedSet=seedSet,
       coreN=coreN,
@@ -60,15 +60,13 @@ EpitopePrioritization <- function(
   gc();gc()
 
   cat("#3. Immunogenicity prediction.\n")
-  scoreDT_ISM <- Immunogenicity_Predict(
-    list(featureDT_ISM),
-    Immunogenicity_TrainModels(
-      featureDF=featureDF,
-      metadataDF=metadataDF,
-      featureSet=featureSet,
-      seedSet=seedSet
-    )
-  )[[1]]
+  ert <- Immunogenicity_TrainModels(
+    featureDF=featureDF,
+    metadataDF=metadataDF,
+    featureSet=featureSet,
+    seedSet=seedSet
+  )
+  scoreDT_ISM <- Immunogenicity_Predict(list(featureDT_ISM), ert)[[1]]
   scoreDT_ISM[Peptide %in% peptideSet_ISM, Peptide_Type:="InSilicoMutated"]
   scoreDT_ISM[Peptide %in% peptideSet, Peptide_Type:="Original"]
   readr::write_csv(scoreDT_ISM, file.path(outDir, "ScoreDF.csv"))

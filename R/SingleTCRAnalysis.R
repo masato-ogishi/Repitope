@@ -88,7 +88,7 @@ Features_sCPP <- function(
       aaIndexID <- paramDT$AAIndexID[j]
       aacpMat <- AACPMatrixList[[aaIndexID]]
       fragSet <- sequenceSlidingWindow(tcr, w=fragLen)
-      fragSet <- c(fragSet, Biostrings::reverse(fragSet))
+      fragSet <- c(fragSet, stringi::stri_reverse(fragSet))
       al <- Biostrings::pairwiseAlignment(
         subject=pept, pattern=fragSet,
         substitutionMatrix=aacpMat,

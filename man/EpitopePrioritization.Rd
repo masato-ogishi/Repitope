@@ -26,7 +26,7 @@ EpitopePrioritization(featureDF, metadataDF, peptideSet, fragLib,
 
 \item{fragDepth}{A fragment library size. Must be an integer vector of length one.}
 
-\item{fragLibType}{A set of strings indicating the types of fragment libraries to be used. Must be a character vector of length one.}
+\item{fragLibType}{A string indicating the types of fragment libraries to be used. Must be a character vector of length one.}
 
 \item{featureSet}{A minimum set of features. Combinations of fragment lengths and AAIndex IDs are internally extracted for calculating CPPs.}
 

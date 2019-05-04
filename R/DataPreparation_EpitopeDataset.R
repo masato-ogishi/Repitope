@@ -1,8 +1,8 @@
 #' Compile epitope datasets retrieved from IEDB and other sources.
 #'
-#' \code{Epitope_Import} imports IEDB and other epitope files. Contradicting annotations on immunogenicity are internally resolved. \cr
-#' \code{compressedToLongFormat} converts a compresed column into a long-format column. The compressed strings should be separated by "|".\cr
-#' \code{compressedToDummyDF} converts a compresed column into a dummy variable dataframe. The compressed strings should be separated by "|".\cr
+#' \code{Epitope_Import} imports IEDB and other epitope files. Contradicting annotations on immunogenicity are internally resolved.\cr
+#' \code{compressedToLongFormat} converts a dataframe with a compresed column in which items are concatenated with "|" into a long-format one.\cr
+#' \code{compressedToDummyDF} generates dummy variable columns from a compresed column in which items are concatenated with "|".\cr
 #'
 #' @param IEDBAssayFileName A set of T cell assay results obtained from IEDB.
 #' @param OtherFileNames Other epitope source files. Must contain a "Dataset" column indicating the data source.

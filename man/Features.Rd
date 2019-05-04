@@ -11,15 +11,15 @@ Features_PeptDesc(peptideSet, fragLenSet = 3:8, featureSet = NULL,
   coreN = parallel::detectCores(logical = F))
 
 Features_CPP(peptideSet, fragLib, aaIndexIDSet = "all",
-  fragLenSet = 3:8, fragDepthSet = 10000,
-  fragLibTypeSet = c("Deduplicated", "Weighted", "Mock"),
+  fragLenSet = 3:8, fragDepth = 10000,
+  fragLibType = c("Deduplicated", "Weighted", "Mock"),
   featureSet = NULL, seedSet = 1:5,
   coreN = parallel::detectCores(logical = F),
   tmpDir = file.path(tempdir(), "FeatureDF", format(Sys.time(),
   "\%Y.\%m.\%d.\%H.\%M.\%S")))
 
 Features(peptideSet, fragLib, aaIndexIDSet = "all", fragLenSet = 3:8,
-  fragDepthSet = 10000, fragLibTypeSet = c("Deduplicated", "Weighted",
+  fragDepth = 10000, fragLibType = c("Deduplicated", "Weighted",
   "Mock"), featureSet = NULL, seedSet = 1:5,
   coreN = parallel::detectCores(logical = F),
   tmpDir = file.path(tempdir(), "FeatureDF", format(Sys.time(),
@@ -38,9 +38,9 @@ Features(peptideSet, fragLib, aaIndexIDSet = "all", fragLenSet = 3:8,
 
 \item{aaIndexIDSet}{A set of AAIndex IDs indicating the AACP scales to be used. Set "all" to shortcut the selection of all available AACP scales.}
 
-\item{fragDepthSet}{A set of fragment library sizes.}
+\item{fragDepth}{A fragment library size. Must be an integer vector of length one.}
 
-\item{fragLibTypeSet}{A set of strings indicating the types of fragment libraries to be used.}
+\item{fragLibType}{A string indicating the types of fragment libraries to be used. Must be a character vector of length one.}
 
 \item{seedSet}{A set of random seeds.}
 

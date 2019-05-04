@@ -1,7 +1,7 @@
 #' Utility functions for sequence analysis.
 #'
 #' \code{sequenceFilter} filters amino acid sequences so that those containing non-standard letters are excluded.\cr
-#' \code{sequenceSlidingWindow} does a sliding window with a fixed window size.\cr
+#' \code{sequenceSlidingWindow} splits the input sequences in a sliding window basis with a fixed window size.\cr
 #' \code{InSilicoMutagenesis} generates single-aa-substituted sequences. Currently insertions and deletions are not supported.\cr
 #'
 #' @param sequenceSet A set of amino acid sequences.
@@ -24,8 +24,12 @@ sequenceFilter <- function(sequenceSet){
 #' @export
 #' @rdname Utility_Sequence
 #' @name Utility_Sequence
-sequenceSlidingWindow <- function(sequenceSet, windowSize){
-  f <- sapply(1:(max(nchar(sequenceSet), na.rm=T)-windowSize+1),
+sequenceSlidingWindow <- function(sequenceSet, windowSize=3){
+  if(min(nchar(sequenceSet))<windowSize){
+    warning("The windowSize parameter exceeds the minimum length of the input sequence! The parameter was adjusted.")
+    windowSize <- min(nchar(sequenceSet))
+  }
+  f <- sapply(1:(max(nchar(sequenceSet))-windowSize+1),
               function(i){stringr::str_sub(sequenceSet, i, i+windowSize-1)})
   f <- f[nchar(f)==windowSize]
   return(f)

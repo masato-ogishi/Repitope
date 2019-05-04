@@ -175,36 +175,23 @@ neighborNetwork_Cluster <- function(peptide, graph, metadataDF, seed=12345, plot
 #' @rdname NeighborNetwork_Clustering
 #' @name NeighborNetwork_Clustering
 neighborNetwork_Cluster_Batch <- function(neighborNetResult, metadataDF, seed=12345, coreN=parallel::detectCores(logical=F)){
-  cluster_single <- function(peptide, neighborNetResult, metadataDF, seed=12345){
-    graph <- Repitope::neighborNetwork_ConnectedSubGraph(neighborNetResult, peptide)
-    df_meta <- Repitope::neighborNetwork_Cluster(peptide, graph, metadataDF, seed, plot=F)
+  ## Extract peptide sequences
+  peptideSet <- igraph::V(neighborNetResult$"NeighborNetwork_DW")$"name"
+
+  ## Cluster analysis
+  message("Clustering neighbor network...")
+  cl <- parallel::makeCluster(coreN, type="PSOCK")
+  snow::clusterSetupRNGstream(cl, seed=rep(seed, 6))
+  doSNOW::registerDoSNOW(cl)
+  res <- foreach::foreach(pept=peptideSet, .inorder=F)%dopar%{
+    graph <- Repitope::neighborNetwork_ConnectedSubGraph(neighborNetResult, pept)
+    df_meta <- Repitope::neighborNetwork_Cluster(pept, graph, metadataDF, seed, plot=F)
     pos <- grep("Target", df_meta$"Target")
     clust <- df_meta$"ClusterID"[[pos]]
     score <- df_meta$"ImmunogenicityScore"[[pos]]
-    return(list("Peptide"=peptide, "Score"=score, "ClusterID"=clust, "SummaryDF"=df_meta))
+    list("Peptide"=pept, "Score"=score, "ClusterID"=clust, "SummaryDF"=df_meta)
   }
-  message("Clustering neighbor network...")
-  peptideSet <- igraph::V(neighborNetResult$"NeighborNetwork_DW")$"name"
-  if(!is.null(coreN)){
-    cl <- parallel::makeCluster(coreN, type="PSOCK")
-    parallel::clusterExport(cl=cl, varlist=c("cluster_single","neighborNetResult","peptideSet","metadataDF"), envir=environment())
-    snow::clusterSetupRNGstream(cl, seed=rep(seed, 6))
-    res <- pbapply::pblapply(
-      1:length(peptideSet),
-      function(i){
-        cluster_single(peptide=peptideSet[[i]], neighborNetResult=neighborNetResult, metadataDF=metadataDF, seed=seed)
-      },
-      cl=cl
-    )
-    parallel::stopCluster(cl)
-  }else{
-    res <- pbapply::pblapply(
-      1:length(peptideSet),
-      function(i){
-        cluster_single(peptide=peptideSet[[i]], neighborNetResult=neighborNetResult, metadataDF=metadataDF, seed=seed)
-      }
-    )
-  }
+  parallel::stopCluster(cl)
   gc();gc()
   return(res)
 }
@@ -213,13 +200,10 @@ neighborNetwork_Cluster_Batch <- function(neighborNetResult, metadataDF, seed=12
 #' @rdname NeighborNetwork_Clustering
 #' @name NeighborNetwork_Clustering
 neighborNetwork_Cluster_FeatureDF <- function(neighborNetClusterResult, coreN=parallel::detectCores(logical=F)){
-  if(!is.null(coreN)){
-    cl <- parallel::makeCluster(coreN, type="PSOCK")
-  }else{
-    cl <- NULL
-  }
   message("Computing cluster-based metrics...")
-  dt_feat <- pbapply::pblapply(1:length(neighborNetClusterResult), function(i){
+  cl <- parallel::makeCluster(coreN, type="PSOCK")
+  doSNOW::registerDoSNOW(cl)
+  dt_feat <- foreach::foreach(i=1:length(neighborNetClusterResult), .inorder=F, .packages=c("dplyr","data.table"))%dopar%{
     summaryDF <- neighborNetClusterResult[[i]][["SummaryDF"]]
     summaryDF <- dplyr::arrange(summaryDF, dplyr::desc(Target))
     dt <- data.table::as.data.table(summaryDF[1,])
@@ -232,10 +216,10 @@ neighborNetwork_Cluster_FeatureDF <- function(neighborNetClusterResult, coreN=pa
     dt[,ImmunogenicityScore_Cluster_Diff_Min:=ImmunogenicityScore_Cluster_Average - min(aveDF$"ImmunogenicityScore")]  ## Considered to be an "escape potential"
     dt[,ImmunogenicityScore_Diff_Max:=max(summaryDF$"ImmunogenicityScore") - ImmunogenicityScore]
     dt[,ImmunogenicityScore_Diff_Min:=ImmunogenicityScore - min(summaryDF$"ImmunogenicityScore")]
-    return(dt)
-  }, cl=cl) %>%
+    dt
+  } %>%
     data.table::rbindlist()
-  if(!is.null(coreN)) parallel::stopCluster(cl)
+  parallel::stopCluster(cl)
   gc();gc()
   return(dt_feat)
 }

@@ -9,7 +9,7 @@
 \usage{
 sequenceFilter(sequenceSet)
 
-sequenceSlidingWindow(sequenceSet, windowSize)
+sequenceSlidingWindow(sequenceSet, windowSize = 3)
 
 InSilicoMutagenesis(sequenceSet)
 }
@@ -20,6 +20,6 @@ InSilicoMutagenesis(sequenceSet)
 }
 \description{
 \code{sequenceFilter} filters amino acid sequences so that those containing non-standard letters are excluded.\cr
-\code{sequenceSlidingWindow} does a sliding window with a fixed window size.\cr
+\code{sequenceSlidingWindow} splits the input sequences in a sliding window basis with a fixed window size.\cr
 \code{InSilicoMutagenesis} generates single-aa-substituted sequences. Currently insertions and deletions are not supported.\cr
 }

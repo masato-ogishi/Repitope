@@ -60,6 +60,7 @@ Immunogenicity_TrainModels <- function(
       "pp_train"=pp_train, "ert"=ert, "predDT"=predDT
     ))
   }
+  message("Training extremely randomized tree models...")
   resList <- foreach::foreach(i=1:length(seedSet))%do%{
     cat("Random seed = ", seedSet[i], "\n", sep="")
     set.seed(seedSet[i])
@@ -72,6 +73,7 @@ Immunogenicity_TrainModels <- function(
 #' @rdname Immunogenicity
 #' @name Immunogenicity
 Immunogenicity_SummarizeInternalScores <- function(trainModelResults){
+  message("Extracting internally computed scores...")
   dt_score <- lapply(trainModelResults$"TrainModelResults", function(res){lapply(res, function(r){r$"predDT"})}) %>%
     purrr::flatten() %>%
     data.table::rbindlist()
@@ -133,6 +135,7 @@ Immunogenicity_Score_Cluster <- function(
 #' @rdname Immunogenicity
 #' @name Immunogenicity
 Immunogenicity_Predict <- function(externalFeatureDFList, trainModelResults){
+  message("Extrapolating trained models to external peptide sequences...")
   featureSet <- trainModelResults$"FeatureSet"
   pp_list <- purrr::flatten(
     lapply(trainModelResults$"TrainModelResults", function(res){lapply(res, function(r){r$"pp_train"})})
@@ -140,12 +143,11 @@ Immunogenicity_Predict <- function(externalFeatureDFList, trainModelResults){
   ert_list <- purrr::flatten(
     lapply(trainModelResults$"TrainModelResults", function(res){lapply(res, function(r){r$"ert"})})
   )
-  scoreDT_list <- foreach::foreach(i=1:length(externalFeatureDFList))%do%{
-    cat("Data set #", i, "\n", sep="")
+  scoreDT_list <- pbapply::pblapply(1:length(externalFeatureDFList), function(i){
     dt <- data.table::as.data.table(externalFeatureDFList[[i]])
     pept <- dt$"Peptide"
     dt_feat <- dt[, featureSet, with=F]
-    dt_score <- pbapply::pblapply(1:length(pp_list), function(j){
+    dt_score <- lapply(1:length(pp_list), function(j){
       data.table::data.table(
         "Peptide"=pept,
         "ImmunogenicityScore"=predict(ert_list[[j]], as.matrix(predict(pp_list[[j]], dt_feat)), probability=T)[,"Positive"]
@@ -158,7 +160,8 @@ Immunogenicity_Predict <- function(externalFeatureDFList, trainModelResults){
     dt_score <- dt_score[, c("Peptide", "ImmunogenicityScore", "ImmunogenicityScore.cv"), with=F]
     gc();gc()
     return(dt_score)
-  }
-  names(scoreDT_list) <- paste0("Score_", 1:length(externalFeatureDFList))
+  })
+  w <- floor(log10(length(externalFeatureDFList))) + 1
+  names(scoreDT_list) <- paste0("Score_", formatC(1:length(externalFeatureDFList), w=w, flag="0"))
   return(scoreDT_list)
 }

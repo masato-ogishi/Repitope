@@ -92,8 +92,8 @@ featureDFList_MHCI <- Features(
   fragLib="./Path/To/Your/Directory/FragmentLibrary.fst",
   aaIndexIDSet="all",
   fragLenSet=3:8,
-  fragDepthSet=10000,
-  fragLibTypeSet="Weighted",
+  fragDepth=10000,
+  fragLibType="Weighted",
   seedSet=1:5,                                   ## must be the same random seeds used for preparing the fragment library
   coreN=parallel::detectCores(logical=F),        ## parallelization
   tmpDir="./Path/To/Your/Temporary/Directory/"   ## where intermediate files are stored
@@ -106,8 +106,8 @@ featureDFList_MHCII <- Features(
   fragLib="./Path/To/Your/Directory/FragmentLibrary.fst",
   aaIndexIDSet="all",
   fragLenSet=3:11,
-  fragDepthSet=10000,
-  fragLibTypeSet="Weighted",
+  fragDepth=10000,
+  fragLibType="Weighted",
   seedSet=1:5,                                   ## must be the same seed set for the fragment library
   coreN=parallel::detectCores(logical=F),        ## parallelization
   tmpDir="./Path/To/Your/Temporary/Directory/"   ## where intermediate files are stored
@@ -186,11 +186,11 @@ res_MHCI <- EpitopePrioritization(
   fragLib=fragLibDT,
   aaIndexIDSet="all",
   fragLenSet=3:8,
-  fragDepthSet=10000,
-  fragLibTypeSet="Weighted",
+  fragDepth=10000,
+  fragLibType="Weighted",
   featureSet=MHCI_Human_MinimumFeatureSet,
   seedSet=1:5,
-  coreN=parallel::detectCores(logical=F),        ## parallelization
+  coreN=parallel::detectCores(logical=F),
   outDir="./Output"  ## Intermediate and final output files will be stored under this directory
 )
 
@@ -202,8 +202,8 @@ res_MHCII <- EpitopePrioritization(
   fragLib=fragLibDT,
   aaIndexIDSet="all",
   fragLenSet=3:11,
-  fragDepthSet=10000,
-  fragLibTypeSet="Weighted",
+  fragDepth=10000,
+  fragLibType="Weighted",
   featureSet=MHCII_Human_MinimumFeatureSet,
   seedSet=1:5,
   coreN=parallel::detectCores(logical=F),
