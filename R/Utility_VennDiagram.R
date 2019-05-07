@@ -1,4 +1,4 @@
-#' A utility function for creating a Venn diagram.
+#' Venn diagram.
 #'
 #' @param x A list of vectors (e.g., integers, chars), with each component corresponding to a separate circle in the Venn diagram. Currently, only a list of length one to five is supported.
 #' @param colors A set of colors for the venn diagram.

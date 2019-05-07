@@ -3,7 +3,7 @@
 \name{Utility_VennDiagram}
 \alias{Utility_VennDiagram}
 \alias{vennDiagram}
-\title{A utility function for creating a Venn diagram.}
+\title{Venn diagram.}
 \usage{
 vennDiagram(x, colors = (ggsci::pal_d3())(length(x)),
   show_category_names = T)
@@ -16,5 +16,5 @@ vennDiagram(x, colors = (ggsci::pal_d3())(length(x)),
 \item{show_category_names}{Logical. Whether the names of \code{x} should be printed?}
 }
 \description{
-A utility function for creating a Venn diagram.
+Venn diagram.
 }

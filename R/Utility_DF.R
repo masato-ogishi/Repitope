@@ -33,3 +33,4 @@ mutate_if_byrow <- function(df, .predictate, ...) {
   df[.predictate_lgl, ] <- df[.predictate_lgl, ] %>% dplyr::mutate(...)
   return(df)
 }
+

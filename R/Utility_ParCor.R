@@ -1,4 +1,4 @@
-#' Parallelized correlation matrix computation
+#' Parallelized correlation matrix computation.
 #'
 #' @param mat A matrix, a data.frame, or a data.table.
 #' @param nblocks The number of sub-matrices.

@@ -194,7 +194,9 @@ classifierDiagnosticPlots <- function(trueClass, predProb, groups=NA, colors=NA,
   if("PRC" %in% plotTypes) plotList$"PRC" <- prcPlot(trueClass, predProb, groups, colors)
   if("Calibration" %in% plotTypes) plotList$"Calibration" <- calibPlot(trueClass, predProb, groups, colors)
   if("CumGain" %in% plotTypes) plotList$"CumGain" <- cumGainPlot(trueClass, predProb, groups, colors)
-  ggpubr::ggarrange(plotlist=plotList, ncol=length(plotList), nrow=1)
+  plot_comb <- ggpubr::ggarrange(plotlist=plotList, ncol=length(plotList), nrow=1)
+  print(plot_comb)
+  plotList$"All" <- plot_comb
   return(plotList)
 }
 

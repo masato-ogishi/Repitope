@@ -34,6 +34,7 @@
 #' @importFrom data.table melt.data.table
 #' @importFrom data.table rbindlist
 #' @importFrom data.table setcolorder
+#' @importFrom data.table setkeyv
 #' @importFrom data.table setorder
 #' @importFrom data.table transpose
 #' @importFrom DescTools Sort

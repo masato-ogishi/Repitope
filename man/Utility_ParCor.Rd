@@ -3,7 +3,7 @@
 \name{Utility_ParCor}
 \alias{Utility_ParCor}
 \alias{parCor}
-\title{Parallelized correlation matrix computation}
+\title{Parallelized correlation matrix computation.}
 \usage{
 parCor(mat, nblocks = 10, coreN = parallel:::detectCores(logical = F))
 }
@@ -15,5 +15,5 @@ parCor(mat, nblocks = 10, coreN = parallel:::detectCores(logical = F))
 \item{coreN}{The number of threads for parallelization. Disable by setting \code{NULL}.}
 }
 \description{
-Parallelized correlation matrix computation
+Parallelized correlation matrix computation.
 }
