@@ -8,11 +8,22 @@
 #' @export
 #' @rdname Utility_Classifier
 #' @name Utility_Classifier
+compute_auc <- function(trueClass, predProb){
+  roc_obj <- pROC::roc(response=trueClass, predictor=predProb)
+  aucSet <- as.numeric(pROC::ci.auc(roc_obj, method="delong"))*100
+  aucSet <- aucSet[c(2,1,3)]
+  names(aucSet) <- c("AUC", "95%CI_Lo", "95%CI_Up")
+  return(aucSet)
+}
+
+#' @export
+#' @rdname Utility_Classifier
+#' @name Utility_Classifier
 rocPlot <- function(trueClass, predProb, groups=NA, colors=NA){
   ## Data
   dt <- data.table::data.table("Truth"=trueClass, "Probability"=predProb, "Group"=groups)
   lev <- levels(trueClass) ## c("Negative","Positive")
-
+  
   ## ROC
   roc_dt <- data.table::rbindlist(lapply(split(dt, by="Group"), function(d){
     pr_obj <- precrec::evalmod(scores=d$"Probability", labels=d$"Truth")
@@ -20,8 +31,8 @@ rocPlot <- function(trueClass, predProb, groups=NA, colors=NA){
     data.table::as.data.table(pr_obj$data)[,x:=x*100][,y:=y*100][,"Group":=unique(d$"Group")]
   }))
   auc_dt <- data.table::rbindlist(lapply(split(dt, by="Group"), function(d){
-    aucSet <- cvAUC::ci.cvAUC(predictions=d$"Probability", labels=d$"Truth")
-    data.table::data.table(Group=unique(d$"Group"), AUC=paste0("AUC: ", format(aucSet$cvAUC*100, digits=3), "% [", format(aucSet$ci[1]*100, digits=3), "%-", format(aucSet$ci[2]*100, digits=3),"%]"))
+    aucSet <- compute_auc(trueClass=d$"Truth", predProb=d$"Probability")
+    data.table::data.table(Group=unique(d$"Group"), AUC=paste0("AUC: ", format(aucSet["AUC"]*100, digits=3), "% [", format(aucSet["95%CI_Lo"]*100, digits=3), "%-", format(aucSet["95%CI_Up"]*100, digits=3),"%]"))
   }))
   data.table::setorder(auc_dt, "Group")
   if(identical(groups, NA)){
@@ -58,7 +69,7 @@ prcPlot <- function(trueClass, predProb, groups=NA, colors=NA){
   ## Data
   dt <- data.table::data.table("Truth"=trueClass, "Probability"=predProb, "Group"=groups)
   lev <- levels(trueClass) ## c("Negative","Positive")
-
+  
   ## Precision-recall curve
   prc_dt <- data.table::rbindlist(lapply(split(dt, by="Group"), function(d){
     pr_obj <- precrec::evalmod(scores=d$"Probability", labels=d$"Truth")
@@ -91,7 +102,7 @@ calibPlot <- function(trueClass, predProb, groups=NA, colors=NA){
   ## Data
   dt <- data.table::data.table("Truth"=trueClass, "Probability"=predProb, "Group"=groups)
   lev <- levels(trueClass) ## c("Negative","Positive")
-
+  
   ## Calibrarion chart
   format_calib_dt <- function(trueClass, predProb){
     bucket_array <- seq(0.0, 1.0, by=0.1)
@@ -135,7 +146,7 @@ cumGainPlot <- function(trueClass, predProb, groups=NA, colors=NA){
   dt <- data.table::data.table("Truth"=trueClass, "Probability"=predProb, "Group"=groups)
   lev <- levels(trueClass) ## c("Negative","Positive")
   dt$Truth <- factor(dt$Truth, levels=rev(lev)) ## necessary for caret::lift
-
+  
   ## Cumulative gain chart
   gain_dt <- data.table::rbindlist(lapply(split(dt, by="Group"), function(d){
     gain_obj <- caret::lift(Truth~Probability, data=d)
@@ -197,14 +208,4 @@ classifierDiagnosticPlots <- function(trueClass, predProb, groups=NA, colors=NA,
   plot_comb <- ggpubr::ggarrange(plotlist=plotList, ncol=length(plotList), nrow=1)
   print(plot_comb)
   return(plotList)
-}
-
-#' @export
-#' @rdname Utility_Classifier
-#' @name Utility_Classifier
-compute_auc <- function(trueClass, predProb){
-  aucSet <- cvAUC::ci.cvAUC(predictions=predProb, labels=trueClass)
-  aucSet <- c(aucSet$cvAUC*100, aucSet$ci[1]*100, aucSet$ci[2]*100)
-  names(aucSet) <- c("AUC", "95%CI_Lo", "95%CI_Up")
-  return(aucSet)
 }
