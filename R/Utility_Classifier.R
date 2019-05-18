@@ -32,7 +32,7 @@ rocPlot <- function(trueClass, predProb, groups=NA, colors=NA){
   }))
   auc_dt <- data.table::rbindlist(lapply(split(dt, by="Group"), function(d){
     aucSet <- compute_auc(trueClass=d$"Truth", predProb=d$"Probability")
-    data.table::data.table(Group=unique(d$"Group"), AUC=paste0("AUC: ", format(aucSet["AUC"]*100, digits=3), "% [", format(aucSet["95%CI_Lo"]*100, digits=3), "%-", format(aucSet["95%CI_Up"]*100, digits=3),"%]"))
+    data.table::data.table(Group=unique(d$"Group"), AUC=paste0("AUC: ", format(aucSet["AUC"], digits=3), "% [", format(aucSet["95%CI_Lo"], digits=3), "%-", format(aucSet["95%CI_Up"], digits=3),"%]"))
   }))
   data.table::setorder(auc_dt, "Group")
   if(identical(groups, NA)){
