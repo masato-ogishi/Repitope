@@ -6,16 +6,23 @@
 \title{Generate sequence fragment libraries.}
 \usage{
 CPP_FragmentLibrary(tcrSequenceSet, fragLenSet = 3:8,
-  fragDepth = 1e+05, seedSet = 1:5)
+  maxFragDepth = 1e+05, seedSet = 1:5,
+  coreN = parallel::detectCores(logical = F),
+  tmpDir = file.path(tempdir(), "FragLibDT", format(Sys.time(),
+  "\%Y.\%m.\%d.\%H.\%M.\%S")))
 }
 \arguments{
 \item{tcrSequenceSet}{A set of TCR CDR3B amino acid sequences.}
 
 \item{fragLenSet}{A set of sliding window sizes.}
 
-\item{fragDepth}{The depth of fragments used to compute repertoire-wide TCR-peptide contact potentials.}
+\item{maxFragDepth}{The maximum depth of fragments used to compute repertoire-wide TCR-peptide contact potentials.}
 
 \item{seedSet}{A set of random seeds.}
+
+\item{coreN}{The number of cores to be used for parallelization.}
+
+\item{tmpDir}{Destination directory to save intermediate files.}
 }
 \description{
 \code{CPP_FragmentLibrary} generates a formatted fragment library datatable.

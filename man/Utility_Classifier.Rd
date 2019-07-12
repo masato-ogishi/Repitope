@@ -2,14 +2,16 @@
 % Please edit documentation in R/Utility_Classifier.R
 \name{Utility_Classifier}
 \alias{Utility_Classifier}
+\alias{compute_auc}
 \alias{rocPlot}
 \alias{prcPlot}
 \alias{calibPlot}
 \alias{cumGainPlot}
 \alias{classifierDiagnosticPlots}
-\alias{compute_auc}
 \title{Utility functions for creating diagnostic plots for binary classifiers.}
 \usage{
+compute_auc(trueClass, predProb)
+
 rocPlot(trueClass, predProb, groups = NA, colors = NA)
 
 prcPlot(trueClass, predProb, groups = NA, colors = NA)
@@ -20,8 +22,6 @@ cumGainPlot(trueClass, predProb, groups = NA, colors = NA)
 
 classifierDiagnosticPlots(trueClass, predProb, groups = NA,
   colors = NA, plotTypes = c("ROC", "PRC", "Calibration", "CumGain"))
-
-compute_auc(trueClass, predProb)
 }
 \arguments{
 \item{trueClass}{A factor of true class labels.}
