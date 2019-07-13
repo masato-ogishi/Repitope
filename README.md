@@ -2,7 +2,8 @@ Repitope: Epitope immunogenicity prediction through in silico TCR-peptide contac
 ===============================================
 
 The 'Repitope' package provides a structured framework of quantitative prediction of immunogenicity and escape potential for a given set of peptides presented onto MHC class I and class II molecules by (approximately) simulating the TCR-peptide intermolecular interactions in silico.  
-Note: This is the original Repitope package repository in R. For Python scripts, see [Repitope-Python](https://github.com/masato-ogishi/Repitope-Python).
+Note: This is the original Repitope package repository in R. For Python scripts, see [Repitope-Python](https://github.com/masato-ogishi/Repitope-Python).  
+Note: As of July 12, 2019, the fragment library generation step was updated (Repitope v3.0.1). The updated fragment library, feature dataframes, and immunogenicity scores for human epitopes can be found at [Mendeley Data](https://data.mendeley.com/datasets/sydw5xnxpt/1). Users are advised to update the package etc accordingly.
 
 Concept
 ------------------------
@@ -84,7 +85,7 @@ fst::write_fst(fragLibDT, "./Path/To/Your/Directory/FragmentLibrary.fst", compre
 ```
 2. Features
 -  Features can be calculated as follows. Note: This computation is time-consuming and resource-intensive. Computation can be resumed if temporary files are stored in the temporary directory provided.  
--  You may find the pre-computed feature dataframes for the example datasets (i.e., human, rodents, and primates) in [Mendeley Data](https://data.mendeley.com/datasets/2hp96k6m2c/3). Note: these data must be downloaded with a good internet connection. Otherwise the downloaded files could be broken, and subsequent codes would not work properly. The expected file sizes are 1.3 and 2.6GB for MHC-I and MHC-II, respectively.
+
 ``` r
 # Features [MHC-I]
 featureDFList_MHCI <- Features(
