@@ -40,12 +40,12 @@ Features_Importance <- function(preprocessedDFList, featureN=100){
 
   # Importances
   message("Calculating feature importances...")
-  featureImportances <- pbapply::pblapply(taskSet, mlr::generateFilterValuesData, method="randomForestSRC.rfsrc")
+  featureImportances <- pbapply::pblapply(taskSet, mlr::generateFilterValuesData, method="randomForestSRC_importance")
   gc();gc()
   featureImportanceDFList <- lapply(1:length(preprocessedDFList), function(i){
     param <- names(preprocessedDFList)[i]
     imp <- featureImportances[[i]][["data"]] %>%
-      dplyr::transmute(FeatureID=name, Importance=scales::rescale(randomForestSRC.rfsrc, to=c(0,1)), Parameter=param) %>%
+      dplyr::transmute(FeatureID=name, Importance=scales::rescale(value, to=c(0,1)), Parameter=param) %>%
       DescTools::Sort(ord="Importance", decreasing=T)
     if(!is.null(featureN)){
       feat <- as.character(dplyr::slice(imp, seq(1, min(nrow(imp), featureN)))[["FeatureID"]])
