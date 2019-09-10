@@ -35,7 +35,7 @@ EpitopePrioritization <- function(
   set.seed(seed)
 
   cat("#1. In silico mutagenesis.\n")
-  peptideSet_ISM <- sort(InSilicoMutagenesis(unique(peptideSet))) ## including original peptides
+  peptideSet_ISM <- sort(InSilicoMutagenesis(unique(peptideSet), coreN)) ## including original peptides
 
   cat("#2. Feature computation.\n")
   featureDT_ISM_Filename <- list.files(pattern="FeatureDF.fst", path=outDir, full.names=T)

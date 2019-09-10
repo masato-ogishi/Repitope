@@ -38,8 +38,8 @@ sequenceSlidingWindow <- function(sequenceSet, windowSize=3){
 #' @export
 #' @rdname Utility_Sequence
 #' @name Utility_Sequence
-InSilicoMutagenesis <- function(sequenceSet){
-  coreN <- parallel::detectCores(logical=F)
+InSilicoMutagenesis <- function(sequenceSet, coreN=parallel::detectCores(logical=F)){
+  # coreN <- parallel::detectCores(logical=F)
   cl <- parallel::makeCluster(coreN, type="PSOCK")
   mut <- pbapply::pblapply(
     sequenceSet,
