@@ -173,5 +173,15 @@ Immunogenicity_Predict <- function(
   scoreDT_list <- split(scoreDT, by="Data", keep.by=F)
   w <- floor(log10(length(externalFeatureDFList))) + 1
   names(scoreDT_list) <- paste0("ScoreDT_", formatC(1:length(externalFeatureDFList), w=w, flag="0"))
+
+  ## warning if overlapping sets of peptides were used for both model training and score prediction
+  peptideSet_train <- unlist(
+    lapply(trainModelResults$"TrainModelResults", function(res){lapply(res, function(r){r$"predDT"$"Peptide"})})
+  )
+  peptideSet_external <- scoreDT$"Peptide"
+  if(length(intersect(peptideSet_train, peptideSet_external))>=1){
+    warning("We recommend predicting scores by extrapolation only for peptides that were not used for the model training phase. For the peptides used for model training, the Immunogenicity_Score function may be used instead.")
+  }
+
   return(scoreDT_list)
 }

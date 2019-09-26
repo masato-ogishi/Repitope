@@ -11,12 +11,15 @@ sequenceFilter(sequenceSet)
 
 sequenceSlidingWindow(sequenceSet, windowSize = 3)
 
-InSilicoMutagenesis(sequenceSet)
+InSilicoMutagenesis(sequenceSet, coreN = parallel::detectCores(logical =
+  F))
 }
 \arguments{
 \item{sequenceSet}{A set of amino acid sequences.}
 
 \item{windowSize}{A size of the sliding window.}
+
+\item{coreN}{The number of cores to be used for parallelization.}
 }
 \description{
 \code{sequenceFilter} filters amino acid sequences so that those containing non-standard letters are excluded.\cr

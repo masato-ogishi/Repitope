@@ -2,30 +2,22 @@
 % Please edit documentation in R/NeighborNetwork.R
 \name{NeighborNetwork}
 \alias{NeighborNetwork}
-\alias{distMat_Sbst}
-\alias{distMat_Indel}
 \alias{neighborNetwork}
 \title{Neighbor network analysis.}
 \usage{
-distMat_Sbst(peptideSet)
-
-distMat_Indel(longerPeptideSet, shorterPeptideSet)
-
-neighborNetwork(peptideSet, numSet = NULL, directed = T,
-  weighted = T)
+neighborNetwork(peptideSet, numSet = NULL, directed = F,
+  weighted = F, coreN = parallel::detectCores(logical = F))
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}
-
-\item{longerPeptideSet}{A set of peptide sequences. Should be one amino acid longer than \code{shorterPeptideSet}.}
-
-\item{shorterPeptideSet}{A set of peptide sequences. Should be one amino acid shorter than \code{longerPeptideSet}.}
 
 \item{numSet}{An attribute for the vertices.}
 
 \item{directed}{Should the network be converted from undirected to directed? Directions are determined using the \code{numSet} provided.}
 
 \item{weighted}{Should the network be converted to weihted? Edge weights are determined using the \code{numSet} provided.}
+
+\item{coreN}{The number of cores to be used for parallelization.}
 }
 \description{
 Neighbor network analysis.
