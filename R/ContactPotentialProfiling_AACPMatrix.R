@@ -19,21 +19,20 @@ CPP_AACPMatrix <- function(sourceFile=system.file("AACPMatrix.csv", package="Rep
     dplyr::mutate(AA.1=stringr::str_sub(AAPair, 1, 1), AA.2=stringr::str_sub(AAPair, 2, 2)) %>%
     dplyr::select(-AAPair) %>%
     tidyr::spread(AA.2, Value) %>%
-    tidyr::nest(-AAIndexID)
-  for(i in 1:nrow(AACP_DF)){
-    AACP_DF$data[[i]] <- AACP_DF$data[[i]] %>% dplyr::select(-AA.1)
-  }
+    dplyr::select(-AA.1)
   formatting <- function(aaIndexID, pairMatInverse=T){
-    pairMat <- dplyr::filter(AACP_DF, AAIndexID==aaIndexID)$data[[1]]
+    pairMat <- AACP_DF %>%
+      dplyr::filter(AAIndexID==aaIndexID) %>%
+      dplyr::select(-AAIndexID)
     pairMat <- as.matrix(pairMat)
     rownames(pairMat) <- colnames(pairMat)
     if(pairMatInverse){ pairMat <- -pairMat }
     pairMat <- scales::rescale(pairMat)
     return(pairMat)
   }
-  aaIndexIDSet <- c(AACP_DF$AAIndexID, paste0(AACP_DF$AAIndexID, "inv"))
-  AACP_DT <- c(lapply(AACP_DF$AAIndexID, function(a){formatting(a, pairMatInverse=F)}),
-               lapply(AACP_DF$AAIndexID, function(a){formatting(a, pairMatInverse=T)}))
+  aaIndexIDSet <- unique(c(AACP_DF$AAIndexID, paste0(AACP_DF$AAIndexID, "inv")))
+  AACP_DT <- c(lapply(unique(AACP_DF$AAIndexID), function(a){formatting(a, pairMatInverse=F)}),
+               lapply(unique(AACP_DF$AAIndexID), function(a){formatting(a, pairMatInverse=T)}))
   names(AACP_DT) <- aaIndexIDSet
   AACP_DT <- data.table::rbindlist(lapply(AACP_DT, as.data.frame))
   AACP_DT[["AAIndexID"]] <- unlist(lapply(aaIndexIDSet, function(id){rep(id, length(Biostrings::AA_STANDARD))}))
