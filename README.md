@@ -15,7 +15,6 @@ Installation
 Install the latest version as follows:
 ``` r
 if(!require(devtools)) install.packages("devtools")
-devtools::install_github("masato-ogishi/plotUtility")
 devtools::install_github("masato-ogishi/Repitope")
 ```
 -  You may be prompted to install some packages before installing Repitope. Follow the messages.  
