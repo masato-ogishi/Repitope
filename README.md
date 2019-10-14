@@ -17,8 +17,8 @@ Install the latest version as follows:
 if(!require(devtools)) install.packages("devtools")
 devtools::install_github("masato-ogishi/Repitope")
 ```
--  You may be prompted to install some packages before installing Repitope. Follow the messages.  
--  This package depends on some packages in the [*Bioconductor*](https://www.bioconductor.org/) (e.g., BioStrings) that cannot be automatically installed through devtools::install_github. Install packages manually as required.  
+-  You may be prompted to install some packages before installing Repitope. Follow the messages.
+-  This package depends on some packages in the [*Bioconductor*](https://www.bioconductor.org/) (e.g., BioStrings) that cannot be automatically installed through devtools::install_github. Install packages manually as required.
 -  You need an appropriate rJava setting beforehand.
 
 Usage
@@ -83,7 +83,7 @@ fragLibDT <- CPP_FragmentLibrary(TCRSet_Public, fragLenSet=3:11, maxFragDepth=10
 fst::write_fst(fragLibDT, "./Path/To/Your/Directory/FragmentLibrary.fst", compress=0)
 ```
 2. Features
--  Features can be calculated as follows. Note: This computation is time-consuming and resource-intensive. Computation can be resumed if temporary files are stored in the temporary directory provided.  
+-  Features can be calculated as follows. Note: This computation is time-consuming and resource-intensive. Computation can be resumed if temporary files are stored in the temporary directory provided.
 
 ``` r
 # Features [MHC-I]
@@ -143,7 +143,7 @@ minFeatureSet_MHCII_Human <- Features_MinimumFeatures(
 saveRDS(minFeatureSet_MHCII_Human, "./Path/To/Your/Directory/MHCII/MinimumFeatureSet_MHCII_Human.rds")
 ```
 3. Immunogenicity scores
--  Probability estimates from multiple extremely randomized trees (ERTs) are summrized into a single numerical scale, termed "immunogenicity score".  
+-  Probability estimates from multiple extremely randomized trees (ERTs) are summrized into a single numerical scale, termed "immunogenicity score".
 -  Prediction can be performed as follows.
 ``` r
 # Datasets
@@ -170,8 +170,9 @@ readr::write_csv(scoreDF_MHCII_Human, "./Path/To/Your/Directory/MHCII/ScoreDF_MH
 ```
 
 4. Epitope prioritization with immunogenicity scores and escape potentials
--  A straitforward wrapper function to compute the two metrics, immunogenicity score and escape potential, for a given set of peptides is provided.  
+-  An easy-to-use wrapper function to compute the two metrics, immunogenicity score and escape potential, for a given set of peptides is provided.
 -  Prediction can be performed as follows.
+-  Note: Users are advised to check whether the input peptide candidates are also included in the Repitope datasets. It is generally not recommended to predict the immunogenicity of the peptides used during internal model construction. Users may need to exclude those overlapping peptides either from model training or from prediction.
 ``` r
 # Datasets
 fragLibDT <- fst::read_fst("./Path/To/Your/Directory/FragmentLibrary.fst", as.data.table=T)
@@ -183,6 +184,7 @@ res_MHCI <- EpitopePrioritization(
   featureDF=featureDF_MHCI[Peptide%in%MHCI_Human$Peptide,], 
   metadataDF=MHCI_Human[,.(Peptide,Immunogenicity)],
   peptideSet=peptideSet_of_interest,
+  peptideLengthSet=8:11,
   fragLib=fragLibDT,
   aaIndexIDSet="all",
   fragLenSet=3:8,
@@ -199,6 +201,7 @@ res_MHCII <- EpitopePrioritization(
   featureDF=featureDF_MHCII[Peptide%in%MHCII_Human$Peptide,], 
   metadataDF=MHCII_Human[,.(Peptide,Immunogenicity)],
   peptideSet=peptideSet_of_interest,
+  peptideLengthSet=11:30,
   fragLib=fragLibDT,
   aaIndexIDSet="all",
   fragLenSet=3:11,

@@ -4,34 +4,42 @@
 #' \code{sequenceSlidingWindow} splits the input sequences in a sliding window basis with a fixed window size.\cr
 #' \code{InSilicoMutagenesis} generates single-aa-substituted sequences. Currently insertions and deletions are not supported.\cr
 #'
-#' @param sequenceSet A set of amino acid sequences.
+#' @param peptideSet A set of amino acid sequences.
+#' @param peptideLengthSet A set of allowed amino acid sequence lengths. Peptides not falling in this range will be discarded.
 #' @param windowSize A size of the sliding window.
 #' @param coreN The number of cores to be used for parallelization.
 #' @export
 #' @rdname Utility_Sequence
 #' @name Utility_Sequence
-sequenceFilter <- function(sequenceSet){
-  s <- sequenceSet[!is.na(sequenceSet)]
+sequenceFilter <- function(
+  peptideSet,
+  peptideLengthSet=8:11
+){
+  s <- peptideSet[!is.na(peptideSet)]
   s <- toupper(s)
   letters <- unique(unlist(stringr::str_split(s, "")))
   letters.exclude <- setdiff(letters, Biostrings::AA_STANDARD)
   for(l in letters.exclude){
     s <- s[!stringr::str_detect(s, stringr::fixed(l))]
   }
-  s <- s[nchar(s)>=8] ## minimum length
+  s <- s[nchar(s)>=min(peptideLengthSet)] ## minimum length
+  s <- s[nchar(s)<=max(peptideLengthSet)] ## maximum length
   return(s)
 }
 
 #' @export
 #' @rdname Utility_Sequence
 #' @name Utility_Sequence
-sequenceSlidingWindow <- function(sequenceSet, windowSize=3){
-  if(min(nchar(sequenceSet))<windowSize){
+sequenceSlidingWindow <- function(
+  peptideSet,
+  windowSize=3
+){
+  if(min(nchar(peptideSet))<windowSize){
     warning("The windowSize parameter exceeds the minimum length of the input sequence! The parameter was adjusted.")
-    windowSize <- min(nchar(sequenceSet))
+    windowSize <- min(nchar(peptideSet))
   }
-  f <- sapply(1:(max(nchar(sequenceSet))-windowSize+1),
-              function(i){stringr::str_sub(sequenceSet, i, i+windowSize-1)})
+  f <- sapply(1:(max(nchar(peptideSet))-windowSize+1),
+              function(i){stringr::str_sub(peptideSet, i, i+windowSize-1)})
   f <- f[nchar(f)==windowSize]
   return(f)
 }
@@ -39,12 +47,16 @@ sequenceSlidingWindow <- function(sequenceSet, windowSize=3){
 #' @export
 #' @rdname Utility_Sequence
 #' @name Utility_Sequence
-InSilicoMutagenesis <- function(sequenceSet, coreN=parallel::detectCores(logical=F)){
+InSilicoMutagenesis <- function(
+  peptideSet,
+  peptideLengthSet=8:11,
+  coreN=parallel::detectCores(logical=F)
+){
   cl <- parallel::makeCluster(coreN, type="PSOCK")
   doSNOW::registerDoSNOW(cl)
-  sequenceList <- split(sequenceSet, nchar(sequenceSet))
+  sequenceList <- split(peptideSet, nchar(peptideSet))
   cat("In silico substitutions...\n")
-  sequenceSet_sub <- foreach::foreach(i=1:length(sequenceList), .inorder=F)%dopar%{
+  peptideSet_sub <- foreach::foreach(i=1:length(sequenceList), .inorder=F)%dopar%{
     l <- nchar(sequenceList[[i]][1])
     apply(data.table::CJ(1:l, Biostrings::AA_STANDARD), 1,
           function(v){
@@ -54,7 +66,7 @@ InSilicoMutagenesis <- function(sequenceSet, coreN=parallel::detectCores(logical
           })
   }
   cat("In silico insertions...\n")
-  sequenceSet_ins <- foreach::foreach(i=1:(length(sequenceList)-1), .inorder=F)%dopar%{
+  peptideSet_ins <- foreach::foreach(i=1:length(sequenceList), .inorder=F)%dopar%{
     l <- nchar(sequenceList[[i]][1])
     apply(data.table::CJ(1:l, Biostrings::AA_STANDARD), 1,
           function(v){
@@ -64,7 +76,7 @@ InSilicoMutagenesis <- function(sequenceSet, coreN=parallel::detectCores(logical
           })
   }
   cat("In silico deletions...\n")
-  sequenceSet_del <- foreach::foreach(i=2:length(sequenceList), .inorder=F)%dopar%{
+  peptideSet_del <- foreach::foreach(i=1:length(sequenceList), .inorder=F)%dopar%{
     l <- nchar(sequenceList[[i]][1])
     lapply(1:l, function(p){
       s <- sequenceList[[i]]
@@ -75,7 +87,9 @@ InSilicoMutagenesis <- function(sequenceSet, coreN=parallel::detectCores(logical
   parallel::stopCluster(cl)
   gc();gc()
   cat("Merging...\n")
-  mut <- list(sequenceSet, sequenceSet_sub, sequenceSet_ins, sequenceSet_del)
+  mut <- list(peptideSet, peptideSet_sub, peptideSet_ins, peptideSet_del)
   mut <- sort(fastUnique(unlist(mut)))
+  mut <- mut[nchar(mut)>=min(peptideLengthSet)] ## minimum length
+  mut <- mut[nchar(mut)<=max(peptideLengthSet)] ## maximum length
   return(mut)
 }

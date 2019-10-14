@@ -7,15 +7,17 @@
 \alias{InSilicoMutagenesis}
 \title{Utility functions for sequence analysis.}
 \usage{
-sequenceFilter(sequenceSet)
+sequenceFilter(peptideSet, peptideLengthSet = 8:11)
 
-sequenceSlidingWindow(sequenceSet, windowSize = 3)
+sequenceSlidingWindow(peptideSet, windowSize = 3)
 
-InSilicoMutagenesis(sequenceSet, coreN = parallel::detectCores(logical =
-  F))
+InSilicoMutagenesis(peptideSet, peptideLengthSet = 8:11,
+  coreN = parallel::detectCores(logical = F))
 }
 \arguments{
-\item{sequenceSet}{A set of amino acid sequences.}
+\item{peptideSet}{A set of amino acid sequences.}
+
+\item{peptideLengthSet}{A set of allowed amino acid sequence lengths. Peptides not falling in this range will be discarded.}
 
 \item{windowSize}{A size of the sliding window.}
 
