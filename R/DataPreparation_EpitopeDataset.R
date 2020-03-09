@@ -48,7 +48,7 @@ Epitope_Import <- function(IEDBAssayFileName=NULL, OtherFileNames=NULL, peptideL
   }
   df <- suppressWarnings(suppressMessages(dplyr::bind_rows(df, df.others))) %>%
     dplyr::filter(nchar(Peptide) %in% peptideLengthSet) %>%   ## Length check.
-    dplyr::filter(Peptide %in% sequenceFilter(Peptide)) %>%   ## Sequences with non-standard characters were discarded.
+    dplyr::filter(Peptide %in% sequenceFilter(Peptide, peptideLengthSet=peptideLengthSet)) %>%   ## Sequences with non-standard characters were discarded.
     dplyr::mutate(Immunogenicity=factor(Immunogenicity, levels=c("Positive", "Negative"))) %>%
     dplyr::group_by(Peptide) %>%
     dplyr::summarise(

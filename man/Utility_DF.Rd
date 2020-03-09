@@ -6,8 +6,12 @@
 \alias{mutate_if_byrow}
 \title{Utility functions for data frames.}
 \usage{
-sortByMedian(df, groupColumnName = "FeatureID",
-  valueColumnName = "Importance", descending = F)
+sortByMedian(
+  df,
+  groupColumnName = "FeatureID",
+  valueColumnName = "Importance",
+  descending = F
+)
 
 mutate_if_byrow(df, .predictate, ...)
 }

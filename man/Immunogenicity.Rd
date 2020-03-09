@@ -9,17 +9,32 @@
 \alias{Immunogenicity_Predict}
 \title{Immunogenicity score.}
 \usage{
-Immunogenicity_TrainModels(featureDF, metadataDF, featureSet = "all",
-  seedSet = 1:5, coreN = parallel::detectCores(logical = F))
+Immunogenicity_TrainModels(
+  featureDF,
+  metadataDF,
+  featureSet = "all",
+  seedSet = 1:5,
+  coreN = parallel::detectCores(logical = F)
+)
 
 Immunogenicity_SummarizeInternalScores(trainModelResults)
 
-Immunogenicity_Score(featureDF, metadataDF, featureSet = "all",
-  seedSet = 1:5, coreN = parallel::detectCores(logical = F))
+Immunogenicity_Score(
+  featureDF,
+  metadataDF,
+  featureSet = "all",
+  seedSet = 1:5,
+  coreN = parallel::detectCores(logical = F)
+)
 
-Immunogenicity_Score_Cluster(featureDF, metadataDF, clusterDF,
-  featureSet = "all", seedSet = 1:5,
-  coreN = parallel::detectCores(logical = F))
+Immunogenicity_Score_Cluster(
+  featureDF,
+  metadataDF,
+  clusterDF,
+  featureSet = "all",
+  seedSet = 1:5,
+  coreN = parallel::detectCores(logical = F)
+)
 
 Immunogenicity_Predict(externalFeatureDFList, trainModelResults)
 }

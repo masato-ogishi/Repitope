@@ -5,11 +5,15 @@
 \alias{CPP_FragmentLibrary}
 \title{Generate sequence fragment libraries.}
 \usage{
-CPP_FragmentLibrary(tcrSequenceSet, fragLenSet = 3:8,
-  maxFragDepth = 1e+05, seedSet = 1:5,
+CPP_FragmentLibrary(
+  tcrSequenceSet,
+  fragLenSet = 3:8,
+  maxFragDepth = 1e+05,
+  seedSet = 1:5,
   coreN = parallel::detectCores(logical = F),
   tmpDir = file.path(tempdir(), "FragLibDT", format(Sys.time(),
-  "\%Y.\%m.\%d.\%H.\%M.\%S")))
+    "\%Y.\%m.\%d.\%H.\%M.\%S"))
+)
 }
 \arguments{
 \item{tcrSequenceSet}{A set of TCR CDR3B amino acid sequences.}

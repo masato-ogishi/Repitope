@@ -11,8 +11,11 @@ sequenceFilter(peptideSet, peptideLengthSet = 8:11)
 
 sequenceSlidingWindow(peptideSet, windowSize = 3)
 
-InSilicoMutagenesis(peptideSet, peptideLengthSet = 8:11,
-  coreN = parallel::detectCores(logical = F))
+InSilicoMutagenesis(
+  peptideSet,
+  peptideLengthSet = 8:11,
+  coreN = parallel::detectCores(logical = F)
+)
 }
 \arguments{
 \item{peptideSet}{A set of amino acid sequences.}

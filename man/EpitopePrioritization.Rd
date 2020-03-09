@@ -4,13 +4,21 @@
 \alias{EpitopePrioritization}
 \title{Epitope prioritization based on immunogenicity scores and escape potentials.}
 \usage{
-EpitopePrioritization(featureDF, metadataDF, peptideSet,
-  peptideLengthSet = 8:11, fragLib, aaIndexIDSet = "all",
-  fragLenSet = 3:8, fragDepth = 10000, fragLibType = "Weighted",
-  featureSet = NULL, seedSet = 1:5,
+EpitopePrioritization(
+  featureDF,
+  metadataDF,
+  peptideSet,
+  peptideLengthSet = 8:11,
+  fragLib,
+  aaIndexIDSet = "all",
+  fragLenSet = 3:8,
+  fragDepth = 10000,
+  fragLibType = "Weighted",
+  featureSet = NULL,
+  seedSet = 1:5,
   coreN = parallel::detectCores(logical = F),
-  outDir = paste0("./Output_", format(Sys.time(),
-  "\%Y.\%m.\%d.\%H.\%M.\%S")))
+  outDir = paste0("./Output_", format(Sys.time(), "\%Y.\%m.\%d.\%H.\%M.\%S"))
+)
 }
 \arguments{
 \item{featureDF}{A pre-computed feature dataframe for model construction.}

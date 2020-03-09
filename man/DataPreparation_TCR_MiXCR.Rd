@@ -6,11 +6,18 @@
 \alias{MiXCR_CombineClonotypes}
 \title{MiXCR workflow.}
 \usage{
-MiXCR_Script(dir = "C:/SRA/output", mixcrPath = "C:/MiXCR/",
-  javaMaxMemory = "6G")
+MiXCR_Script(
+  dir = "C:/SRA/output",
+  mixcrPath = "C:/MiXCR/",
+  javaMaxMemory = "6G"
+)
 
-MiXCR_CombineClonotypes(dirClones = NULL, clonesFileNames = NULL,
-  countSummarise = F, rdsFileName = NULL)
+MiXCR_CombineClonotypes(
+  dirClones = NULL,
+  clonesFileNames = NULL,
+  countSummarise = F,
+  rdsFileName = NULL
+)
 }
 \arguments{
 \item{dir}{A directory in which FASTQ files are stored.}

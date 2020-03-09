@@ -4,7 +4,6 @@
 \name{Repitope}
 \alias{Repitope}
 \alias{package-Repitope}
-\alias{Repitope-package}
 \title{Repitope: Epitope immunogenicity prediction via TCR-peptide contact potential profiling}
 \description{
 In silico screening of immunogenic epitopes among the vast amount of MHC-loaded peptides is a critical step toward effective precision immunotherapy. Although various sequence-based prediction models have been proposed, none of them has ever achieved meaningful accuracy and robustness. Here, we developped a framework that enables accurate classification of immunogenic epitopes and non-immunogenic MHC ligands.

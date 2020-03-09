@@ -1,7 +1,7 @@
 Package: Repitope
 Type: Package
 Title: Epitope immunogenicity prediction through in silico TCR-peptide contact potential profiling
-Version: 3.1.1.1
+Version: 3.1.2
 Author: Masato Ogishi
 Maintainer: Masato Ogishi <oogishi-tky@umin.ac.jp>
 Description: In silico screening of immunogenic epitopes among the vast amount of MHC-loaded peptides is a critical step toward effective precision immunotherapy.
@@ -11,7 +11,7 @@ Depends: R (>= 3.6.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Imports:
     BBmisc (>= 1.11),
     Biostrings (>= 2.52.0),

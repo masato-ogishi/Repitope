@@ -13,14 +13,19 @@ neighborNetwork_ConnectedSubGraphDF(neighborNetResult, peptide)
 
 neighborNetwork_ConnectedSubGraph(neighborNetResult, peptide)
 
-neighborNetwork_Cluster(peptide, graph, metadataDF, seed = 12345,
-  plot = T)
+neighborNetwork_Cluster(peptide, graph, metadataDF, seed = 12345, plot = T)
 
-neighborNetwork_Cluster_Batch(neighborNetResult, metadataDF,
-  seed = 12345, coreN = parallel::detectCores(logical = F))
+neighborNetwork_Cluster_Batch(
+  neighborNetResult,
+  metadataDF,
+  seed = 12345,
+  coreN = parallel::detectCores(logical = F)
+)
 
-neighborNetwork_Cluster_FeatureDF(neighborNetClusterResult,
-  coreN = parallel::detectCores(logical = F))
+neighborNetwork_Cluster_FeatureDF(
+  neighborNetClusterResult,
+  coreN = parallel::detectCores(logical = F)
+)
 }
 \arguments{
 \item{neighborNetResult}{The result returned from \code{neighborNetwork}.}

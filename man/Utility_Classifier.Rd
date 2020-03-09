@@ -20,8 +20,13 @@ calibPlot(trueClass, predProb, groups = NA, colors = NA)
 
 cumGainPlot(trueClass, predProb, groups = NA, colors = NA)
 
-classifierDiagnosticPlots(trueClass, predProb, groups = NA,
-  colors = NA, plotTypes = c("ROC", "PRC", "Calibration", "CumGain"))
+classifierDiagnosticPlots(
+  trueClass,
+  predProb,
+  groups = NA,
+  colors = NA,
+  plotTypes = c("ROC", "PRC", "Calibration", "CumGain")
+)
 }
 \arguments{
 \item{trueClass}{A factor of true class labels.}

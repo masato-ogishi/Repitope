@@ -7,8 +7,11 @@
 \alias{compressedToDummyDF}
 \title{Compile epitope datasets retrieved from IEDB and other sources.}
 \usage{
-Epitope_Import(IEDBAssayFileName = NULL, OtherFileNames = NULL,
-  peptideLengthSet = 8:11)
+Epitope_Import(
+  IEDBAssayFileName = NULL,
+  OtherFileNames = NULL,
+  peptideLengthSet = 8:11
+)
 
 compressedToLongFormat(df, compressedColumnName)
 

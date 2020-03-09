@@ -7,8 +7,7 @@
 \alias{NetMHC_Import}
 \title{Utility functions for NetMHC.}
 \usage{
-NetMHC_PeptideExport(peptideSet, outDir = "./NetMHC/",
-  maxPeptides = NULL)
+NetMHC_PeptideExport(peptideSet, outDir = "./NetMHC/", maxPeptides = NULL)
 
 NetMHC_Script(outDir = "./NetMHC/")
 

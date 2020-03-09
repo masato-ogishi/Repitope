@@ -5,8 +5,9 @@
 \alias{CPP_AACPMatrix}
 \title{Amino acid pairwise contact potential (AACP) matrix.}
 \usage{
-CPP_AACPMatrix(sourceFile = system.file("AACPMatrix.csv", package =
-  "Repitope"))
+CPP_AACPMatrix(
+  sourceFile = system.file("AACPMatrix.csv", package = "Repitope")
+)
 }
 \arguments{
 \item{sourceFile}{A source file. By default, the AACP dataset downloaded from the official AAIndex database will be used. Alternatively, users can provide modified AACP scales.}

@@ -7,23 +7,40 @@
 \alias{Features}
 \title{Feature computation.}
 \usage{
-Features_PeptDesc(peptideSet, fragLenSet = 3:8, featureSet = NULL,
-  coreN = parallel::detectCores(logical = F))
+Features_PeptDesc(
+  peptideSet,
+  fragLenSet = 3:8,
+  featureSet = NULL,
+  coreN = parallel::detectCores(logical = F)
+)
 
-Features_CPP(peptideSet, fragLib, aaIndexIDSet = "all",
-  fragLenSet = 3:8, fragDepth = 10000,
+Features_CPP(
+  peptideSet,
+  fragLib,
+  aaIndexIDSet = "all",
+  fragLenSet = 3:8,
+  fragDepth = 10000,
   fragLibType = c("Deduplicated", "Weighted", "Mock"),
-  featureSet = NULL, seedSet = 1:5,
+  featureSet = NULL,
+  seedSet = 1:5,
   coreN = parallel::detectCores(logical = F),
   tmpDir = file.path(tempdir(), "FeatureDF", format(Sys.time(),
-  "\%Y.\%m.\%d.\%H.\%M.\%S")))
+    "\%Y.\%m.\%d.\%H.\%M.\%S"))
+)
 
-Features(peptideSet, fragLib, aaIndexIDSet = "all", fragLenSet = 3:8,
-  fragDepth = 10000, fragLibType = c("Deduplicated", "Weighted",
-  "Mock"), featureSet = NULL, seedSet = 1:5,
+Features(
+  peptideSet,
+  fragLib,
+  aaIndexIDSet = "all",
+  fragLenSet = 3:8,
+  fragDepth = 10000,
+  fragLibType = c("Deduplicated", "Weighted", "Mock"),
+  featureSet = NULL,
+  seedSet = 1:5,
   coreN = parallel::detectCores(logical = F),
   tmpDir = file.path(tempdir(), "FeatureDF", format(Sys.time(),
-  "\%Y.\%m.\%d.\%H.\%M.\%S")))
+    "\%Y.\%m.\%d.\%H.\%M.\%S"))
+)
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}

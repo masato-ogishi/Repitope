@@ -5,8 +5,7 @@
 \alias{vennDiagram}
 \title{Venn diagram.}
 \usage{
-vennDiagram(x, colors = (ggsci::pal_d3())(length(x)),
-  show_category_names = T)
+vennDiagram(x, colors = (ggsci::pal_d3())(length(x)), show_category_names = T)
 }
 \arguments{
 \item{x}{A list of vectors (e.g., integers, chars), with each component corresponding to a separate circle in the Venn diagram. Currently, only a list of length one to five is supported.}

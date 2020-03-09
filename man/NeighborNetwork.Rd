@@ -5,8 +5,13 @@
 \alias{neighborNetwork}
 \title{Neighbor network analysis.}
 \usage{
-neighborNetwork(peptideSet, numSet = NULL, directed = F,
-  weighted = F, coreN = parallel::detectCores(logical = F))
+neighborNetwork(
+  peptideSet,
+  numSet = NULL,
+  directed = F,
+  weighted = F,
+  coreN = parallel::detectCores(logical = F)
+)
 }
 \arguments{
 \item{peptideSet}{A set of peptide sequences.}

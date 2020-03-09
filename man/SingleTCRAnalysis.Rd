@@ -12,25 +12,40 @@
 \usage{
 contactFootprintDensityPlot(weightStringSet)
 
-Features_sCPP(peptideSet, tcrSet, aaIndexIDSet = c("BETM990101inv",
-  "KESO980102inv", "KOLA930101", "MICC010101", "SIMK990104", "VENM980101",
-  "VENM980101inv"), fragLenSet = 3:8, seed = 12345,
-  coreN = parallel::detectCores(logical = F))
+Features_sCPP(
+  peptideSet,
+  tcrSet,
+  aaIndexIDSet = c("BETM990101inv", "KESO980102inv", "KOLA930101", "MICC010101",
+    "SIMK990104", "VENM980101", "VENM980101inv"),
+  fragLenSet = 3:8,
+  seed = 12345,
+  coreN = parallel::detectCores(logical = F)
+)
 
-univariateCorrelationAnalysis(dt_deltaG_sCPP,
-  coreN = parallel::detectCores(logical = F))
+univariateCorrelationAnalysis(
+  dt_deltaG_sCPP,
+  coreN = parallel::detectCores(logical = F)
+)
 
-univariateCorrelationPlot(dt_deltaG_sCPP, dt_deltaG_sCPP_outlier = NULL,
-  corVarName = "sCPP_BETM990101inv_Skew_4")
+univariateCorrelationPlot(
+  dt_deltaG_sCPP,
+  dt_deltaG_sCPP_outlier = NULL,
+  corVarName = "sCPP_BETM990101inv_Skew_4"
+)
 
-univariateFeatureSelect(dt_univ, aaIndexIDSet, sig = 0.05,
-  bestOnly = T)
+univariateFeatureSelect(dt_univ, aaIndexIDSet, sig = 0.05, bestOnly = T)
 
-multivariateRegressionPlot(dt_deltaG_sCPP, dt_deltaG_sCPP_outlier = NULL,
-  corVarNames)
+multivariateRegressionPlot(
+  dt_deltaG_sCPP,
+  dt_deltaG_sCPP_outlier = NULL,
+  corVarNames
+)
 
-multivariateRegressionPrediction(dt_deltaG_sCPP,
-  dt_deltaG_sCPP_new = NULL, corVarNames)
+multivariateRegressionPrediction(
+  dt_deltaG_sCPP,
+  dt_deltaG_sCPP_new = NULL,
+  corVarNames
+)
 }
 \arguments{
 \item{weightStringSet}{A set of contact weights. E.g. "1|2|3|2|1"}
