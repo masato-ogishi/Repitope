@@ -24,6 +24,15 @@ Immunogenicity_TrainModels <- function(
   seedSet=1:5,
   coreN=parallel::detectCores(logical=F)
 ){
+  # Input check
+  if(is.list(featureSet)){
+    if("MinimumFeatureSet" %in% names(featureSet)){
+      featureSet <- featureSet$"MinimumFeatureSet"
+    }else{
+      stop("featureSet should be either \"all\" or a character vectory specifying the column names of the input featureDF.")
+    }
+  }
+
   # A combined feature dataframe
   dt <- merge(data.table::as.data.table(metadataDF), data.table::as.data.table(featureDF), by="Peptide")
   if(identical(featureSet, "all")){
