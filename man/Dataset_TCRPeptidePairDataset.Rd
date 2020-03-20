@@ -5,7 +5,9 @@
 \alias{Dataset_TCRPeptidePairDataset}
 \alias{TCRPeptidePairDataset}
 \title{A compiled dataset of human TCR-peptide pairs.}
-\format{data.table}
+\format{
+data.table
+}
 \usage{
 TCRPeptidePairDataset
 }

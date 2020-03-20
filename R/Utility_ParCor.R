@@ -59,6 +59,11 @@ parCor <- function(mat, nblocks=10, coreN=parallel:::detectCores(logical=F)){
   P <- setdiff(1:ncol(x), grep("^DUMMY_", colnames(x)))
   corMAT <- corMAT[P,P]
 
+  ## Replace diagonal NA to one
+  for(i in 1:nrow(corMAT)){
+    corMAT[i,i] <- 1
+  }
+
   ## Finish
   rm(list=setdiff(ls(), c("corMAT")))
   gc();gc()

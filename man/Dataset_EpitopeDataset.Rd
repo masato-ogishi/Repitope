@@ -13,7 +13,23 @@
 \alias{MHCI_Human_MinimumFeatureSet}
 \alias{MHCII_Human_MinimumFeatureSet}
 \title{Compiled datasets of MHC class I and class II epitopes and ligands.}
-\format{data.table}
+\format{
+data.table
+
+An object of class \code{data.table} (inherits from \code{data.frame}) with 8756 rows and 9 columns.
+
+An object of class \code{data.table} (inherits from \code{data.frame}) with 411 rows and 9 columns.
+
+An object of class \code{data.table} (inherits from \code{data.frame}) with 31693 rows and 9 columns.
+
+An object of class \code{data.table} (inherits from \code{data.frame}) with 8445 rows and 9 columns.
+
+An object of class \code{data.table} (inherits from \code{data.frame}) with 76 rows and 9 columns.
+
+Character vectors containing 32 and 27 feature names for HLA-I and HLA-II, respectively.
+
+An object of class \code{character} of length 27.
+}
 \usage{
 MHCI_Human
 

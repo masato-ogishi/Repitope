@@ -5,7 +5,9 @@
 \alias{Dataset_TCRDatasets}
 \alias{TCRSet_Public}
 \title{A compiled dataset of human TCR beta CDR3 sequences}
-\format{A character vector containing 191,326 sequences.}
+\format{
+A character vector containing 191,326 sequences.
+}
 \usage{
 TCRSet_Public
 }
