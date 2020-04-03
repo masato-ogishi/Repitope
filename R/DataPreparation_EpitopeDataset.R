@@ -63,10 +63,10 @@ Epitope_Import <- function(IEDBAssayFileName=NULL, OtherFileNames=NULL, peptideL
 
   resolveImmunogenicityContradiction <- function(df){
     df <- df %>%
-      dplyr::mutate(ImmunogenicityContradiction=stringr::str_detect(Immunogenicity, stringr::fixed("Positive|Negative")))
+      dplyr::mutate(ImmunogenicityContradiction=factor(stringr::str_detect(Immunogenicity, stringr::fixed("Positive|Negative")), levels=c(T,F)))
 
     cont <- table(df$"ImmunogenicityContradiction")
-    cat(cont[[2]], "/", nrow(df), " (", scales::percent(cont[[2]]/nrow(df)), ") peptides have contradicting annotations regarding immunogenicity.\n", sep="")
+    cat(cont[["TRUE"]], "/", nrow(df), " (", scales::percent(cont[["TRUE"]]/nrow(df)), ") peptides have contradicting annotations regarding immunogenicity.\n", sep="")
 
     df <- df %>%
       dplyr::transmute(
@@ -83,7 +83,7 @@ Epitope_Import <- function(IEDBAssayFileName=NULL, OtherFileNames=NULL, peptideL
       dplyr::mutate(Immunogenicity=factor(Immunogenicity, levels=c("Positive", "Negative")))
 
     imm <- table(df$"Immunogenicity")
-    cat(imm[[1]], "/", nrow(df), " (", scales::percent(imm[[1]]/nrow(df)), ") peptides are considered immunogenic.\n", sep="")
+    cat(imm[["Positive"]], "/", nrow(df), " (", scales::percent(imm[["Positive"]]/nrow(df)), ") peptides are considered immunogenic.\n", sep="")
 
     return(df)
   }
