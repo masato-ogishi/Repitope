@@ -9,7 +9,9 @@
 MiXCR_Script(
   dir = "C:/SRA/output",
   mixcrPath = "C:/MiXCR/",
-  javaMaxMemory = "6G"
+  javaMaxMemory = "60G",
+  rnaseq = F,
+  species = "hsa"
 )
 
 MiXCR_CombineClonotypes(
@@ -25,6 +27,10 @@ MiXCR_CombineClonotypes(
 \item{mixcrPath}{A path to MiXCR JAR file.}
 
 \item{javaMaxMemory}{A maximum memory size allocated to the Java virtual machine.}
+
+\item{rnaseq}{Logical. Specifies if the analysis takes RNASeq datasets.}
+
+\item{species}{A character string. "hsa" or "mmu".}
 
 \item{dirClones}{A directory in which MiXCR clonotype TXT files are stored.}
 
