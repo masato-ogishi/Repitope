@@ -24,7 +24,7 @@ MiXCR_Script <- function(
 ){
   # MiXCR script template [type 1: single-end, type 2: paired-end]
   mixcrJarPath <- normalizePath(file.path(mixcrPath, "mixcr.jar"))
-  template <- function(accessionNumber, type, rnaseq=rnaseq){
+  template <- function(accessionNumber, type, rnaseq){
     outDir <- suppressWarnings(normalizePath(file.path(dir, accessionNumber)))
     if(rnaseq==F){
       if(type==1){
@@ -83,7 +83,7 @@ MiXCR_Script <- function(
       as.data.frame() %>%
       dplyr::group_by(V1) %>%
       dplyr::summarise(Count=dplyr::n())
-    mixcr.script <- paste0(mapply(template, d1$V1, d1$Count), collapse="\n")
+    mixcr.script <- paste0(mapply(template, d1$V1, d1$Count, MoreArgs=list(rnaseq=rnaseq)), collapse="\n")
     write.table(mixcr.script, file.path(dir, "MiXCR_script.txt"), row.names=F, col.names=F, quote=F)
   }else{
     message("No FastQ files.")
@@ -101,7 +101,7 @@ MiXCR_Script <- function(
     d3 <- d1 %>%
       dplyr::filter(V1 %in% setdiff(d1$V1, d2$V1))
     if(purrr::is_empty(d3)){message("No MiXCR analysis remaining to be done.")}
-    mixcr.script.rem <- paste0(mapply(template, d3$V1, d3$Count), collapse="\n")
+    mixcr.script.rem <- paste0(mapply(template, d3$V1, d3$Count, MoreArgs=list(rnaseq=rnaseq)), collapse="\n")
     write.table(mixcr.script.rem, file.path(dir, "MiXCR_script_remaining.txt"), row.names=F, col.names=F, quote=F)
   }else{
     message("No existing MiXCR folders detected.")
