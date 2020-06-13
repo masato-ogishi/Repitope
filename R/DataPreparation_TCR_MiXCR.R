@@ -51,7 +51,7 @@ MiXCR_Script <- function(
       if(type==1){
         s <- paste0(c(
           paste0("mkdir ", outDir),
-          paste0("java -jar -Xmx", javaMaxMemory, " ", mixcrJarPath, " align -p rna-seq -s ", species, " -r ", outDir, "\\log.txt ", outDir, "_pass.fastq.gz ", outDir, "\\alignments.vdjca"),
+          paste0("java -jar -Xmx", javaMaxMemory, " ", mixcrJarPath, " align -p rna-seq -OallowPartialAlignments=true -s ", species, " -r ", outDir, "\\log.txt ", outDir, "_pass.fastq.gz ", outDir, "\\alignments.vdjca"),
           paste0("java -jar -Xmx", javaMaxMemory, " ", mixcrJarPath, " assemblePartial -r ", outDir, "\\log.txt ", outDir, "\\alignments.vdjca ", outDir, "\\alignments_rescued_1.vdjca"),
           paste0("java -jar -Xmx", javaMaxMemory, " ", mixcrJarPath, " assemblePartial -r ", outDir, "\\log.txt ", outDir, "\\alignments_rescued_1.vdjca ", outDir, "\\alignments_rescued_2.vdjca"),
           paste0("java -jar -Xmx", javaMaxMemory, " ", mixcrJarPath, " extend -r ", outDir, "\\log.txt ", outDir, "\\alignments_rescued_2.vdjca ", outDir, "\\alignments_extended.vdjca"),
@@ -63,7 +63,7 @@ MiXCR_Script <- function(
       if(type==2){
         s <- paste0(c(
           paste0("mkdir ", outDir),
-          paste0("java -jar -Xmx", javaMaxMemory, " ", mixcrJarPath, " align -p rna-seq -s ", species, " -r ", outDir, "\\log.txt ", outDir, "_pass_1.fastq.gz ", outDir, "_pass_2.fastq.gz ", outDir, "\\alignments.vdjca"),
+          paste0("java -jar -Xmx", javaMaxMemory, " ", mixcrJarPath, " align -p rna-seq -OallowPartialAlignments=true -s ", species, " -r ", outDir, "\\log.txt ", outDir, "_pass_1.fastq.gz ", outDir, "_pass_2.fastq.gz ", outDir, "\\alignments.vdjca"),
           paste0("java -jar -Xmx", javaMaxMemory, " ", mixcrJarPath, " assemblePartial -r ", outDir, "\\log.txt ", outDir, "\\alignments.vdjca ", outDir, "\\alignments_rescued_1.vdjca"),
           paste0("java -jar -Xmx", javaMaxMemory, " ", mixcrJarPath, " assemblePartial -r ", outDir, "\\log.txt ", outDir, "\\alignments_rescued_1.vdjca ", outDir, "\\alignments_rescued_2.vdjca"),
           paste0("java -jar -Xmx", javaMaxMemory, " ", mixcrJarPath, " extend -r ", outDir, "\\log.txt ", outDir, "\\alignments_rescued_2.vdjca ", outDir, "\\alignments_extended.vdjca"),
