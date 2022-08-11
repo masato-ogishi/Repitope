@@ -18,13 +18,13 @@ Epitope_Import <- function(IEDBAssayFileName=NULL, OtherFileNames=NULL, peptideL
     df <- suppressWarnings(suppressMessages(readr::read_csv(IEDBAssayFileName, skip=1))) %>%
       magrittr::set_colnames(stringr::str_replace_all(colnames(.), " ", "")) %>%
       dplyr::transmute(
-        Peptide=Description,
+        Peptide=Description...12,
         Immunogenicity=factor(ifelse(stringr::str_detect(QualitativeMeasure, "Positive"), "Positive", "Negative"), levels=c("Positive", "Negative")),
         ImmunogenicityEvidence=AssayGroup,
         MHC=AlleleName,
         MHCEvidence=AlleleEvidenceCode,
         Host=Name,
-        Organism=ImmunogenOrganismSpecies,
+        Organism=ImmunogenOrganismSpecies...50,
         Dataset="IEDB"
       ) %>%
       dplyr::filter(ImmunogenicityEvidence %in% immEvi)
