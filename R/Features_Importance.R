@@ -40,7 +40,7 @@ Features_Importance <- function(preprocessedDFList, featureN=100){
 
   # Importances
   message("Calculating feature importances...")
-  featureImportances <- pbapply::pblapply(taskSet, mlr::generateFilterValuesData, method="randomForestSRC_importance")
+  featureImportances <- pbapply::pblapply(taskSet, mlr::generateFilterValuesData, method="randomForest_importance")
   gc();gc()
   featureImportanceDFList <- lapply(1:length(preprocessedDFList), function(i){
     param <- names(preprocessedDFList)[i]
