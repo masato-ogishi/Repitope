@@ -1,0 +1,18 @@
+Bootstrap: docker
+From: insilico/repitope:latest
+Stage: build
+
+%files
+    # download Repitope_Performance_Check_Data from https://data.mendeley.com/datasets/sydw5xnxpt/1
+    Repitope_Performance_Check_Data/ /opt
+
+%post
+    # update Repitope to Repitope_3.1.7.tar.gz
+    Rscript -e 'install.packages("pROC")'
+    Rscript -e 'if(!require(devtools)) install.packages("devtools")'
+    Rscript -e 'devtools::install_github("masato-ogishi/Repitope", dependencies="No")'
+
+%labels
+    Author biolxy@aliyun.com
+
+# singularity  build --fakeroot insilico_Repitope_3.1.7.sif singularity.def
